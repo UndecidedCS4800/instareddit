@@ -16,7 +16,7 @@ services:
       - instareddit-network
   backend:
     build: backend
-    command: python instareddit/manage.py runserver 0.0.0.0:8000
+    command: python instareddit/instareddit/manage.py runserver 0.0.0.0:8000
     ports:
       - 8000:8000
     environment:
