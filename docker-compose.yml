@@ -16,13 +16,14 @@ services:
       - instareddit-network
   backend:
     build: backend
-    command: python instareddit/instareddit/manage.py runserver 0.0.0.0:8000
+    command: python instareddit/manage.py runserver 0.0.0.0:8000 
     ports:
       - 8000:8000
     environment:
       PORT: "8000"
+      DJANGO_DEBUG: "TRUE"
     volumes:
-        - ./backend:/usr/src/app/instareddit
+        - ./backend:/usr/src/app
     networks:
       - instareddit-network
     depends_on:

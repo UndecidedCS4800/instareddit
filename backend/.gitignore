@@ -1,0 +1,4 @@
+instareddit/dist
+instareddit/instareddit/__pycache__
+instareddit/instareddit/__pycache__/*
+instareddit/staticfiles
