@@ -16,12 +16,12 @@ services:
       - instareddit-network
   backend:
     build: backend
-    command: python instareddit/manage.py runserver 0.0.0.0:8000 
+    command: "python -m gunicorn --chdir instareddit/ instareddit.asgi:application -k uvicorn.workers.UvicornWorker"
     ports:
       - 8000:8000
     environment:
       PORT: "8000"
-      DJANGO_DEBUG: "FALSE"
+      RENDER: "TRUE"
     volumes:
         - ./backend:/usr/src/app
     networks:
@@ -37,8 +37,6 @@ services:
       - instareddit-db:/var/lib/mysql
     environment:
       - MARIADB_ROOT_PASSWORD=secret
-    ports:
-      - 3306:3306
 
  
   

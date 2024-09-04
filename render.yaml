@@ -9,3 +9,5 @@ services:
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
+      - key: RENDER
+        value: TRUE
