@@ -5,7 +5,7 @@ services:
     runtime: python
     buildCommand: "./render-build.sh"
     repo: https://github.com/UndecidedCS4800/instareddit.git
-    startCommand: "python -m gunicorn --chdir backend/instareddit instareddit.asgi:application -k uvicorn.workers.UvicornWorker"
+    startCommand: "python -m gunicorn -b 0.0.0.0:10000 --chdir backend/instareddit instareddit.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
