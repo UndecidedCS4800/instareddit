@@ -14,6 +14,8 @@ services:
       - backend
     networks:
       - instareddit-network
+    environment:
+      - NODE_ENV=development
   backend:
     build: backend
     command: python instareddit/manage.py runserver 0.0.0.0:8000 
