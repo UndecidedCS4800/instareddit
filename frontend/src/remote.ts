@@ -3,7 +3,7 @@ import { Teammate } from "./schema"
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`
 
 export const getData = async (): Promise<Teammate[]> => {
-    const get = await fetch(URL+"/api/team", {
+    const get = await fetch(URL+"/api", {
         method: 'GET',
         headers: {
             'Content-Type': "application/json"
