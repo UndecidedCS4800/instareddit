@@ -29,7 +29,6 @@ services:
       DJANGO_DEBUG: "FALSE"
     volumes:
         - ./backend:/usr/src/app
-        - ./ssl:/ssl
     networks:
       - instareddit-network
     depends_on:
