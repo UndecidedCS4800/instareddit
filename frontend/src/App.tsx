@@ -11,23 +11,25 @@ import { getData } from './remote';
 const App: React.FC = () => {
   const [count, setCount] = useState<number>(0); // Specify type for state
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<Teammate[] | null>(null);
   const handleDBClick = async () => {
     setLoading(false);
     try {
       const res = await getData();
       setData(res);
-    } catch (e){
-      console.log(e)
-      setError(true);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e)
+        setError(e);
+      }
     }
     setLoading(false);
   }
 
   const dbResult = () => {
     if (error) {
-      return <p>Failed to connect to db:</p>
+      return <p>Failed to connect to db: {error.message}</p>
     }
     if (loading) {
       return <p>Loading</p>
