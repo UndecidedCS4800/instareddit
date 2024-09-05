@@ -30,7 +30,9 @@ const About: React.FC = () => {
           </tr>
           <tr>
             <td>9/5</td>
-            <td>Row 3, Column 2</td>
+            <td>Group meeting was done in person at the library. The about us page with the information for the meeting 
+                logs on the company website was completed. Backend has completed setting up with the database being 
+                connected to AWS. Discussed that configuration needs to be fixed. Deployment should be ready soon.</td>
           </tr>
           <tr>
             <td>9/6</td>
