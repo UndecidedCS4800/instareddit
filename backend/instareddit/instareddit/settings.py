@@ -92,13 +92,10 @@ db = {
     'PORT':'3306',
     'USER': os.environ.get('MARIA_DB_USER'),
     'PASSWORD': os.environ.get('MARIA_DB_PASSWORD'),
-    'OPTIONS': {
-        'ssl': {'ca': '/usr/src/app/instareddit/global-bundle.pem' }
-    }
 }
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
-    db |= { 'OPTIONS': { 'ssl': {'ca': '/usr/src/app/instareddit/global-bundle.pem' }}}
+    db |= { 'OPTIONS': { 'ssl': {'ca': 'backend/instareddit/global-bundle.pem' }}}
 # else:
 #     db = {
 #         #TODO add params for aws DB
