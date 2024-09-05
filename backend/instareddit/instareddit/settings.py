@@ -82,27 +82,24 @@ WSGI_APPLICATION = 'instareddit.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST':'instareddit-database-1.c16g8c8mol8o.us-east-2.rds.amazonaws.com',
-    #     'PORT':'3306',
-    #     'USER':'admin',
-    #     'PASSWORD':'wvtifa0pBmoz8Fxc1ab7',
-    #     'OPTIONS' : {
-    #         'ssl' : {
-    #             'ca' : './global-bundle.pem'
-    #         }
-    #     }
-    # }
-    'default': {
+db = {}
+local_db = bool(os.environ.get('USE_LOCAL_DB'))
+if local_db:
+    db = {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':'test',
+        'NAME': os.environ.get('MARIA_DB_NAME'),
         'HOST':'db',
         'PORT':'3306',
         'USER':'root',
         'PASSWORD':'secret',
     }
+else:
+    db = {
+        #TODO add params for aws DB
+    }
+
+DATABASES = {
+    'default': db
 }
 
 

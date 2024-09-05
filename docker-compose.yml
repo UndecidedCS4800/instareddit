@@ -27,6 +27,8 @@ services:
     environment:
       PORT: "8000"
       DJANGO_DEBUG: "FALSE"
+      MARIA_DB_NAME: "dummy"
+      USE_LOCAL_DB: True
     volumes:
         - ./backend:/usr/src/app
     networks:
