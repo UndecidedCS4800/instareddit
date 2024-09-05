@@ -3,3 +3,5 @@
 **/__pycache__/
 json-srv
 .render.env
+cred
+render_credit

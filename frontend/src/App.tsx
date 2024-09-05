@@ -36,7 +36,7 @@ const App: React.FC = () => {
     }
     let i = 0;
     return <div>
-      {data?.map(tm => <p key={i++}>{tm.name} {tm.fruit}</p>)}
+      {data?.map(tm => <p key={i++}>{tm.name}</p>)}
     </div>
   };
   return (
