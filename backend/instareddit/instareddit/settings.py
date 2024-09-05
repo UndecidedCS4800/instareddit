@@ -95,7 +95,7 @@ db = {
 }
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
-    db |= { 'OPTIONS': { 'ssl': {'ca': 'backend/instareddit/global-bundle.pem' }}}
+    db |= { 'OPTIONS': { 'ssl': {'ca': 'global-bundle.pem' }}}
 # else:
 #     db = {
 #         #TODO add params for aws DB
