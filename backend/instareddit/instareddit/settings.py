@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -82,9 +83,25 @@ WSGI_APPLICATION = 'instareddit.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST':'instareddit-database-1.c16g8c8mol8o.us-east-2.rds.amazonaws.com',
+    #     'PORT':'3306',
+    #     'USER':'admin',
+    #     'PASSWORD':'wvtifa0pBmoz8Fxc1ab7',
+    #     'OPTIONS' : {
+    #         'ssl' : {
+    #             'ca' : './global-bundle.pem'
+    #         }
+    #     }
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'dummy',
+        'HOST':'db',
+        'PORT':'3306',
+        'USER':'root',
+        'PASSWORD':'secret',
     }
 }
 

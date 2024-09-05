@@ -26,6 +26,7 @@ services:
       DJANGO_DEBUG: "FALSE"
     volumes:
         - ./backend:/usr/src/app
+        - ./ssl:/ssl
     networks:
       - instareddit-network
     depends_on:
@@ -52,6 +53,18 @@ services:
       interval: 1m
       timeout: 5s
       retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: secret
+    networks:
+      - instareddit-network
 
  
   
