@@ -2,7 +2,7 @@
 
 set -o errexit
 npm --prefix frontend install 
-npm --prefix frontend run build
+NODE_ENV="production" npm --prefix frontend run build
 cp -r frontend/dist backend/instareddit
 pip install -r backend/requirements.txt
 python3 backend/instareddit/manage.py collectstatic --no-input
