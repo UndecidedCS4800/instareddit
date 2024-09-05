@@ -19,7 +19,7 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
@@ -59,17 +59,17 @@ services:
       timeout: 5s
       retries: 3
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: secret
-    networks:
-      - instareddit-network
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: phpmyadmin
+  #   ports:
+  #     - "8080:80"
+  #   environment:
+  #     PMA_HOST: db
+  #     PMA_USER: root
+  #     PMA_PASSWORD: secret
+  #   networks:
+  #     - instareddit-network
 
  
   
