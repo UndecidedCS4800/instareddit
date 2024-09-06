@@ -95,7 +95,7 @@ db = {
 }
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
-    db |= { 'OPTIONS': { 'ssl': {'ca': '/etc/secrets/global-bundle.pem' }}}
+    db |= { 'OPTIONS': { 'ssl': {'ca': os.environ.get("SSL_PEM_ABSOLUTE_PATH", default="global-bundle.pem") }}}
 # else:
 #     db = {
 #         #TODO add params for aws DB
