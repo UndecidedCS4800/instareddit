@@ -19,6 +19,7 @@ class RegisterUserView(views.APIView):
     def post(self, request, *args, **kwargs):
         # get data from request, return error status if data incomplete
         try: 
+            #try getting these from request body
             username = request.data['username']
             email = request.data['email']
             password = request.data['password']
@@ -32,6 +33,7 @@ class RegisterUserView(views.APIView):
             models.User.objects.get(email=email)
             return Response("User with this email or username already exists.", status=status.HTTP_400_BAD_REQUEST)
         except models.User.DoesNotExist:
+            #if user doesn't exist, this will be executed and the code will continue
             pass    
 
         #hash password
