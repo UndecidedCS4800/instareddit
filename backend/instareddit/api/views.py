@@ -49,3 +49,8 @@ class RegisterUserView(views.APIView):
 
         response = {'username': username, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
+
+#TODO
+class LoginView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        return Response()
