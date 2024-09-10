@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import generics, views, status
 from rest_framework.response import Response
-from . import serializers, models
+from . import serializers, models, forms
 import bcrypt
 import jwt
 
@@ -17,15 +17,13 @@ class DummyListCreateView(generics.ListCreateAPIView):
 #request should be POST with body containing username, email, and password
 class RegisterUserView(views.APIView):
     def post(self, request, *args, **kwargs):
-        # get data from request, return error status if data incomplete
-        try: 
-            #try getting these from request body
-            username = request.data['username']
-            email = request.data['email']
-            password = request.data['password']
-        except MultiValueDictKeyError:
-            return Response("Incomplete user data", status=status.HTTP_400_BAD_REQUEST)
-
+        # get data from request, validate form and return error status if data incomplete
+        form = forms.UserRegisterForm(request.data)
+        if not form.is_valid(): 
+            return Response("Incomplete or incorrect user data", status=status.HTTP_400_BAD_REQUEST)
+        username = form.cleaned_data['username']
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
 
         #check if user already exists, return error status if user already exists
         try:
@@ -37,7 +35,7 @@ class RegisterUserView(views.APIView):
             pass    
 
         #hash password
-        pw_bytes = password.encode('utf-8')
+        pw_bytes = password.encode('utf-8') #convert to bytes
         pw_hash = bcrypt.hashpw(pw_bytes, bcrypt.gensalt())
 
         #store user in DB 
@@ -47,7 +45,7 @@ class RegisterUserView(views.APIView):
 
         #generate token
         key = "secret" #TODO change
-        token = jwt.encode({'username':username}, key, algorithm='HS256') #TODO what to encode? currently username
+        token = jwt.encode({'username': username}, key, algorithm='HS256') #TODO what to encode? currently username
 
-        response = {'username' : username, 'token': token} #TODO check if right format
+        response = {'username': username, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
