@@ -5,3 +5,5 @@ json-srv
 .render.env
 cred
 render_credit
+docker-compose-aws-milosz.yml
+docker-compose-milosz.yml
