@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from . import serializers, models, forms
 import bcrypt
 import jwt
+import os
 
 # Create your views here.
 
@@ -44,7 +45,7 @@ class RegisterUserView(views.APIView):
         new_user.save()
 
         #generate token
-        key = "secret" #TODO change
+        key = os.environ.get('TOKEN_KEY')
         token = jwt.encode({'username': username}, key, algorithm='HS256') #TODO what to encode? currently username
 
         response = {'username': username, 'token': token}

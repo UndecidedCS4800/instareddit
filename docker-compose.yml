@@ -30,6 +30,7 @@ services:
       MARIA_DB_USER: "root"
       MARIA_DB_PASSWORD: "secret"
       USE_LOCAL_DB: True
+      TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
     volumes:
         - ./backend:/usr/src/app
     networks:

@@ -19,7 +19,7 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "python3 instareddit/manage.py makemigrations && python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations && python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
@@ -32,6 +32,7 @@ services:
       SSL_PEM_ABSOLUTE_PATH: "/Users/tony/Documents/instareddit/backend/instareddit/global-bundle.pem"
       USE_LOCAL_DB: True
       MARIA_DB_USE_SSL: "True"
+      TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
     volumes:
         - ./backend:/usr/src/app
     networks:
