@@ -7,7 +7,7 @@ import bcrypt
 import jwt
 import os
 
-# Create your views here.
+SALT = bcrypt.gensalt()
 
 # currently uses locally created 'dummy' table
 class DummyListCreateView(generics.ListCreateAPIView):
@@ -32,10 +32,8 @@ class RegisterUserView(views.APIView):
 
         #hash password
         pw_bytes = password.encode('utf-8') #convert to bytes
-        salt = bcrypt.gensalt(10)
-        pw_hash = bcrypt.hashpw(pw_bytes, salt)
-        pw_hash= str(pw_hash)
-        
+        pw_hash = bcrypt.hashpw(pw_bytes, SALT)
+        pw_hash = pw_hash.decode('utf-8') #convert hashed password back to string to store in DB
 
         #store user in DB 
         #TODO match fields with final User model
@@ -52,33 +50,26 @@ class RegisterUserView(views.APIView):
 #TODO
 class LoginView(views.APIView):
     def post(self, request, *args, **kwargs):
+        #validate data with form
         form = forms.UserLoginForm(request.data)
-        
         if not form.is_valid(): 
             return Response("Incomplete or incorrect user data", status=status.HTTP_400_BAD_REQUEST)
-        
-	 
+        # get data
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
-        pw_bytes = password.encode('utf-8')
-        
-        
+        pw_bytes = password.encode('utf-8') #convert password to bytes
         
         # Check if user exists already
         if not models.User.objects.filter(username=username).exists():
             return Response("User with this username does not exist", status=status.HTTP_400_BAD_REQUEST)
         
+        #get user and password hash from DB
         user = models.User.objects.get(username=username)
         hashpass = user.password_hash
-
-        #testpassword = 'secret'
-        #testpassword = testpassword.encode('utf-8')
-        #salt = bcrypt.gensalt(10)
-        #hashtest = bcrypt.hashpw(testpassword, salt)
-        #hashtest = str(hashtest)
-        
-        
-        if bcrypt.checkpw(pw_bytes, hashpass):
+        hashpass_bytes = hashpass.encode('utf-8') # convert hashed pw to bytes
+          
+        # check if password matches the hashed pw from db
+        if bcrypt.checkpw(pw_bytes, hashpass_bytes):
             key = os.environ.get('TOKEN_KEY')
             token = jwt.encode({'username': username}, key, algorithm='HS256')
             response = {'username': username, 'token': token}
