@@ -36,6 +36,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -96,6 +98,12 @@ db = {
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
     db |= { 'OPTIONS': { 'ssl': {'ca': os.environ.get("SSL_PEM_ABSOLUTE_PATH", default="global-bundle.pem") }}}
+
+#CORS ORIGINS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://instareddit.onrender.com"
+]
 # else:
 #     db = {
 #         #TODO add params for aws DB

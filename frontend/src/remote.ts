@@ -1,59 +1,93 @@
-import { Teammate } from "./schema"
+import { Teammate } from "./schema";
 
-const URL = `${import.meta.env.VITE_BACKEND_URL}`
+const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
 export const getData = async (): Promise<Teammate[]> => {
-    const get = await fetch(URL+"/api", {
-        method: 'GET',
-        headers: {
-            'Content-Type': "application/json"
-        },
-    })
+    try {
+        const response = await fetch(`${URL}/api`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
 
-    const json = await get.json();
-    return json as Teammate[]
-}
+        if (!response.ok) {
+            // Check if there's a response body and log it
+            const errorData = await response.json();
+            console.error('Error fetching data:', response.status, response.statusText, errorData);
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
 
-// Function to register new user
-export const registerUser = async(username: string, email: string, password: string) => {
-    const response = await fetch(URL+"/api/auth/register", {
-        method: 'POST',
-        headers: {
-            'Content-Type': "application/json"
-        },
-        // creates user data
-        body: JSON.stringify({username, email, password}),
-    });
-
-    if(!response.ok){
-        throw new Error('Registration Unsuccessful');
+        const json = await response.json();
+        return json as Teammate[];
+    } catch (error) {
+        console.error('Error in getData function:', error);
+        throw error; // Rethrow to allow further handling if needed
     }
-    return response.json();
 };
 
-// Function to log user in and store jwt
-export const loginUser = async(username: string, password: string) => {
-    const response = await fetch('${URL}/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-    });
+// Function to register a new user
+export const registerUser = async (username: string, email: string, password: string) => {
+    try {
+        const response = await fetch(`${URL}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password }),
+        });
 
-    if(!response.ok){
-        throw new Error('Login Unsuccessful');
-    }
-    const data = await response.json();
+        if (!response.ok) {
+            // Check if there's a response body and log it
+            const errorData = await response.json();
+            console.error('Error registering user:', response.status, response.statusText, errorData);
+            throw new Error(`Registration Unsuccessful: ${response.statusText}`);
+        }
 
-    // Storing jwt
-    if(data.token) {
-        localStorage.setItem('token', data.token)
+        return await response.json();
+    } catch (error) {
+        console.error('Error in registerUser function:', error);
+        throw error; // Rethrow to allow further handling if needed
     }
-    return data;
 };
 
-// Function to log user out
+// Function to log a user in and store JWT
+export const loginUser = async (username: string, password: string) => {
+    try {
+        const response = await fetch(`${URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error logging in:', response.status, response.statusText, errorData);
+            throw new Error(`Login Unsuccessful: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Storing JWT
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error in loginUser function:', error);
+        throw error; // Rethrow to allow further handling if needed
+    }
+};
+
+
+// Function to log a user out
 export const logoutUser = () => {
-    localStorage.removeItem('token');
-}
+    try {
+        localStorage.removeItem('token');
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+};
