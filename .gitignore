@@ -6,3 +6,5 @@ json-srv
 cred
 render_credit
 backend/instareddit/api/migrations/
+docker-compose-aws-milosz.yml
+docker-compose-milosz.yml

@@ -19,7 +19,7 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations && python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
@@ -30,6 +30,7 @@ services:
       MARIA_DB_USER: "root"
       MARIA_DB_PASSWORD: "secret"
       USE_LOCAL_DB: True
+      TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
     volumes:
         - ./backend:/usr/src/app
     networks:
@@ -59,17 +60,17 @@ services:
       timeout: 5s
       retries: 3
 
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin:latest
-  #   container_name: phpmyadmin
-  #   ports:
-  #     - "8080:80"
-  #   environment:
-  #     PMA_HOST: db
-  #     PMA_USER: root
-  #     PMA_PASSWORD: secret
-  #   networks:
-  #     - instareddit-network
+  phpmyadmin:
+     image: phpmyadmin/phpmyadmin:latest
+     container_name: phpmyadmin
+     ports:
+       - "8080:80"
+     environment:
+       PMA_HOST: db
+       PMA_USER: root
+       PMA_PASSWORD: secret
+     networks:
+       - instareddit-network
 
  
   
