@@ -5,3 +5,4 @@ json-srv
 .render.env
 cred
 render_credit
+backend/instareddit/api/migrations/
