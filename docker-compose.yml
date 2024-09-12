@@ -25,7 +25,7 @@ services:
     environment:
       PORT: "8000"
       DJANGO_DEBUG: "FALSE"
-      MARIA_DB_NAME: "dummy"
+      MARIA_DB_NAME: "test"
       MARIA_DB_HOST: "db"
       MARIA_DB_USER: "root"
       MARIA_DB_PASSWORD: "secret"

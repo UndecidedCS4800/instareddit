@@ -4,9 +4,12 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import About from './About'; // Import the About component
-import './About.css';
+//import './About.css';
 import { Teammate } from './schema';
 import { getData } from './remote';
+import NavBar from './NavBar';
+import Login from './Login';
+import Register from './Register';
 
 const App: React.FC = () => {
   const [count, setCount] = useState<number>(0); // Specify type for state
@@ -39,8 +42,13 @@ const App: React.FC = () => {
       {data?.map(tm => <p key={i++}>{tm.name}</p>)}
     </div>
   };
+
   return (
     <Router>
+      <div> 
+        {/* use navbar */}
+        <NavBar />
+      {/*
       <div>
         <nav>
           <ul>
@@ -52,7 +60,10 @@ const App: React.FC = () => {
             </li>
           </ul>
         </nav>
+  */}
+
         <Routes>
+          {/* Home Route */}
           <Route
             path="/"
             element={
@@ -86,7 +97,13 @@ const App: React.FC = () => {
               </>
             }
           />
+          {/* About Us Route */}
           <Route path="/about" element={<About />} />
+
+          {/* Login Route */}
+          <Route path="/login" element={<Login />} />
+
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </Router>
