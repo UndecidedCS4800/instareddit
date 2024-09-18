@@ -16,13 +16,22 @@ class User(models.Model):
         db_table = 'user'
         
 class UserInfo(models.Model):
-    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, related_name='user_info')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField()
     profile_picture = models.ImageField() #TODO read on usage
     class Meta:
         db_table = 'user_info'
+
+class Community(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    picture = models.ImageField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
+    class Meta:
+        db_table = 'community'
         
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -30,6 +39,7 @@ class Post(models.Model):
     text = models.TextField()
     image = models.ImageField()
     datetime = models.DateTimeField()
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, default=None) #optional
     class Meta:
         db_table = 'post'
         
@@ -60,12 +70,3 @@ class RecentActivity(models.Model):
     datetime = models.DateTimeField()
     class Meta:
         db_table = 'recent_activity'
-        
-class Community(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    picture = models.ImageField()
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
-    class Meta:
-        db_table = 'community'
