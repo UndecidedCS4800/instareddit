@@ -30,6 +30,7 @@ class Community(models.Model):
     picture = models.ImageField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
+    members = models.ManyToManyField(User, related_name='member_communities', db_table='community_member')
     class Meta:
         db_table = 'community'
         

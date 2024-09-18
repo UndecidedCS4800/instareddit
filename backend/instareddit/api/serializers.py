@@ -20,4 +20,4 @@ class CommunitySerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Post
-        fields = ['id', 'user', 'text', 'image', 'datetime']
+        fields = ['id', 'user', 'text', 'image', 'datetime'] #TODO add community
