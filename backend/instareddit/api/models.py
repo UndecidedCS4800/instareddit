@@ -59,12 +59,13 @@ class RecentActivity(models.Model):
     type = models.CharField(max_length= 100)
     datetime = models.DateTimeField()
     class Meta:
-        db_table = 'recentActivity'
+        db_table = 'recent_activity'
         
 class Community(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     picture = models.ImageField()
-    admin = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
     class Meta:
         db_table = 'community'
