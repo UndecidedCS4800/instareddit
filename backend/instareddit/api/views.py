@@ -22,7 +22,7 @@ class RegisterUserView(views.APIView):
         password = form.cleaned_data['password']
 
         # check if user already exists
-        if models.User.objects.filter(username=username, email=email).exists():
+        if models.User.objects.filter(username=username).exists() or models.User.objects.filter(email=email).exists():
             return Response("User with this email or username already exists.", status=status.HTTP_400_BAD_REQUEST)
 
         #hash password

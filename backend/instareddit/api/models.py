@@ -20,14 +20,14 @@ class UserInfo(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField()
-    profile_picture = models.ImageField() #TODO read on usage
+    profile_picture = models.ImageField(null=True) #TODO read on usage
     class Meta:
         db_table = 'user_info'
 
 class Community(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    picture = models.ImageField()
+    picture = models.ImageField(null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
     members = models.ManyToManyField(User, related_name='member_communities', db_table='community_member')
@@ -38,9 +38,9 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #TODO add community
     text = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(null=True)
     datetime = models.DateTimeField()
-    community = models.ForeignKey(Community, on_delete=models.CASCADE, default=None) #optional
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, default=None, null=True) #optional
     class Meta:
         db_table = 'post'
         
@@ -56,6 +56,8 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     text = models.TextField()
     datetime = models.DateTimeField()
+    class Meta:
+        db_table = 'comment'
 
 class Dislike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
