@@ -87,3 +87,19 @@ class CommunityListCreateView(generics.ListCreateAPIView):
 class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.PostSerializer
     queryset = models.Post.objects.all()
+
+class LikeListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.LikeSerializer
+    queryset = models.Like.objects.all()
+
+class DislikeListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.DislikeSerializer
+    queryset = models.Dislike.objects.all()
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+
+class RecentActivityListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.RecentActivitySerializer
+    queryset = models.RecentActivity.objects.all()
