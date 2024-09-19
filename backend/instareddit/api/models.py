@@ -55,6 +55,8 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     text = models.TextField()
     datetime = models.DateTimeField()
+    class Meta:
+        db_table = 'comment'
 
 class Dislike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

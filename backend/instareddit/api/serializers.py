@@ -21,3 +21,23 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Post
         fields = ['id', 'user', 'text', 'image', 'datetime']
+        
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Like
+        fields = ['id', 'user', 'post' , 'datetime']
+        
+class DislikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Dislike
+        fields = ['id', 'user', 'post' , 'datetime']
+        
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Comment
+        fields = ['id', 'user', 'post' ,'text', 'datetime']
+        
+class RecentActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RecentActivity
+        fields = ['id', 'user', 'post' ,'type', 'datetime']
