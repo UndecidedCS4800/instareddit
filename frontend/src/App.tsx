@@ -1,49 +1,17 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import About from './About'; // Import the About component
 //import './About.css';
-import { Teammate } from './schema';
-import { getData } from './remote';
 import NavBar from './NavBar';
 import Login from './Login';
 import Register from './Register';
 import AllTables from './AllTables';
 
 const App: React.FC = () => {
-  return <AllTables />
   const [count, setCount] = useState<number>(0); // Specify type for state
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<Teammate[] | null>(null);
-  const handleDBClick = async () => {
-    setLoading(false);
-    try {
-      const res = await getData();
-      setData(res);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e)
-        setError(e);
-      }
-    }
-    setLoading(false);
-  }
-
-  const dbResult = () => {
-    if (error) {
-      return <p>Failed to connect to db: {error.message}</p>
-    }
-    if (loading) {
-      return <p>Loading</p>
-    }
-    let i = 0;
-    return <div>
-      {data?.map(tm => <p key={i++}>{tm.name}</p>)}
-    </div>
-  };
 
   return (
     <Router>
@@ -90,12 +58,6 @@ const App: React.FC = () => {
                 <p className="read-the-docs">
                   Click on the Vite and React logos to learn more
                 </p>
-                <div>
-                  <button onClick={handleDBClick}>
-                    Click me to load the table
-                  </button>
-                  {dbResult()}
-                </div>
               </>
             }
           />
@@ -106,6 +68,8 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
 
           <Route path="/register" element={<Register />} />
+
+          <Route path="/alltables" element={<AllTables />} />
         </Routes>
       </div>
     </Router>
