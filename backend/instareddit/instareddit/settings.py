@@ -22,12 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if "DJANGO_DEBUG" in os.environ or "RENDER" not in os.environ else False
+# DEBUG =  "DJANGO_DEBUG" in os.environ or "RENDER" not in os.environ
+DEBUG=True
 SECRET_KEY = 'django-insecure-a3^=ra1a5v15z)@a#t99wldmwxrpk2(i#sa5oaw7q&ut5vydbz'
 if not DEBUG:
     SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "52.41.36.82", "54.191.253.12", "44.226.122.3"]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:    
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -103,6 +104,7 @@ if os.environ.get('MARIA_DB_USE_SSL') is not None:
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://instareddit.onrender.com:10000"
+    "https://instareddit-1.onrender.com:10000"
 ]
 # else:
 #     db = {
@@ -153,7 +155,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "dist",
 ]
 WHITENOISE_ROOT = "dist/"
-WHITENOISE_INDEX_FILE = True
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

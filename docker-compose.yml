@@ -24,7 +24,7 @@ services:
       - 8000:8000
     environment:
       PORT: "8000"
-      DJANGO_DEBUG: "FALSE"
+      DJANGO_DEBUG: "TRUE"
       MARIA_DB_NAME: "name"
       MARIA_DB_HOST: "db"
       MARIA_DB_USER: "root"
