@@ -10,8 +10,10 @@ import { getData } from './remote';
 import NavBar from './NavBar';
 import Login from './Login';
 import Register from './Register';
+import AllTables from './AllTables';
 
 const App: React.FC = () => {
+  return <AllTables />
   const [count, setCount] = useState<number>(0); // Specify type for state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

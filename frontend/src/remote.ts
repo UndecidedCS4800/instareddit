@@ -2,9 +2,9 @@ import { Teammate } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
-export const getData = async (): Promise<Teammate[]> => {
+export const getData = async <T>(relative_path: string): Promise<T[]> => {
     try {
-        const response = await fetch(`${URL}/api`, {
+        const response = await fetch(`${URL}/api/${relative_path}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -19,12 +19,14 @@ export const getData = async (): Promise<Teammate[]> => {
         }
 
         const json = await response.json();
-        return json as Teammate[];
+        return json as T[];
     } catch (error) {
         console.error('Error in getData function:', error);
         throw error; // Rethrow to allow further handling if needed
     }
 };
+
+
 
 // Function to register a new user
 export const registerUser = async (username: string, email: string, password: string) => {
