@@ -1,10 +1,16 @@
+import { useState } from "react";
 import { TableView } from "./TableView"
 import { getData } from "./remote"
 //import { Teammate } from "./schema"
 import { user, userinfo, post, comment, community, recentactivity, like, dislike } from "./schema"
 
 const AllTables = () => {
+    const [buttonClicked, setButtonClicked] = useState(false);
     
+
+    if (!buttonClicked) {
+        return <button onClick={() => setButtonClicked(true)}>Click me to load all data</button>
+    }
     return (
 
         <div>
