@@ -21,9 +21,6 @@ export function TableView<T>({getter, renderItem }: TableViewProps<T>) {
     if (loading) {
         return <div>Loading</div>
     }
-    const noId = ({id, ...rest}: T): Omit<T, "id">  => {
-       return rest
-    }
     return (
         <div>
             <p>Data</p>

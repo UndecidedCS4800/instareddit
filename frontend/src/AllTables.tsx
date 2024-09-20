@@ -10,7 +10,7 @@ const AllTables = () => {
         <div>
             <h2> Users </h2>
             <TableView
-                getter={() => getData("/user") as Promise<user[]>}
+                getter={() => getData("users") as Promise<user[]>}
                 renderItem={(u: user) => (
                     <div key={u.id}>
                         {u.username}
@@ -23,7 +23,7 @@ const AllTables = () => {
 
             <h2> User Info </h2>
             <TableView
-                getter={() => getData("/userinfo") as Promise<userinfo[]>}
+                getter={() => getData("userinfo") as Promise<userinfo[]>}
                 renderItem={(i: userinfo) => (
                     <div key={i.user}>
                         {i.first_name}
@@ -37,7 +37,7 @@ const AllTables = () => {
 
             <h2> Posts </h2>
             <TableView
-                getter={() => getData("/post") as Promise<post[]>}
+                getter={() => getData("posts") as Promise<post[]>}
                 renderItem={(p: post) => (
                     <div key={p.id}>
                         {p.user}
@@ -52,7 +52,7 @@ const AllTables = () => {
 
             <h2> Comment </h2>
             <TableView
-                getter={() => getData("/comment") as Promise<comment[]>}
+                getter={() => getData("comments") as Promise<comment[]>}
                 renderItem={(c: comment) => (
                     <div key={c.id}>
                         {c.user}
@@ -66,7 +66,7 @@ const AllTables = () => {
 
             <h2> Community </h2>
             <TableView
-                getter={() => getData("/community") as Promise<community[]>}
+                getter={() => getData("communities") as Promise<community[]>}
                 renderItem={(o: community) => (
                     <div key={o.id}>
                         {o.name}
@@ -80,7 +80,7 @@ const AllTables = () => {
 
             <h2> Recent Activity </h2>
             <TableView
-                getter={() => getData("/recentactivity") as Promise<recentactivity[]>}
+                getter={() => getData("recentactivity") as Promise<recentactivity[]>}
                 renderItem={(r: recentactivity) => (
                     <div key={r.id}>
                         {r.userid}
@@ -94,7 +94,7 @@ const AllTables = () => {
 
             <h2> Likes </h2>
             <TableView
-                getter={() => getData("/like") as Promise<like[]>}
+                getter={() => getData("likes") as Promise<like[]>}
                 renderItem={(l: like) => (
                     <div key={l.id}>
                         {l.user}
@@ -107,7 +107,7 @@ const AllTables = () => {
 
             <h2> Dislikes </h2>
             <TableView
-                getter={() => getData("/dislike") as Promise<dislike[]>}
+                getter={() => getData("dislikes") as Promise<dislike[]>}
                 renderItem={(d: dislike) => (
                     <div key={d.id}>
                         {d.user}
@@ -118,9 +118,9 @@ const AllTables = () => {
                 )}
             />.
 
-            <h2> Friendship </h2>
+            {/* <h2> Friendship </h2>
             <TableView
-                getter={() => getData("/friendship") as Promise<Friendship[]>}
+                getter={() => getData("friendships") as Promise<Friendship[]>}
                 renderItem={(f: Friendship) => (
                     <div key={f.id}>
                         {f.userid}
@@ -128,11 +128,11 @@ const AllTables = () => {
                     </div>
 
                 )}
-            />.
+            />. */}
 
-            <h2> Community Members </h2>
+            {/* <h2> Community Members </h2>
             <TableView
-                getter={() => getData("/communitymembers") as Promise<CommunityMembers[]>}
+                getter={() => getData("communitymembers") as Promise<CommunityMembers[]>}
                 renderItem={(m: CommunityMembers) => (
                     <div key={m.id}>
                         {m.userid}
@@ -140,7 +140,7 @@ const AllTables = () => {
                     </div>
 
                 )}
-            />.
+            />. */}
 
         </div>
 
