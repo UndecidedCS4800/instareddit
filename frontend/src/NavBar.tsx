@@ -15,9 +15,6 @@ const NavBar: React.FC = () => {
                 <li className="nav-item">
                     <Link to="/login">Login</Link>
                 </li>
-                <li className="nav-item">
-                    <Link to="/alltables">All Tables</Link>
-                </li>
             </ul>
         </nav>
     );
