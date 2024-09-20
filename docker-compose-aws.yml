@@ -29,7 +29,7 @@ services:
       MARIA_DB_HOST: "instareddit-database-1.c16g8c8mol8o.us-east-2.rds.amazonaws.com"
       MARIA_DB_USER: "render"
       MARIA_DB_PASSWORD: "^GE5g;DtEQkMeKv"
-      SSL_PEM_ABSOLUTE_PATH: "/Users/tony/Documents/instareddit/backend/instareddit/global-bundle.pem"
+      SSL_PEM_ABSOLUTE_PATH: "/usr/src/app/instareddit/global-bundle.pem"
       USE_LOCAL_DB: True
       MARIA_DB_USE_SSL: "True"
       TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"

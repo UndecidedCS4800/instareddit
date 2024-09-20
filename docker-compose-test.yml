@@ -2,43 +2,35 @@ networks:
   instareddit-network:
     driver: bridge
 services:
-  frontend:
-    image: node:latest
-    command: sh -c "npm install && npm run dev"
-    ports:
-      - 5173:5173
-    working_dir: /frontend
-    volumes:
-      - ./frontend:/frontend
-    depends_on:
-      - backend
-    networks:
-      - instareddit-network
+  # frontend:
+  #   image: node:latest
+  #   command: sh -c "npm install && npm run dev"
+  #   ports:
+  #     - 5173:5173
+  #   working_dir: /frontend
+  #   volumes:
+  #     - ./frontend:/frontend
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - instareddit-network
   backend:
     build: backend
-    command: "python -m gunicorn --chdir instareddit/ instareddit.asgi:application -k uvicorn.workers.UvicornWorker"
+    command: sh -c "pip3 install -r requirements.txt; python3 instareddit/manage.py collectstatic --no-input; python -m gunicorn --chdir instareddit/ instareddit.asgi:application -k uvicorn.workers.UvicornWorker"
     ports:
       - 8000:8000
     environment:
       PORT: "8000"
       RENDER: "TRUE"
+      MARIA_DB_NAME: "instareddit"
+      MARIA_DB_HOST: "instareddit-database-1.c16g8c8mol8o.us-east-2.rds.amazonaws.com"
+      MARIA_DB_USER: "render"
+      MARIA_DB_PASSWORD: "^GE5g;DtEQkMeKv"
+      SSL_PEM_ABSOLUTE_PATH: "/usr/src/app/instareddit/global-bundle.pem"
+      MARIA_DB_USE_SSL: "True"
+      TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
+
     volumes:
         - ./backend:/usr/src/app
     networks:
       - instareddit-network
-    depends_on:
-      - db
-  db:
-    image: mariadb:latest
-    restart: always
-    networks:
-      - instareddit-network
-    volumes:
-      - instareddit-db:/var/lib/mysql
-    environment:
-      - MARIADB_ROOT_PASSWORD=secret
-
- 
-  
-volumes:
-  instareddit-db:  
