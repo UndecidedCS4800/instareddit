@@ -1,7 +1,7 @@
 import { TableView } from "./TableView"
 import { getData } from "./remote"
 //import { Teammate } from "./schema"
-import { user, userinfo, post, comment, community, recentactivity, like, dislike, Friendship, CommunityMembers } from "./schema"
+import { user, userinfo, post, comment, community, recentactivity, like, dislike } from "./schema"
 
 const AllTables = () => {
     
