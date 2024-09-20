@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react"
 
-function TableView<T extends {id: number}>(getter: () => Promise<T>) {
+interface TableViewProps<T> {
+    getter: () => Promise<T[]>,
+    renderItem: (item: T) => React.ReactNode
+}
+export function TableView<T>({getter, renderItem }: TableViewProps<T>) {
     const [loading, isLoading] = useState(false)
     const [data, setData] = useState<T[] | null>(null)
 
@@ -22,13 +26,8 @@ function TableView<T extends {id: number}>(getter: () => Promise<T>) {
     }
     return (
         <div>
-            <tbody>
-                {data?.map(item => (
-                    <p key={item.id}>
-                        {Object.keys(noId).reduce((acc, c) => `${}`)}
-                    </p>
-                ))}
-            </tbody>
+            <p>Data</p>
+            {data?.map(renderItem)}
         </div>
     )
 }
