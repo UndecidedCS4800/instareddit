@@ -103,10 +103,10 @@ if os.environ.get('MARIA_DB_USE_SSL') is not None:
 #CORS ORIGINS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://instareddit.onrender.com:10000",
-    "https://instareddit.onrender.com:443",
-    "https://instareddit-1.onrender.com:10000",
-    "https://instareddit-1.onrender.com:443"
+    "https://instareddit.onrender.com",
+    "https://instareddit.onrender.com",
+    "https://instareddit-1.onrender.com",
+    "https://instareddit-1.onrender.com"
 ]
 # else:
 #     db = {
