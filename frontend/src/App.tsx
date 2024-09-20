@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter, } from 'react-router-dom';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [count, setCount] = useState<number>(0); // Specify type for state
 
   return (
-    <Router>
+    <BrowserRouter>
       <div> 
         {/* use navbar */}
         <NavBar />
@@ -72,7 +72,7 @@ const App: React.FC = () => {
           <Route path="/alltables" element={<AllTables />} />
         </Routes>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 
