@@ -17,3 +17,4 @@ sqlparse==0.5.1
 uvicorn==0.30.6
 wheel==0.44.0
 whitenoise==6.7.0
+Pillow

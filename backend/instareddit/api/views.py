@@ -9,11 +9,6 @@ import os
 
 SALT = bcrypt.gensalt()
 
-# currently uses locally created 'dummy' table
-class DummyListCreateView(generics.ListCreateAPIView):
-    serializer_class = serializers.DummySerializer
-    queryset = models.Dummy.objects.all()
-
 #registers a new user
 #request should be POST with body containing username, email, and password
 class RegisterUserView(views.APIView):
@@ -27,7 +22,7 @@ class RegisterUserView(views.APIView):
         password = form.cleaned_data['password']
 
         # check if user already exists
-        if models.User.objects.filter(username=username, email=email).exists():
+        if models.User.objects.filter(username=username).exists() or models.User.objects.filter(email=email).exists():
             return Response("User with this email or username already exists.", status=status.HTTP_400_BAD_REQUEST)
 
         #hash password
@@ -42,12 +37,11 @@ class RegisterUserView(views.APIView):
 
         #generate token
         key = os.environ.get('TOKEN_KEY')
-        token = jwt.encode({'username': username}, key, algorithm='HS256') #TODO what to encode? currently username
+        token = jwt.encode({'username': username}, key, algorithm='HS256')
 
         response = {'username': username, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
 
-#TODO
 class LoginView(views.APIView):
     def post(self, request, *args, **kwargs):
         #validate data with form
@@ -76,3 +70,36 @@ class LoginView(views.APIView):
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response("Incorrect password", status=status.HTTP_401_UNAUTHORIZED)
+
+#general format to GET all instances or POST a new one
+class UserListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.UserSerializer
+    queryset = models.User.objects.all()
+
+class UserInfoListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.UserInfoSerializer
+    queryset = models.UserInfo.objects.all()
+
+class CommunityListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.CommunitySerializer
+    queryset = models.Community.objects.all()
+
+class PostListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.PostSerializer
+    queryset = models.Post.objects.all()
+
+class LikeListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.LikeSerializer
+    queryset = models.Like.objects.all()
+
+class DislikeListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.DislikeSerializer
+    queryset = models.Dislike.objects.all()
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+
+class RecentActivityListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.RecentActivitySerializer
+    queryset = models.RecentActivity.objects.all()
