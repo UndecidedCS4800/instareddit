@@ -76,3 +76,7 @@ export interface CommunityMembers {
   communityid: number,
   userid: number,
 }
+
+export interface JWTTokenResponse {
+  token: string,
+}
