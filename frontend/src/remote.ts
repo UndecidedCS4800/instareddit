@@ -1,3 +1,5 @@
+import { JWTTokenResponse } from "./schema";
+
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
 export const getData = async <T>(relative_path: string): Promise<T[]> => {
@@ -27,7 +29,7 @@ export const getData = async <T>(relative_path: string): Promise<T[]> => {
 
 
 // Function to register a new user
-export const registerUser = async (username: string, email: string, password: string) => {
+export const registerUser = async (username: string, email: string, password: string): Promise<JWTTokenResponse> => {
     try {
         const response = await fetch(`${URL}/api/auth/register`, {
             method: 'POST',
@@ -69,11 +71,6 @@ export const loginUser = async (username: string, password: string) => {
         }
 
         const data = await response.json();
-
-        // Storing JWT
-        if (data.token) {
-            localStorage.setItem('token', data.token);
-        }
 
         return data;
     } catch (error) {
