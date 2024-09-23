@@ -1,37 +1,55 @@
 import React, { useState } from 'react';
-import { Form, redirect, useActionData } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import './Login.css';
-import { loginUser } from './remote';
+import { loginUser, registerUser } from './remote';
 //import { FaUser, FaLock} from "react-icons/fa";
 // import { loginUser } from './remote';
-
-
-export const action = async ({request}: { request: Request}) => {
-    let formData = await request.formData();
-    let username = formData.get("username")?.toString() 
-    let password = formData.get("password")?.toString()
-
-    if (username && password) {
-        const {token} = await loginUser(username, password)
-        localStorage.setItem("token", token)
-        return redirect("/")
-    }
-
-    else return { "error": "Enter a login and password" }
-}
 
 
 export const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const [intent, setIntent] = useState<"login" | "register">("login")
+    const [error, setError] = useState<Error | null>(null)
+    const navigate = useNavigate()
     // const [errorMessage, setErrorMessage] = useState('');
-    const actionData = useActionData() as null | { error: string}
+    const swapIntentQuestion = intent == "login" ? "Don't have an account?" : "Already have an account?"
+    const swapIntentButton = intent == "login" ? "register" : "login"
+    const handleSwapIntent = () => {
+        console.log("swap intent")
+        if (intent == "login") {
+            setIntent("register")
+        } else {
+            setIntent("login")
+        }
+    }
+
+    const handleSubmit = async () => {
+        let token: string
+
+        try {
+            if (username && password) {
+                if (email) {
+                    token = (await registerUser(username, email, password)).token
+                } else {
+                    token = (await loginUser(username, password)).token
+                }
+                // TODO: fix me
+                localStorage.setItem("token", token)
+                navigate("/", { replace: true })
+            }
+        } catch (e) {
+            if (e instanceof Error) {
+                setError(e)
+            }
+        }
+    }
 
     return (
 
             <div className='wrapper'>
-                {actionData && actionData.error }
+                {error && <div>{error.message}</div>}
                 <Form action="post">
                     <h1>Login</h1>
                     <div className="input-box">
@@ -44,6 +62,18 @@ export const Login: React.FC = () => {
                             onChange={(e) => setUsername(e.target.value)}
                         />
                     </div>
+                    {
+                    intent == "register" && 
+                    <div className="input-box">
+                        <input
+                            type="text"
+                            placeholder="Email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    }
                     <div className="input-box">
                         <input
                             type="text"
@@ -54,14 +84,11 @@ export const Login: React.FC = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    <div className="remeber-forgot">
-                        <label><input type="checkbox" />Remember me </label>
-                        <a href="#">Forgot password?</a>
-                    </div>
-                    {/* {errorMessage && <p className="error-message">{errorMessage}</p>} */}
-                    <button type="submit" name={intent}>Login</button>
+                    <button type="submit" name={intent} onClick={handleSubmit}>{intent.toUpperCase()}</button>
+
+                    
                     <div className="register-link">
-                        <p>Don't have an account? <span className="register-button" onClick={handleRegisterRedirect}>Register</span></p>
+                        <p>{swapIntentQuestion} <span className="register-button" onClick={handleSwapIntent}>{swapIntentButton}</span></p>
                     </div>
                 </Form>
             </div>
