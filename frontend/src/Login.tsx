@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
 import './Login.css';
 import { loginUser, registerUser } from './remote';
+import { useAuthDispatch } from './components/auth';
+import { JWTTokenResponse } from './schema';
 //import { FaUser, FaLock} from "react-icons/fa";
 // import { loginUser } from './remote';
 
@@ -13,6 +15,7 @@ export const Login: React.FC = () => {
     const [intent, setIntent] = useState<"login" | "register">("login")
     const [error, setError] = useState<Error | null>(null)
     const navigate = useNavigate()
+    const authDispatchContext = useAuthDispatch()
     // const [errorMessage, setErrorMessage] = useState('');
     const swapIntentQuestion = intent == "login" ? "Don't have an account?" : "Already have an account?"
     const swapIntentButton = intent == "login" ? "register" : "login"
@@ -26,17 +29,16 @@ export const Login: React.FC = () => {
     }
 
     const handleSubmit = async () => {
-        let token: string
+        let token: JWTTokenResponse
 
         try {
             if (username && password) {
                 if (email) {
-                    token = (await registerUser(username, email, password)).token
+                    token = (await registerUser(username, email, password))
                 } else {
-                    token = (await loginUser(username, password)).token
+                    token = (await loginUser(username, password))
                 }
-                // TODO: fix me
-                localStorage.setItem("token", token)
+                authDispatchContext({ type: "login", payload: token})
                 navigate("/", { replace: true })
             }
         } catch (e) {
