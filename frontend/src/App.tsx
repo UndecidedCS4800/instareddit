@@ -1,12 +1,15 @@
 import {Outlet} from 'react-router-dom';
 import './App.css';
 import NavBar from './NavBar';
+import { AuthProvider } from "./components/auth"
 const App: React.FC = () => {
 
   return (
     <>
-      <NavBar />
-      <Outlet />
+      <AuthProvider>
+        <NavBar />
+        <Outlet />
+      </AuthProvider>
     </>
   );
 }
