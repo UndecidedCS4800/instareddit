@@ -3,7 +3,7 @@ import { createContext, useContext, useReducer } from "react"
 import { JWTTokenResponse } from "../schema"
 
 const authContext = createContext<JWTTokenResponse | null>(null);
-const authDispatchContext = createContext<React.Dispatch<AuthAction> | null>(null)
+const authDispatchContext = createContext<React.Dispatch<AuthAction>>(() => null)
 
 type AuthAction = { type: "login", payload: JWTTokenResponse } | { type: "logout" }
 
