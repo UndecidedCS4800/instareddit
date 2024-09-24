@@ -1,6 +1,6 @@
-from rest_framework import generics, views, status
+from rest_framework import views, status
 from rest_framework.response import Response
-from .. import serializers, models, forms
+from .. import models, forms
 import bcrypt
 import jwt
 import os
