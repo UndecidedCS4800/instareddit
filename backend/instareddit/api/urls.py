@@ -18,6 +18,7 @@ urlpatterns = [
     path('recentactivity', views.RecentActivityListCreateView.as_view()),
 
     path('community/<int:pk>', community_views.CommunityPostsView.as_view()),
-    path('community/<int:pk>/about', community_views.CommunityDetailView.as_view())
+    path('community/<int:pk>/about', community_views.CommunityDetailView.as_view()),
+    path('community/<int:community_pk>/post/<int:post_pk>', community_views.CommunityPostDetailView.as_view())
 
 ]
