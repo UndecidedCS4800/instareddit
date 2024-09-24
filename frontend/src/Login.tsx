@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { loginUser, registerUser } from './remote';
 import { useAuthDispatch } from './components/auth';
@@ -52,7 +52,7 @@ export const Login: React.FC = () => {
 
             <div className='wrapper'>
                 {error && <div>{error.message}</div>}
-                <Form action="post">
+                <form action="post">
                     <h1>Login</h1>
                     <div className="input-box">
                         <input
@@ -92,7 +92,7 @@ export const Login: React.FC = () => {
                     <div className="register-link">
                         <p>{swapIntentQuestion} <span className="register-button" onClick={handleSwapIntent}>{swapIntentButton}</span></p>
                     </div>
-                </Form>
+                </form>
             </div>
     );
 };
