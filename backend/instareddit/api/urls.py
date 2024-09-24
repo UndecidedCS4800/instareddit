@@ -1,11 +1,11 @@
 from django.urls import path
 from . import views
-from .controllers import community_views
+from .controllers import community_views, auth_views
 
 urlpatterns = [
     #authentication routes
-    path("auth/register", views.RegisterUserView.as_view()), #register new user
-    path("auth/login", views.LoginView.as_view()),#login user
+    path("auth/register", auth_views.RegisterUserView.as_view()), #register new user
+    path("auth/login", auth_views.LoginView.as_view()),#login user
 
     #GET/POST for each table
     path("users", views.UserListCreateView.as_view()),
