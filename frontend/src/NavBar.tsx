@@ -8,7 +8,7 @@ const NavBar: React.FC = () => {
     const authDispatch = useAuthDispatch()
     let loginLink =  (<Link to="/login">Login</Link>)
     if (auth) {
-        loginLink = <a onClick={() => authDispatch({type: "logout"})}>Logout</a>
+        loginLink = <a onClick={() => authDispatch({type: "logout"})}>Hello, {auth.username}</a>
     }
     return (
         <nav className="navbar">
