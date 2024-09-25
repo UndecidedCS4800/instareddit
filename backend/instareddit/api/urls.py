@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .controllers import community_views, auth_views
+from .controllers import community_views, auth_views, profile_views
 
 urlpatterns = [
     #authentication routes
@@ -19,6 +19,9 @@ urlpatterns = [
 
     path('community/<int:pk>', community_views.CommunityPostsView.as_view()),
     path('community/<int:pk>/about', community_views.CommunityDetailView.as_view()),
-    path('community/<int:community_pk>/post/<int:post_pk>', community_views.CommunityPostDetailView.as_view())
+    path('community/<int:community_pk>/post/<int:post_pk>', community_views.CommunityPostDetailView.as_view()),
+
+    path('profile/<str:username>' , profile_views.ProfileView.as_view()),
+    path('profile/', profile_views.SelfProfileView.as_view()),
 
 ]
