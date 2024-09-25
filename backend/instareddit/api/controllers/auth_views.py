@@ -68,3 +68,16 @@ class LoginView(views.APIView):
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response("Incorrect password", status=status.HTTP_401_UNAUTHORIZED)
+        
+
+def verify_token(request):
+    # Extract the token from the Authorization header
+    auth_header = request.headers.get('Authorization')
+    
+    if auth_header and auth_header.startswith('bearer '):
+        # Extract the token part after 'bearer '
+        token = auth_header.split(' ')[1]
+    else:
+        token = None
+
+    return token
