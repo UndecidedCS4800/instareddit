@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { loginUser, registerUser } from './remote';
@@ -28,8 +28,10 @@ export const Login: React.FC = () => {
         } 
     }
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
         let token: JWTTokenResponse
+        console.log("handleSubmit")
 
         try {
             if (username && password) {
@@ -53,7 +55,7 @@ export const Login: React.FC = () => {
             <div className='wrapper'>
                 {error && <div>{error.message}</div>}
                 <form onSubmit={handleSubmit}>
-                    <h1>Login</h1>
+                    <h1>{intent.toUpperCase()}</h1>
                     <div className="input-box">
                         <input
                             type="text"
