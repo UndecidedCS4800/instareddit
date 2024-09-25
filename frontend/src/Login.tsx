@@ -25,7 +25,7 @@ export const Login: React.FC = () => {
             setIntent("register")
         } else {
             setIntent("login")
-        }
+        } 
     }
 
     const handleSubmit = async () => {
@@ -52,7 +52,7 @@ export const Login: React.FC = () => {
 
             <div className='wrapper'>
                 {error && <div>{error.message}</div>}
-                <form action="post">
+                <form onSubmit={handleSubmit}>
                     <h1>Login</h1>
                     <div className="input-box">
                         <input
