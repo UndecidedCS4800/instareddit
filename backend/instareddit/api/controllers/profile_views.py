@@ -11,11 +11,11 @@ class ProfileView(views.APIView):
 	def get(self, request, username):
 		profile = models.User.objects.filter(username = username).first()
 		if profile is None:
-			return Response("Invalid Username",status=status.HTTP_404_NOT_FOUND)
+			return Response("Invalid Username",status=status.HTTP_400_BAD_REQUEST)
 
 		user_info = models.UserInfo.objects.filter(user = profile).first()
 		if user_info is None:
-			return Response("Invalid User info", status = status.HTTP_400_BAD_REQUEST)
+			return Response("No user info for given username", status = status.HTTP_400_BAD_REQUEST)
 		serializer = serializers.UserInfoSerializer(user_info)
 		return Response(serializer.data,status=status.HTTP_200_OK)
 
