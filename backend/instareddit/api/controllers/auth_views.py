@@ -1,6 +1,8 @@
 from rest_framework import views, status
 from rest_framework.response import Response
 from .. import models, forms
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 import bcrypt
 import jwt
 import os
@@ -14,14 +16,37 @@ class RegisterUserView(views.APIView):
         # get data from request, validate form and return error status if data incomplete
         form = forms.UserRegisterForm(request.data)
         if not form.is_valid(): 
-              return Response("Incomplete or incorrect user data", status=status.HTTP_400_BAD_REQUEST)
+              #check if username is not an empty field
+              if 'username' in form.errors:
+                  username_errors = form.errors['username']
+                  return Response({'username' : username_errors}, status=status.HTTP_400_BAD_REQUEST)
+              #check if password is not an empty field
+              if 'password' in form.errors:
+                  password_errors = form.errors['password']
+                  return Response({'password' : password_errors}, status=status.HTTP_400_BAD_REQUEST)
+              #check if email is in the correct format
+              if 'email' in form.errors:
+                  email_errors = form.errors['email']
+                  return Response({'email' : email_errors}, status=status.HTTP_400_BAD_REQUEST)
+              
+              
         username = form.cleaned_data['username']
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
+        
+	 #check if password is too weak
+        try:
+            #checks to make sure password is over 8 characters, not common and not only numeric
+            validate_password(password)
+        except ValidationError as e:
+            return Response({'password': e.messages}, status=status.HTTP_400_BAD_REQUEST)
 
         # check if user already exists
-        if models.User.objects.filter(username=username).exists() or models.User.objects.filter(email=email).exists():
-            return Response("User with this email or username already exists.", status=status.HTTP_400_BAD_REQUEST)
+        if models.User.objects.filter(username=username).exists():
+            return Response("Username is already taken.", status=status.HTTP_400_BAD_REQUEST)
+        
+        if models.User.objects.filter(email=email).exists():
+            return Response("User with this email is already used.", status=status.HTTP_400_BAD_REQUEST)
 
         #hash password
         pw_bytes = password.encode('utf-8') #convert to bytes
