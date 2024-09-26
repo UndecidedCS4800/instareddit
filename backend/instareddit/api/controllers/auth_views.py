@@ -68,10 +68,13 @@ class LoginView(views.APIView):
         #validate data with form
         form = forms.UserLoginForm(request.data)
         if not form.is_valid(): 
-
-            #TODO ADD SPECIFIC ERRORS
-
-            return Response("Incomplete or incorrect user data", status=status.HTTP_400_BAD_REQUEST)
+            error_message = {} #include all form errors in reponse
+            if 'username' in form.errors:
+                error_message['username'] = form.errors['username']
+            if 'password' in form.errors:
+                error_message['password'] = form.errors['password']
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+        
         # get data
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
@@ -79,7 +82,7 @@ class LoginView(views.APIView):
         
         # Check if user exists already
         if not models.User.objects.filter(username=username).exists():
-            return Response("User with this username does not exist", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'username' : "User with this username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
         
         #get user and password hash from DB
         user = models.User.objects.get(username=username)
@@ -93,7 +96,7 @@ class LoginView(views.APIView):
             response = {'username': username, 'token': token}
             return Response(response, status=status.HTTP_200_OK)
         else:
-            return Response("Incorrect password", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'password' : "Incorrect password"}, status=status.HTTP_401_UNAUTHORIZED)
         
 def verify_token(request):
     # Extract the token from the Authorization header
