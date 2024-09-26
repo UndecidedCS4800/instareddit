@@ -16,19 +16,17 @@ class RegisterUserView(views.APIView):
         # get data from request, validate form and return error status if data incomplete
         form = forms.UserRegisterForm(request.data)
         if not form.is_valid(): 
+              error_response = {} #return all errors in one response
               #check if username is not an empty field
               if 'username' in form.errors:
-                  username_errors = form.errors['username']
-                  return Response({'username' : username_errors}, status=status.HTTP_400_BAD_REQUEST)
+                  error_response['username'] = form.errors['username']
               #check if password is not an empty field
               if 'password' in form.errors:
-                  password_errors = form.errors['password']
-                  return Response({'password' : password_errors}, status=status.HTTP_400_BAD_REQUEST)
+                  error_response['password'] = form.errors['password']
               #check if email is in the correct format
               if 'email' in form.errors:
-                  email_errors = form.errors['email']
-                  return Response({'email' : email_errors}, status=status.HTTP_400_BAD_REQUEST)
-              
+                  error_response['email'] = form.errors['email']
+              return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
               
         username = form.cleaned_data['username']
         email = form.cleaned_data['email']
@@ -43,10 +41,10 @@ class RegisterUserView(views.APIView):
 
         # check if user already exists
         if models.User.objects.filter(username=username).exists():
-            return Response("Username is already taken.", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'username': "Username is already taken."}, status=status.HTTP_400_BAD_REQUEST)
         
         if models.User.objects.filter(email=email).exists():
-            return Response("User with this email is already used.", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'email':"User with this email is already used." }, status=status.HTTP_400_BAD_REQUEST)
 
         #hash password
         pw_bytes = password.encode('utf-8') #convert to bytes
@@ -70,6 +68,9 @@ class LoginView(views.APIView):
         #validate data with form
         form = forms.UserLoginForm(request.data)
         if not form.is_valid(): 
+
+            #TODO ADD SPECIFIC ERRORS
+
             return Response("Incomplete or incorrect user data", status=status.HTTP_400_BAD_REQUEST)
         # get data
         username = form.cleaned_data['username']
