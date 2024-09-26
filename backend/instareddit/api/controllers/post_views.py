@@ -1,19 +1,24 @@
 from rest_framework import views, status
 from rest_framework.response import Response
 from .. import serializers, models
-from auth_views import verify_token
+from .auth_views import verify_token
 import os
 import jwt
 
 #GET recent posts of users friends and communities
 class RecentPostsView(views.APIView):
     def get(self, request):
+        
         token = verify_token(request)
+        
         if not token:
-            return Response("User not authorized", status=status.HTTP_401_UNAUTHORIZED)
+            return Response("Token not provided or invalid (must start with 'bearer ')", status=status.HTTP_401_UNAUTHORIZED)
         
         #get username from token
-        decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response("Invalid token", status=status.HTTP_401_UNAUTHORIZED)
         username = decoded_token['username']
         #get logged in user
         user = models.User.objects.get(username=username)
