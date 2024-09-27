@@ -20,7 +20,6 @@ export const Login: React.FC = () => {
     const swapIntentQuestion = intent == "login" ? "Don't have an account?" : "Already have an account?"
     const swapIntentButton = intent == "login" ? "register" : "login"
     const handleSwapIntent = () => {
-        console.log("swap intent")
         if (intent == "login") {
             setIntent("register")
         } else {
@@ -31,7 +30,6 @@ export const Login: React.FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         let token: JWTTokenResponse
-        console.log("handleSubmit")
 
         try {
             if (username && password) {
@@ -80,7 +78,7 @@ export const Login: React.FC = () => {
                     }
                     <div className="input-box">
                         <input
-                            type="text"
+                            type="password"
                             placeholder='Password'
                             name="password"
                             required
