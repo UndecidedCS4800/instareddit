@@ -8,14 +8,14 @@ urlpatterns = [
     path("auth/login", auth_views.LoginView.as_view()),#login user
 
     #GET/POST for each table
-    path("users", views.UserListCreateView.as_view()),
-    path("userinfo", views.UserInfoListCreateView.as_view()),
-    path("posts", views.PostListCreateView.as_view()),
-    path("communities", views.CommunityListCreateView.as_view()),
-    path('likes', views.LikeListCreateView.as_view()),
-    path('dislikes', views.DislikeListCreateView.as_view()),
-    path('comments', views.CommentListCreateView.as_view()),
-    path('recentactivity', views.RecentActivityListCreateView.as_view()),
+    # path("users", views.UserListCreateView.as_view()),
+    # path("userinfo", views.UserInfoListCreateView.as_view()),
+    # path("posts", views.PostListCreateView.as_view()),
+    # path("communities", views.CommunityListCreateView.as_view()),
+    # path('likes', views.LikeListCreateView.as_view()),
+    # path('dislikes', views.DislikeListCreateView.as_view()),
+    # path('comments', views.CommentListCreateView.as_view()),
+    # path('recentactivity', views.RecentActivityListCreateView.as_view()),
 
     #communities
     path('community/<int:pk>', community_views.CommunityPostsView.as_view()),
@@ -24,6 +24,9 @@ urlpatterns = [
 
     #posts
     path('', post_views.RecentPostsView.as_view()),
+    path('user/<str:username>/posts', post_views.UserPostsListView.as_view()),
+    path('posts', post_views.PostCreateView.as_view()),
+    path('posts/<int:pk>', post_views.PostGetUpdateDestroyView.as_view()),
 
     #profiles
     path('profile/<str:username>' , profile_views.ProfileView.as_view()),

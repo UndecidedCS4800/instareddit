@@ -1,4 +1,4 @@
-from rest_framework import views, status
+from rest_framework import views, status, mixins, generics
 from rest_framework.response import Response
 from .. import serializers, models
 from .auth_views import verify_token
@@ -50,3 +50,41 @@ class RecentPostsView(views.APIView):
         #generate response
         serializer = serializers.PostSerializer(posts, many=True)
         return Response(serializer.data)
+    
+#GET posts by user 
+class UserPostsListView(views.APIView):
+    serializer_class = serializers.PostSerializer
+    queryset = models.Post.objects.all()
+
+    def get(self, request, username):
+        #get query params
+        limit = request.query_params.get('limit', None)
+
+        # check if user exists
+        user = models.User.objects.filter(username=username).first()
+        if not user:
+            return Response("Username does not exist", status=status.HTTP_400_BAD_REQUEST)
+        posts = user.post_set.all()
+
+        if limit:
+            limit = int(limit)
+            if limit < len(posts):
+                posts = posts[:limit]
+        posts = list(posts)
+        posts.sort(key=lambda p: p.datetime, reverse=True)
+
+        #serialize posts
+        serializer = serializers.PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+#general view to get/update/delete post
+class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Post.objects.all()
+    serializer_class = serializers.PostSerializer
+    lookup_field = 'pk'
+
+#general view to create a post
+#POST /api/posts
+class PostCreateView(generics.CreateAPIView):
+    queryset = models.Post.objects.all()
+    serializer_class = serializers.PostSerializer
