@@ -1,6 +1,24 @@
 from rest_framework import views, status, generics, mixins
 from rest_framework.response import Response
 from .. import serializers, models, pagination_classes
+from django.db.models import Q
+
+#GET /api/communities
+#optional query param: 'query' (search by name)
+#POST /api/communities - create new community
+class CommunityListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.CommunitySerializer
+    pagination_class = pagination_classes.StandardPostSetPagination
+
+    def get(self, request, *args, **kwargs):
+        #query query param
+        name_query = request.query_params.get('query', None)
+        communities = models.Community.objects.all()
+        if name_query:
+            communities = communities.filter(Q(name__icontains=name_query))
+        communities = sorted(list(communities), key=lambda c: c.num_members, reverse=True)
+        self.queryset = communities
+        return self.list(request)
 
 # get all posts from a community - GET /api/community/<pk>
 class CommunityPostsView(generics.GenericAPIView, mixins.ListModelMixin):
