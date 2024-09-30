@@ -1,16 +1,18 @@
-from rest_framework import views, status
+from rest_framework import views, status, generics, mixins
 from rest_framework.response import Response
-from .. import serializers, models
+from .. import serializers, models, pagination_classes
 
 # get all posts from a community - GET /api/community/<pk>
-class CommunityPostsView(views.APIView):
+class CommunityPostsView(generics.GenericAPIView, mixins.ListModelMixin):
+    serializer_class = serializers.PostSerializer
+    pagination_class = pagination_classes.StandardPostSetPagination
+
     def get(self, request, pk):
         community = models.Community.objects.filter(id=pk)
         if not community.exists():
             return Response("Invalid Community ID", status=status.HTTP_400_BAD_REQUEST)
-        posts = community[0].post_set.all()
-        serializer = serializers.PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        self.queryset = community[0].post_set.all()
+        return self.list(request)
     
 # get details about a community - GET /api/community/<pk>/about
 class CommunityDetailView(views.APIView):
