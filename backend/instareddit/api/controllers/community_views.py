@@ -10,7 +10,7 @@ class CommunityPostsView(generics.GenericAPIView, mixins.ListModelMixin):
     def get(self, request, pk):
         community = models.Community.objects.filter(id=pk)
         if not community.exists():
-            return Response("Invalid Community ID", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Invalid Community ID"}, status=status.HTTP_400_BAD_REQUEST)
         self.queryset = community[0].post_set.all()
         return self.list(request)
     
@@ -19,7 +19,7 @@ class CommunityDetailView(views.APIView):
     def get(self, request, pk):
         community = models.Community.objects.filter(id=pk)
         if not community.exists():
-            return Response("Invalid Community ID", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Invalid Community ID"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers.CommunitySerializer(community[0])
         return Response(serializer.data)
 
@@ -29,11 +29,11 @@ class CommunityPostDetailView(views.APIView):
         #get community
         community = models.Community.objects.filter(id=community_pk)
         if not community.exists():
-            return Response("Invalid Community ID", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Invalid Community ID"}, status=status.HTTP_400_BAD_REQUEST)
         #get post from the community's post set
         post = community[0].post_set.filter(id=post_pk)
         if not post.exists():
-            return Response("Invalid Post ID", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Invalid Post ID"}, status=status.HTTP_400_BAD_REQUEST)
         #get comments on posts
         comments = post[0].comment_set.all()
         #convert data to JSON
