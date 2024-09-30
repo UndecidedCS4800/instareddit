@@ -1,16 +1,18 @@
-from rest_framework import views, status, mixins, generics
+from rest_framework import status, mixins, generics
 from rest_framework.response import Response
-from .. import serializers, models
+from .. import serializers, models, pagination_classes
 from .auth_views import verify_token
 import os
 import jwt
 
 #GET recent posts of users friends and communities
-class RecentPostsView(views.APIView):
+class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
+    serializer_class = serializers.PostSerializer
+    pagination_class = pagination_classes.StandardPostSetPagination
+
     def get(self, request):
-        
+        #verify token
         token = verify_token(request)
-        
         if not token:
             return Response("Token not provided or invalid (must start with 'bearer ')", status=status.HTTP_401_UNAUTHORIZED)
         
@@ -27,9 +29,6 @@ class RecentPostsView(views.APIView):
         friends = user.friends.all()
         communities = user.member_communities.all()
 
-        # get number to start at if provided
-        begin_at = int(request.query_params.get('begin_at', 0))
-        
         # get posts from friends & communties 
         posts = []
         for f in friends:
@@ -37,45 +36,25 @@ class RecentPostsView(views.APIView):
         for c in communities:
             posts.extend(c.post_set.all())
 
-        # sort by date and limit number to 10
-        posts.sort(key=lambda p: p.datetime, reverse=True)
-        try:
-            posts = posts[begin_at:begin_at+10]
-        except IndexError: # possible errors: begin_at larger than num of posts / upper index out of bounds
-            if begin_at >= len(posts):
-                pass
-            elif begin_at + 10 >= len(posts):
-                posts = posts[begin_at:]
+        # sort by date 
+        self.queryset = sorted(posts, key=lambda p: p.datetime, reverse=True)
+        print(self.queryset)
 
-        #generate response
-        serializer = serializers.PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        return self.list(request)
     
 #GET posts by user 
-class UserPostsListView(views.APIView):
+class UserPostsListView(generics.GenericAPIView, mixins.ListModelMixin):
     serializer_class = serializers.PostSerializer
-    queryset = models.Post.objects.all()
+    pagination_class = pagination_classes.StandardPostSetPagination
 
     def get(self, request, username):
-        #get query params
-        limit = request.query_params.get('limit', None)
-
         # check if user exists
         user = models.User.objects.filter(username=username).first()
         if not user:
             return Response("Username does not exist", status=status.HTTP_400_BAD_REQUEST)
-        posts = user.post_set.all()
+        self.queryset = user.post_set.all().order_by('-datetime')
 
-        if limit:
-            limit = int(limit)
-            if limit < len(posts):
-                posts = posts[:limit]
-        posts = list(posts)
-        posts.sort(key=lambda p: p.datetime, reverse=True)
-
-        #serialize posts
-        serializer = serializers.PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
 #general view to get/update/delete post
 class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
