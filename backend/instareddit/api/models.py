@@ -31,6 +31,11 @@ class Community(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     admins = models.ManyToManyField(User, related_name='admin_communities', db_table='community_admin')
     members = models.ManyToManyField(User, related_name='member_communities', db_table='community_member')
+
+    @property
+    def num_members(self):
+        return len(self.members.all())
+
     class Meta:
         db_table = 'community'
         

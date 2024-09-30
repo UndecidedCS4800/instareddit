@@ -14,13 +14,13 @@ class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
         #verify token
         token = verify_token(request)
         if not token:
-            return Response("Token not provided or invalid (must start with 'bearer ')", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
         
         #get username from token
         try:
             decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
         except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response("Invalid token", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
         username = decoded_token['username']
         #get logged in user
         user = models.User.objects.get(username=username)
@@ -51,7 +51,7 @@ class UserPostsListView(generics.GenericAPIView, mixins.ListModelMixin):
         # check if user exists
         user = models.User.objects.filter(username=username).first()
         if not user:
-            return Response("Username does not exist", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
         self.queryset = user.post_set.all().order_by('-datetime')
 
         return self.list(request)
