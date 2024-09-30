@@ -92,7 +92,11 @@ export const logoutUser = () => {
 
 async function get<T>(relative_path: string): Promise<ResponseOrError<T>> {
     try {
-        const req = await fetch(`${URL}${relative_path}`)
+        const req = await fetch(`${URL}${relative_path}`, {
+            headers: {
+                'Content-Type': "application/json"
+            }
+        })
         if (!req.ok) {
             const json = req.json()
             return json as unknown as ServerError
@@ -130,3 +134,26 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
     return await get(`/api/${username}/posts`)
 }
 
+export const createPost = async (communityid: number, post: Post) : Promise<ResponseOrError<boolean>> => {
+    try {
+        const req = await fetch(`/api/community/${communityid}/`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(post)
+        })
+        if (!req.ok) {
+            const json = req.json()
+            return json as unknown as ServerError
+        }
+        return req.ok
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
+    }
+}
