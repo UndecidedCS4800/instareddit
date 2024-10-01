@@ -62,8 +62,25 @@ class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.PostSerializer
     lookup_field = 'pk'
 
+    def put(self, request, *args, **kwargs):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        return self.update(request, args, kwargs)
+    def delete(self, request, *args, **kwargs):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        return self.destroy(request, *args, **kwargs)
+
 #general view to create a post
 #POST /api/posts
 class PostCreateView(generics.CreateAPIView):
     queryset = models.Post.objects.all()
     serializer_class = serializers.PostSerializer
+
+    def post(self, request):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        return self.create(request)
