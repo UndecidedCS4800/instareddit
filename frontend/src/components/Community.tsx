@@ -3,7 +3,7 @@ import { getCommunity, getCommunityPosts } from "../remote"
 import { isError } from "../schema"
 import { CommunityCard } from "./CommunityCard"
 import React from "react"
-import { LoaderFunction } from "react-router-dom"
+import { LoaderFunction, useParams } from "react-router-dom"
 import { Posts } from "./Posts"
 
 type LoaderParams = {
@@ -34,6 +34,7 @@ type LoaderData = {
 export const Community = () => {
     // fixme: error should be unwrapped
     const { community, posts } = useLoaderData() as LoaderData
+    const { postid }= useParams()
 
     //fix me: failure should be handled in loader
     if (isError(community)) {
@@ -42,6 +43,10 @@ export const Community = () => {
 
     if (isError(posts)) {
         return <div>Error: {posts.error}</div>
+    }
+    
+    if (postid) {
+        return <Outlet />
     }
 
     // TODO: add pagination support

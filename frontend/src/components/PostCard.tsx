@@ -8,7 +8,7 @@ export const PostCard = ({post}: PostCardProps) => {
     // TODO?: truncate post preview text
     const { datetime, image, user, text } = post
     return (
-        <Card>
+        <Card to={`posts/${post.id}`}>
             {image && <img src={image} />}
             {text}
             {user}

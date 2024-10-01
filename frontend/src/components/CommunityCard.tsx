@@ -7,8 +7,9 @@ interface CommunityCardProps {
 
 export const CommunityCard = ({community}: CommunityCardProps) => {
     const {name, description, picture } = community;
+
     return (
-        <Card>
+        <Card to={`/community/${community.id}`}>
             {picture && <img src={picture} />}
             <h1>{name}</h1>
             <p>{description}</p>

@@ -7,11 +7,16 @@ import About from './About.tsx'
 import { Login } from './Login.tsx'
 import { loader as communityLoader, Community } from "./components/Community.tsx"
 import { loader as postLoader, Post } from "./components/Post.tsx"
+import { CenterPane } from './components/CenterPane.tsx'
 
 const router = createBrowserRouter([
   { path: "/",
     element: <App />,
     children: [
+      {
+        index: true,
+        element: <CenterPane />
+      },
       {
         path: "/about",
         element: <About />
@@ -26,9 +31,13 @@ const router = createBrowserRouter([
         loader: communityLoader,
         children: [
           {
-            path: "/posts/:postid",
+            path: "/community/:communityid/posts/:postid",
             element: <Post />,
             loader: postLoader
+          },
+          {
+            path: "/community/:communityid/posts/create",
+            element: <CreatePost />
           }
         ]
       }

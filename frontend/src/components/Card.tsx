@@ -1,8 +1,10 @@
-export const Card = ({children, ...props}: Omit<React.HTMLProps<HTMLDivElement>, "className">) => {
+import { Link, LinkProps } from "react-router-dom"
+
+export const Card = ({children, ...props}: Omit<LinkProps, "className">) => {
 
     return (
-        <div {...props} className="">
+        <Link {...props} className="">
             {children}
-        </div>
+        </Link>
     )
 }

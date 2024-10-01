@@ -134,9 +134,9 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
     return await get(`/api/${username}/posts`)
 }
 
-export const createPost = async (communityid: number, post: Post) : Promise<ResponseOrError<boolean>> => {
+export const createPost = async (post: Post) : Promise<ResponseOrError<boolean>> => {
     try {
-        const req = await fetch(`/api/community/${communityid}/`, {
+        const req = await fetch(`/api/posts`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
