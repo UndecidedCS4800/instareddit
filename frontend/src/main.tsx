@@ -5,6 +5,8 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import About from './About.tsx'
 import { Login } from './Login.tsx'
+import { loader as communityLoader, Community } from "./components/Community.tsx"
+import { loader as postLoader, Post } from "./components/Post.tsx"
 
 const router = createBrowserRouter([
   { path: "/",
@@ -17,6 +19,18 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/community/:communityid",
+        element: <Community />,
+        loader: communityLoader,
+        children: [
+          {
+            path: "/posts/:postid",
+            element: <Post />,
+            loader: postLoader
+          }
+        ]
       }
     ],
   },

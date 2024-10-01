@@ -22,7 +22,7 @@ export interface Post {
   id: number, // Primary key for Post
   user: number, // Foreign key to the user
   text: string,
-  image: string,
+  image: string | null,
   datetime: string,
   community: number, // Foreign key to the community
   comments?: Comment[]
@@ -40,8 +40,9 @@ export interface Community {
   id: number, //primary key for Community
   name: string,
   description: string,
-  picture: string,
+  picture: string | null,
   owner: number,
+  num_members: number,
 }
 
 
@@ -92,6 +93,11 @@ export interface PaginationResponse<T> {
   results: T[],
 }
 
-export interface ServerError {
+export type ServerError = {
   error: string
 }
+
+export const isError = <T>(obj: T | ServerError): obj is ServerError => {
+  return (obj as ServerError).error !== undefined
+}
+

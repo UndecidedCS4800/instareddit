@@ -113,7 +113,7 @@ async function get<T>(relative_path: string): Promise<ResponseOrError<T>> {
     }
 }
 
-export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community[]>>> => {
+export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community>>> => {
     const query_string = query ? `?query={${query}}` : ""
     return await get(`/api/communities${query_string}`)
 }
