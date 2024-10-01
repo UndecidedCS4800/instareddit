@@ -1,7 +1,7 @@
 import { Community, JWTTokenResponse, PaginationResponse, Post, ServerError } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
-type ResponseOrError<T> = T | ServerError;
+export type ResponseOrError<T> = T | ServerError;
 export const getData = async <T>(relative_path: string): Promise<T[]> => {
     try {
         const response = await fetch(`${URL}/api/${relative_path}`, {
@@ -126,7 +126,7 @@ export const getCommunity = async (id: number): Promise<ResponseOrError<Communit
     return await get(`/api/community/${id}/about`)
 }
 
-export const getPostComments = async (communityid: number, postid: number) : Promise<ResponseOrError<Post[]>> => {
+export const getPostComments = async (communityid: number, postid: number) : Promise<ResponseOrError<Post>> => {
     return await get(`/api/community/${communityid}/post/${postid}`)
 }
 

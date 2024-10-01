@@ -1,6 +1,6 @@
 import { LoaderFunction, useLoaderData } from "react-router-dom"
-import { getPostComments } from "../remote"
-import { Post as PostType } from "../schema.ts"
+import { getPostComments, ResponseOrError } from "../remote"
+import { isError, Post as PostType } from "../schema.ts"
 import { PostCard } from "./PostCard"
 import { Comments } from "./Comments.tsx"
 export const loader: LoaderFunction<{ communityid: string, postid: string }> = async (args) => {
@@ -19,7 +19,11 @@ export const loader: LoaderFunction<{ communityid: string, postid: string }> = a
 }
 
 export const Post = () => {
-    const data = useLoaderData() as PostType;
+    const data = useLoaderData() as ResponseOrError<PostType>;
+    // fix me, see Community.tsx
+    if (isError(data)) {
+        return <p>{data.error}</p>
+    }
 
     const { comments, ...post } = data
     return (
