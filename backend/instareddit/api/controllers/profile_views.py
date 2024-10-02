@@ -1,6 +1,5 @@
 from rest_framework import views, status
 from rest_framework.response import Response
-from django.shortcuts import redirect
 from .. import serializers, models
 from .auth_views import verify_token
 import jwt
@@ -25,7 +24,7 @@ class SelfProfileView(views.APIView):
         # Get the token from the request
         token = verify_token(request)
         if not token:
-            return redirect('/api/')
+            return Response("user not verified", status=status.HTTP_400_BAD_REQUEST)
         
         try:
             # Decode the token
