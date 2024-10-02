@@ -24,7 +24,15 @@ export const CommunityFeed = () => {
     }, [])
 
     if (!data) {
-        return <p>Loading</p>
+        return (
+            /*<div className="flex flex-wrap justify-center gap-4 p-4">
+                <CommunityCard community={sampleCommunity} />
+            
+            </div> */
+            //comment out below and un comment above to view sample post
+            <p>Loading</p>
+        ); 
+        //
     }
 
     const { results } = data;
@@ -34,3 +42,10 @@ export const CommunityFeed = () => {
         </div>
     )
 }
+
+const sampleCommunity = {
+    id: 1,
+    name: "Mark",
+    description: "I am Adam.",
+    picture: "./public/Frame35.png" // Placeholder image URL
+};
