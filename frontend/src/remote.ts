@@ -8,34 +8,33 @@ const withAuth = (token: string, headers: HeadersInit): HeadersInit => ({
 })
 
 export type ResponseOrError<T> = T | ServerError;
-export const getData = async <T>(relative_path: string): Promise<T[]> => {
-    try {
-        const response = await fetch(`${URL}/api/${relative_path}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+// export const getData = async <T>(relative_path: string): Promise<T[]> => {
+//     try {
+//         const response = await fetch(`${URL}/api/${relative_path}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//         });
 
-        if (!response.ok) {
-            // Check if there's a response body and log it
-            const errorData = await response.json();
-            console.error('Error fetching data:', response.status, response.statusText, errorData);
-            throw new Error(`Failed to fetch data: ${response.statusText}`);
-        }
+//         if (!response.ok) {
+//             // Check if there's a response body and log it
+//             const errorData = (await response.json() as ServerError);
+//             return errorData
+//         }
 
-        const json = await response.json();
-        return json as T[];
-    } catch (error) {
-        console.error('Error in getData function:', error);
-        throw error; // Rethrow to allow further handling if needed
-    }
-};
+//         const json = await response.json();
+//         return json as T[];
+//     } catch (error) {
+//         console.error('Error in getData function:', error);
+//         throw error; // Rethrow to allow further handling if needed
+//     }
+// };
 
 
 
 // Function to register a new user
-export const registerUser = async (username: string, email: string, password: string): Promise<JWTTokenResponse> => {
+export const registerUser = async (username: string, email: string, password: string): Promise<ResponseOrError<JWTTokenResponse>> => {
     try {
         const response = await fetch(`${URL}/api/auth/register`, {
             method: 'POST',
@@ -47,20 +46,24 @@ export const registerUser = async (username: string, email: string, password: st
 
         if (!response.ok) {
             // Check if there's a response body and log it
-            const errorData = await response.json();
+            const errorData = (await response.json()) as ServerError;
             console.error('Error registering user:', response.status, response.statusText, errorData);
-            throw new Error(`Registration Unsuccessful: ${response.statusText}`);
+            return errorData
         }
 
-        return await response.json();
-    } catch (error) {
-        console.error('Error in registerUser function:', error);
-        throw error; // Rethrow to allow further handling if needed
+        return await response.json() as JWTTokenResponse;
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
     }
 };
 
 // Function to log a user in and store JWT
-export const loginUser = async (username: string, password: string) => {
+export const loginUser = async (username: string, password: string): Promise<ResponseOrError<JWTTokenResponse>> => {
     try {
         const response = await fetch(`${URL}/api/auth/login`, {
             method: 'POST',
@@ -72,28 +75,22 @@ export const loginUser = async (username: string, password: string) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Error logging in:', response.status, response.statusText, errorData);
-            throw new Error(`Login Unsuccessful: ${response.statusText}`);
+            return errorData
         }
 
         const data = await response.json();
 
-        return data;
-    } catch (error) {
-        console.error('Error in loginUser function:', error);
-        throw error; // Rethrow to allow further handling if needed
+        return data as JWTTokenResponse;
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
     }
 };
 
-
-// Function to log a user out
-export const logoutUser = () => {
-    try {
-        localStorage.removeItem('token');
-    } catch (error) {
-        console.error('Error logging out:', error);
-    }
-};
 
 
 async function get<T>(relative_path: string): Promise<ResponseOrError<T>> {

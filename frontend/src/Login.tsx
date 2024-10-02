@@ -1,9 +1,9 @@
 import React, { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
-import { loginUser, registerUser } from './remote';
+import { loginUser, registerUser, ResponseOrError } from './remote';
 import { useAuthDispatch } from './components/auth';
-import { JWTTokenResponse } from './schema';
+import { isError, JWTTokenResponse, ServerError } from './schema';
 //import { FaUser, FaLock} from "react-icons/fa";
 // import { loginUser } from './remote';
 
@@ -13,7 +13,7 @@ export const Login: React.FC = () => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [intent, setIntent] = useState<"login" | "register">("login")
-    const [error, setError] = useState<Error | null>(null)
+    const [error, setError] = useState<ServerError | null>(null)
     const navigate = useNavigate()
     const authDispatchContext = useAuthDispatch()
     // const [errorMessage, setErrorMessage] = useState('');
@@ -29,21 +29,19 @@ export const Login: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        let token: JWTTokenResponse
+        let token: ResponseOrError<JWTTokenResponse>
 
-        try {
-            if (username && password) {
-                if (email) {
-                    token = (await registerUser(username, email, password))
-                } else {
-                    token = (await loginUser(username, password))
-                }
-                authDispatchContext({ type: "login", payload: token})
-                navigate("/", { replace: true })
+        if (username && password) {
+            if (email) {
+                token = (await registerUser(username, email, password))
+            } else {
+                token = (await loginUser(username, password))
             }
-        } catch (e) {
-            if (e instanceof Error) {
-                setError(e)
+            if (isError(token)) {
+                setError(token)
+            } else {
+                authDispatchContext({ type: "login", payload: token })
+                navigate("/", { replace: true })
             }
         }
     }
@@ -51,7 +49,7 @@ export const Login: React.FC = () => {
     return (
 
             <div className='wrapper'>
-                {error && <div>{error.message}</div>}
+                {error && <div>{error.error}</div>}
                 <form onSubmit={handleSubmit}>
                     <h1>{intent.toUpperCase()}</h1>
                     <div className="input-box">
