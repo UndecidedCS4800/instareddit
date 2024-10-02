@@ -24,7 +24,6 @@ export const CreatePost = () => {
             community: Number(communityid)
         }
         const res = await createPost(a.token, post)
-        console.log(res)
         if (isError(res)) {
             setError(res)
         } else {
