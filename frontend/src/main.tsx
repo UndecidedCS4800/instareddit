@@ -8,6 +8,7 @@ import { Login } from './Login.tsx'
 import { loader as communityLoader, Community } from "./components/Community.tsx"
 import { loader as postLoader, Post } from "./components/Post.tsx"
 import { CenterPane } from './components/CenterPane.tsx'
+import { CreatePost } from './components/CreatePost.tsx'
 
 const router = createBrowserRouter([
   { path: "/",

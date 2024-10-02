@@ -29,8 +29,9 @@ export const AuthProvider = ( {children}: {children: React.ReactNode}) => {
 
 const token = localStorage.getItem("token")
 const username = localStorage.getItem("username")
+const userid = localStorage.getItem("userid")
 
-const initialLogin = (): JWTTokenResponse | null => (token && username) ? { token, username } : null
+const initialLogin = (): JWTTokenResponse | null => (token && username && userid) ? { token, username, userid: Number(userid) } : null
 const reducer = (_login: JWTTokenResponse | null, action: AuthAction) => {
     switch (action.type) {
         case "login":
