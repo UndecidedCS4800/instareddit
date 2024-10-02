@@ -1,6 +1,12 @@
-import { Community, JWTTokenResponse, PaginationResponse, Post, ServerError } from "./schema";
+import { Community, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
+
+const withAuth = (token: string, headers: HeadersInit): HeadersInit => ({
+    "Authorization": `bearer ${token}`,
+    ...headers
+})
+
 export type ResponseOrError<T> = T | ServerError;
 export const getData = async <T>(relative_path: string): Promise<T[]> => {
     try {
@@ -134,20 +140,20 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
     return await get(`/api/${username}/posts`)
 }
 
-export const createPost = async (post: Post) : Promise<ResponseOrError<boolean>> => {
+export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
     try {
-        const req = await fetch(`/api/posts`, {
+        const req = await fetch(`${URL}/api/posts`, {
             method: "POST",
-            headers: {
+            headers: withAuth(token, {
                 'Content-Type': 'application/json'
-            },
+            }),
             body: JSON.stringify(post)
         })
         if (!req.ok) {
             const json = req.json()
             return json as unknown as ServerError
         }
-        return req.ok
+        return await req.json()
     } catch (e) {
         if (e instanceof Error) {
             console.log("Unhandled error:", e.name, e.message)

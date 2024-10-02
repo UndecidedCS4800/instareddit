@@ -3,7 +3,7 @@ import { getCommunity, getCommunityPosts } from "../remote"
 import { isError } from "../schema"
 import { CommunityCard } from "./CommunityCard"
 import React from "react"
-import { LoaderFunction, useParams } from "react-router-dom"
+import { Link, LoaderFunction, useParams } from "react-router-dom"
 import { Posts } from "./Posts"
 
 type LoaderParams = {
@@ -52,6 +52,7 @@ export const Community = () => {
     // TODO: add pagination support
     return (
         <React.Fragment>
+            <Link to="posts/create">Create Post</Link>
             <CommunityCard community={community} />
             <Posts posts={posts.results} />
             <Outlet />

@@ -80,7 +80,6 @@ export interface CommunityMembers {
   userid: number,
 }
 
-
 export interface JWTTokenResponse {
   userid: number,
   username: string,
@@ -98,6 +97,7 @@ export type ServerError = {
   error: string
 }
 
+export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
   return (obj as ServerError).error !== undefined
 }

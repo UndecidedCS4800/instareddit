@@ -98,7 +98,7 @@ class PostCreateView(views.APIView):
             community = models.Community.objects.filter(id=community_id).first()
         else:
             community = None
-        new_post = models.Post(user=user, text=body['text'], image=body['image'], datetime=datetime.now(), community=community)
+        new_post = models.Post(user=user, text=body['text'],  datetime=datetime.now(), community=community)
         new_post.save()
 
         #response
