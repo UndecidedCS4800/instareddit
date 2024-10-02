@@ -76,6 +76,9 @@ class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 #general view to create a post
 #POST /api/posts
+#authorization stoken required
+#required in body: text
+#optional in body: image. community
 class PostCreateView(views.APIView):
     def post(self, request):
         #verify token
@@ -93,12 +96,21 @@ class PostCreateView(views.APIView):
 
         #get body and create post
         body = request.data
+        #check if post in community (commnunity optional)
         community_id = body.get('community', None)
         if community_id:
             community = models.Community.objects.filter(id=community_id).first()
         else:
             community = None
-        new_post = models.Post(user=user, text=body['text'], image=body['image'], datetime=datetime.now(), community=community)
+        #check if text provided
+        text = body.get('text', None)
+        if not text:
+            return Response({'error': 'Post text not provided'}) 
+        #check if image provided (image optional)   
+        image = body.get('image', None)
+
+        #create post instance
+        new_post = models.Post(user=user, text=text, image=image, datetime=datetime.now(), community=community)
         new_post.save()
 
         #response
