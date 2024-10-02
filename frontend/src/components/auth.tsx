@@ -29,20 +29,17 @@ export const AuthProvider = ( {children}: {children: React.ReactNode}) => {
 
 const token = localStorage.getItem("token")
 const username = localStorage.getItem("username")
-const userid = localStorage.getItem("userid")
 
-const initialLogin = (): JWTTokenResponse | null => (token && username && userid) ? { token, username, userid: Number(userid) } : null
+const initialLogin = (): JWTTokenResponse | null => (token && username) ? { token, username  } : null
 const reducer = (_login: JWTTokenResponse | null, action: AuthAction) => {
     switch (action.type) {
         case "login":
             localStorage.setItem("token", action.payload.token)
             localStorage.setItem("username", action.payload.username)
-            localStorage.setItem("userid", action.payload.userid.toString())
             return action.payload
         case "logout":
             localStorage.removeItem("token")
             localStorage.removeItem("username")
-            localStorage.removeItem("userid")
             return null
     }
     

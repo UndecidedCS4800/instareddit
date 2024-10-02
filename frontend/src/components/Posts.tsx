@@ -8,7 +8,7 @@ type PostProps = {
 export const Posts = ({posts}: PostProps) => {
     return (
         <div>
-            {posts.map(p => <PostCard key={p.id} post={p} />)}
+            {posts.map(p => <PostCard link key={p.id} post={p} />)}
         </div>
     )
 }
