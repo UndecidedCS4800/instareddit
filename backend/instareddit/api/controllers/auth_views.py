@@ -55,10 +55,11 @@ class RegisterUserView(views.APIView):
         #TODO match fields with final User model
         new_user = models.User(username=username, email=email, password_hash=pw_hash)
         new_user.save()
+        user_id = new_user.id
 
         #generate token
         key = os.environ.get('TOKEN_KEY')
-        token = jwt.encode({'username': username}, key, algorithm='HS256')
+        token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
 
         response = {'username': username, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
@@ -86,13 +87,14 @@ class LoginView(views.APIView):
         
         #get user and password hash from DB
         user = models.User.objects.get(username=username)
+        user_id = user.id
         hashpass = user.password_hash
         hashpass_bytes = hashpass.encode('utf-8') # convert hashed pw to bytes
           
         # check if password matches the hashed pw from db
         if bcrypt.checkpw(pw_bytes, hashpass_bytes):
             key = os.environ.get('TOKEN_KEY')
-            token = jwt.encode({'username': username}, key, algorithm='HS256')
+            token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
             response = {'username': username, 'token': token}
             return Response(response, status=status.HTTP_200_OK)
         else:
