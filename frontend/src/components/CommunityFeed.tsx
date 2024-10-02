@@ -42,10 +42,3 @@ export const CommunityFeed = () => {
         </div>
     )
 }
-
-const sampleCommunity = {
-    id: 1,
-    name: "Mark",
-    description: "I am Adam.",
-    picture: "./public/Frame35.png" // Placeholder image URL
-};
