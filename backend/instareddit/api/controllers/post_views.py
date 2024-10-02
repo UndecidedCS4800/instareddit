@@ -1,9 +1,10 @@
-from rest_framework import status, mixins, generics
+from rest_framework import status, mixins, generics, views
 from rest_framework.response import Response
 from .. import serializers, models, pagination_classes
 from .auth_views import verify_token
 import os
 import jwt
+from datetime import datetime
 
 #GET recent posts of users friends and communities
 class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
@@ -75,12 +76,33 @@ class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 #general view to create a post
 #POST /api/posts
-class PostCreateView(generics.CreateAPIView):
-    queryset = models.Post.objects.all()
-    serializer_class = serializers.PostSerializer
-
+class PostCreateView(views.APIView):
     def post(self, request):
+        #verify token
         token = verify_token(request)
         if not token:
             return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.create(request)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get user data
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id=user_id)
+
+        #get body and create post
+        body = request.data
+        community_id = body.get('community', None)
+        if community_id:
+            community = models.Community.objects.filter(id=community_id).first()
+        else:
+            community = None
+        new_post = models.Post(user=user, text=body['text'], image=body['image'], datetime=datetime.now(), community=community)
+        new_post.save()
+
+        #response
+        response = serializers.PostSerializer(new_post).data
+        return Response(response)
+
+
