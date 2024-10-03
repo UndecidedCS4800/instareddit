@@ -7,8 +7,8 @@ interface FeedNavProps {
 
 export const FeedNav = ({ viewSetter, activeView }: FeedNavProps) => {
     return (
-        <nav className="flex justify-center bg-stone-800 py-4 px-8">
-            <ol className="flex space-x-14">
+        <nav className="flex justify-center bg-stone-800 py-4 px-4">
+            <ol className="flex space-x-24">
                 <li
                 onClick={() => viewSetter("recent")}
                 className={`cursor-pointer px-2 py-1 ${

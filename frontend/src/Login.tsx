@@ -53,9 +53,9 @@ export const Login: React.FC = () => {
                 <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-sm">
                     {error && <div>{error.message}</div>}
                     <form onSubmit={handleSubmit}>
-                        <h1 className="text-3xl font-bold text-center mb-8 text-pink-300">
-                            <span className="text-stone-700">Only</span>
-                            <span className="text-pink-300">Friends</span>
+                        <h1 className="text-3xl text-center mb-8 text-pink-300">
+                            <span className="font-normal text-stone-700">Only</span>
+                            <span className="font-bold text-pink-300">Friends</span>
                         </h1>
                         <div className="input-box">
                         <input
