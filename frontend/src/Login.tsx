@@ -1,6 +1,5 @@
 import React, { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css';
 import { loginUser, registerUser, ResponseOrError } from './remote';
 import { useAuthDispatch } from './components/auth';
 import { isError, JWTTokenResponse, ServerError } from './schema';

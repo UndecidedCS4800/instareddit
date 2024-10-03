@@ -19,13 +19,13 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations && python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations api && python3 instareddit/manage.py migrate --fake api zero && python instareddit/manage.py migrate api && python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
       PORT: "8000"
       DJANGO_DEBUG: "TRUE"
-      MARIA_DB_NAME: "name"
+      MARIA_DB_NAME: "dummy"
       MARIA_DB_HOST: "db"
       MARIA_DB_USER: "root"
       MARIA_DB_PASSWORD: "secret"
