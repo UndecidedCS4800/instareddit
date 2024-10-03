@@ -105,8 +105,9 @@ class PostCreateView(views.APIView):
         response = serializers.PostSerializer(new_post).data
         return Response(response)
     
+#create like on a post
 class PostLikesView(views.APIView):
-    def post(self, request):
+    def post(self, request,post_id):
         token = verify_token(request)
         if not token:
             return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -121,10 +122,6 @@ class PostLikesView(views.APIView):
         except models.User.DoesNotExist:
             return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
         
-        #get the post id from body
-        body = request.data 
-        post_id = body.get('post') 
-
         if not post_id:
             return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,5 +141,83 @@ class PostLikesView(views.APIView):
         
 	 #create response
         response = serializers.LikeSerializer(new_like).data
-        return Response(response)     
+        return Response(response)  
+
+#create dislike on a post
+class PostDislikesView(views.APIView):
+    def post(self, request,post_id):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+	#get the user
+        user_id = decoded_token['id']
+        try:
+            user = models.User.objects.get(id = user_id)
+        except models.User.DoesNotExist:
+            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+        
+
+        if not post_id:
+            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = models.Post.objects.get(id =post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+
+        #check if the post is already disliked by user
+        if models.Dislike.objects.filter(user=user, post=post).exists():
+            return Response({'message': "You have already disliked this post"}, status=status.HTTP_400_BAD_REQUEST)
+	 
+        
+	 #create dislike and save
+        new_dislike = models.Dislike(user = user, post = post, datetime = datetime.now())
+        new_dislike.save()
+        
+	 #create response
+        response = serializers.DislikeSerializer(new_dislike).data
+        return Response(response)    
+    
+#create comment on a post
+class PostCommentView(views.APIView):
+    def post(self, request,post_id):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+	#get the user
+        user_id = decoded_token['id']
+        try:
+            user = models.User.objects.get(id = user_id)
+        except models.User.DoesNotExist:
+            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+        
+        #get the post id from body
+        body = request.data 
+        comment = body.get('text')
+
+        if not post_id:
+            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not comment:
+            return Response({'error': "comment is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = models.Post.objects.get(id =post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+ 
+	 #create comment and save
+        new_comment = models.Comment(user = user, post = post,text = comment, datetime = datetime.now())
+        new_comment.save()
+        
+	 #create response
+        response = serializers.CommentSerializer(new_comment).data
+        return Response(response)   
 
