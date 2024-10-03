@@ -4,5 +4,10 @@ type CommentProps = {
 }
 
 export const Comment = ({comment}: CommentProps) => {
-    return <li>{comment.user}: {comment.text}</li>
+    return (
+    <li className="bg-stone-700 p-4 rounded-lg mb-4">
+        <span className="font-bold text-pink-400">{comment.user}</span>
+        <p className="text-gray-300 mt-2">{comment.text}</p> 
+    </li>
+    )
 }
