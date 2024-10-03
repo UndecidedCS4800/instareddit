@@ -1,6 +1,7 @@
 import {Outlet} from 'react-router-dom';
 import { AuthProvider } from "./components/auth"
 import NavBar from './NavBar';
+import { CenterViewContainer } from './components/CenterViewContainer';
 
 const App: React.FC = () => {
 
@@ -8,7 +9,9 @@ const App: React.FC = () => {
     <>
       <AuthProvider>
         <NavBar />
-        <Outlet />
+        <CenterViewContainer>
+          <Outlet />
+        </CenterViewContainer>
       </AuthProvider>
     </>
   );
