@@ -35,10 +35,10 @@ const router = createBrowserRouter([
             element: <Post />,
             loader: postLoader
           },
-          {
-            path: "/community/:communityid/posts/create",
-            element: <CreatePost />
-          }
+          // {
+          //   path: "/community/:communityid/posts/create",
+          //   element: <CreatePost />
+          // }
         ]
       }
     ],
