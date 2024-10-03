@@ -32,7 +32,7 @@ export const CenterPane = () => {
     const v = getView(view)
 
     return (
-        <div className='h-full w-'>
+        <div id="centerpane" className='h-full basis-8/12'>
             <FeedNav viewSetter={setViewHandler} activeView={view} />
             <CenterViewContainer>
                 {v}
