@@ -105,7 +105,7 @@ class PostCreateView(views.APIView):
         response = serializers.PostSerializer(new_post).data
         return Response(response)
     
-#create like on a post
+#post like on a post and get likes from a post
 class PostLikesView(views.APIView):
     def post(self, request,post_id):
         token = verify_token(request)
@@ -122,9 +122,7 @@ class PostLikesView(views.APIView):
         except models.User.DoesNotExist:
             return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
         
-        if not post_id:
-            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+	 #check if post exists
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
@@ -142,6 +140,16 @@ class PostLikesView(views.APIView):
 	 #create response
         response = serializers.LikeSerializer(new_like).data
         return Response(response)  
+    
+    def get(self, request, post_id):
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        likes = models.Like.objects.filter(post = post)
+        serializer = serializers.LikeSerializer(likes, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 #create dislike on a post
 class PostDislikesView(views.APIView):
@@ -160,10 +168,7 @@ class PostDislikesView(views.APIView):
         except models.User.DoesNotExist:
             return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
         
-
-        if not post_id:
-            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+	 #check if post exists
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
@@ -180,7 +185,17 @@ class PostDislikesView(views.APIView):
         
 	 #create response
         response = serializers.DislikeSerializer(new_dislike).data
-        return Response(response)    
+        return Response(response) 
+    
+    def get(self, request, post_id):
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        dislikes = models.Dislike.objects.filter(post = post)
+        serializer = serializers.DislikeSerializer(dislikes, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)   
     
 #create comment on a post
 class PostCommentView(views.APIView):
@@ -199,15 +214,14 @@ class PostCommentView(views.APIView):
         except models.User.DoesNotExist:
             return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
         
-        #get the post id from body
+        #get the comment from body
         body = request.data 
         comment = body.get('text')
 
-        if not post_id:
-            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
         if not comment:
             return Response({'error': "comment is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+	#check if post exists
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
@@ -219,5 +233,15 @@ class PostCommentView(views.APIView):
         
 	 #create response
         response = serializers.CommentSerializer(new_comment).data
-        return Response(response)   
+        return Response(response)
+    
+    def get(self, request, post_id):
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        comments = models.Comment.objects.filter(post = post)
+        serializer = serializers.CommentSerializer(comments, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)   
 
