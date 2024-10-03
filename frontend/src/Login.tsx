@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, registerUser } from './remote';
+import { loginUser, registerUser, ResponseOrError } from './remote';
 import { useAuthDispatch } from './components/auth';
 import { isError, JWTTokenResponse, ServerError } from './schema';
 //import { FaUser, FaLock} from "react-icons/fa";
