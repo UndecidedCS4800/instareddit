@@ -19,7 +19,7 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations api && python3 instareddit/manage.py migrate --fake api zero && python instareddit/manage.py migrate api && python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "pip3 install -r requirements.txt;  python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
