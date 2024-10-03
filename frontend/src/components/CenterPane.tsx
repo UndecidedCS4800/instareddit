@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { FeedNav } from "./FeedNav"
-import { CenterViewContainer } from "./CenterViewContainer"
 import { CommunityFeed } from "./CommunityFeed"
 
 export type FeedViews = "recent" | "community"
@@ -34,9 +33,9 @@ export const CenterPane = () => {
     return (
         <div id="centerpane" className='h-full basis-8/12'>
             <FeedNav viewSetter={setViewHandler} activeView={view} />
-            <CenterViewContainer>
+            <div>
                 {v}
-            </CenterViewContainer>
+            </div>
         </div>
     )
 }
