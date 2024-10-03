@@ -104,5 +104,45 @@ class PostCreateView(views.APIView):
         #response
         response = serializers.PostSerializer(new_post).data
         return Response(response)
+    
+class PostLikesView(views.APIView):
+    def post(self, request):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+	#get the user
+        user_id = decoded_token['id']
+        try:
+            user = models.User.objects.get(id = user_id)
+        except models.User.DoesNotExist:
+            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+        
+        #get the post id from body
+        body = request.data 
+        post_id = body.get('post') 
 
+        if not post_id:
+            return Response({'error': "post id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = models.Post.objects.get(id =post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+
+        #check if the post is already liked by user
+        if models.Like.objects.filter(user=user, post=post).exists():
+            return Response({'message': "You have already liked this post"}, status=status.HTTP_400_BAD_REQUEST)
+	 
+        
+	 #create like and save
+        new_like = models.Like(user = user, post = post, datetime = datetime.now())
+        new_like.save()
+        
+	 #create response
+        response = serializers.LikeSerializer(new_like).data
+        return Response(response)     
 

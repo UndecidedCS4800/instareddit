@@ -24,7 +24,7 @@ class SelfProfileView(views.APIView):
         # Get the token from the request
         token = verify_token(request)
         if not token:
-            return Response("user not verified", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
             # Decode the token

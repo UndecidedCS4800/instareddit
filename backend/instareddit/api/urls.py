@@ -28,6 +28,7 @@ urlpatterns = [
     path('user/<str:username>/posts', post_views.UserPostsListView.as_view()),
     path('posts', post_views.PostCreateView.as_view()),
     path('posts/<int:pk>', post_views.PostGetUpdateDestroyView.as_view()),
+    path('posts/like', post_views.PostLikesView.as_view()),
 
     #profiles
     path('profile/<str:username>' , profile_views.ProfileView.as_view()),
