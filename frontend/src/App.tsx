@@ -1,7 +1,7 @@
 import {Outlet} from 'react-router-dom';
-import './App.css';
-import NavBar from './NavBar';
 import { AuthProvider } from "./components/auth"
+import NavBar from './NavBar';
+
 const App: React.FC = () => {
 
   return (
