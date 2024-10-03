@@ -21,7 +21,7 @@ export const CommunityCard = ({ community }: CommunityCardProps) => {
                 <img className="w-[29px] h-[29px]" src="/public/thumb_down(1).png" alt="Thumb Down" />
                 <img className="w-[29px] h-[29px]" src="/public/tooltip(1).png" alt="Tooltip" />
                 <img className="w-[29px] h-[29px] ml-auto" src="/public/Reply(1).png" alt="Reply" />
-</div>
+            </div>
 
             <p className="px-4 py-2 text-white flex">{description}</p>
         </Card>

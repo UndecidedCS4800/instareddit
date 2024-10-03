@@ -15,10 +15,12 @@ export const PostCard = ({post, link}: PostCardProps) => {
 
     return (
         <Elem link={link} to={`posts/${post.id}`}>
-            {image && <img src={image} />}
-            {text}
-            {user}
-            {datetime}
+            <div className=" h-[65px] px-[12px] py-4 justify-start items-center gap-5 flex ">
+                <div className="text-white text-xl font-bold font-sans">{user}</div>
+                {image && <img className="h-[350px] w-full object-cover"src={image} />}
+                <div className="px-4 py-2 text-pink-800 flex">{text}</div>
+                {datetime}
+            </div>
         </Elem>
     )
 }
