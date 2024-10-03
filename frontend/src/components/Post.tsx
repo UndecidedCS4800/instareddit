@@ -27,7 +27,7 @@ export const Post = () => {
 
     const { comments, ...post } = data
     return (
-        <div>
+        <div className="border border-[#514350] bg-[#342c33] overflow-hidden shadow-lg transition-transform transform hover:scale-105">
             <PostCard post={post} />
             {comments && <Comments comments={comments} />}
         </div>
