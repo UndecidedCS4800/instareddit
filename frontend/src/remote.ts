@@ -1,33 +1,40 @@
+import { Community, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
+
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
-export const getData = async <T>(relative_path: string): Promise<T[]> => {
-    try {
-        const response = await fetch(`${URL}/api/${relative_path}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+const withAuth = (token: string, headers: HeadersInit): HeadersInit => ({
+    "Authorization": `bearer ${token}`,
+    ...headers
+})
 
-        if (!response.ok) {
-            // Check if there's a response body and log it
-            const errorData = await response.json();
-            console.error('Error fetching data:', response.status, response.statusText, errorData);
-            throw new Error(`Failed to fetch data: ${response.statusText}`);
-        }
+export type ResponseOrError<T> = T | ServerError;
+// export const getData = async <T>(relative_path: string): Promise<T[]> => {
+//     try {
+//         const response = await fetch(`${URL}/api/${relative_path}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//         });
 
-        const json = await response.json();
-        return json as T[];
-    } catch (error) {
-        console.error('Error in getData function:', error);
-        throw error; // Rethrow to allow further handling if needed
-    }
-};
+//         if (!response.ok) {
+//             // Check if there's a response body and log it
+//             const errorData = (await response.json() as ServerError);
+//             return errorData
+//         }
+
+//         const json = await response.json();
+//         return json as T[];
+//     } catch (error) {
+//         console.error('Error in getData function:', error);
+//         throw error; // Rethrow to allow further handling if needed
+//     }
+// };
 
 
 
 // Function to register a new user
-export const registerUser = async (username: string, email: string, password: string) => {
+export const registerUser = async (username: string, email: string, password: string): Promise<ResponseOrError<JWTTokenResponse>> => {
     try {
         const response = await fetch(`${URL}/api/auth/register`, {
             method: 'POST',
@@ -39,20 +46,24 @@ export const registerUser = async (username: string, email: string, password: st
 
         if (!response.ok) {
             // Check if there's a response body and log it
-            const errorData = await response.json();
+            const errorData = (await response.json()) as ServerError;
             console.error('Error registering user:', response.status, response.statusText, errorData);
-            throw new Error(`Registration Unsuccessful: ${response.statusText}`);
+            return errorData
         }
 
-        return await response.json();
-    } catch (error) {
-        console.error('Error in registerUser function:', error);
-        throw error; // Rethrow to allow further handling if needed
+        return await response.json() as JWTTokenResponse;
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
     }
 };
 
 // Function to log a user in and store JWT
-export const loginUser = async (username: string, password: string) => {
+export const loginUser = async (username: string, password: string): Promise<ResponseOrError<JWTTokenResponse>> => {
     try {
         const response = await fetch(`${URL}/api/auth/login`, {
             method: 'POST',
@@ -64,30 +75,88 @@ export const loginUser = async (username: string, password: string) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Error logging in:', response.status, response.statusText, errorData);
-            throw new Error(`Login Unsuccessful: ${response.statusText}`);
+            return errorData
         }
 
         const data = await response.json();
 
-        // Storing JWT
-        if (data.token) {
-            localStorage.setItem('token', data.token);
+        return data as JWTTokenResponse;
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
         }
-
-        return data;
-    } catch (error) {
-        console.error('Error in loginUser function:', error);
-        throw error; // Rethrow to allow further handling if needed
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
     }
 };
 
 
-// Function to log a user out
-export const logoutUser = () => {
+
+async function get<T>(relative_path: string): Promise<ResponseOrError<T>> {
     try {
-        localStorage.removeItem('token');
-    } catch (error) {
-        console.error('Error logging out:', error);
+        const req = await fetch(`${URL}${relative_path}`, {
+            headers: {
+                'Content-Type': "application/json"
+            }
+        })
+        if (!req.ok) {
+            const json = req.json()
+            return json as unknown as ServerError
+        }
+        const json = req.json();
+        return json as unknown as T
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
     }
-};
+}
+
+export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community>>> => {
+    const query_string = query ? `?query={${query}}` : ""
+    return await get(`/api/communities${query_string}`)
+}
+
+export const getCommunityPosts = async (id: number): Promise<ResponseOrError<PaginationResponse<Post>>> => {
+    return await get(`/api/community/${id}`)
+}
+
+export const getCommunity = async (id: number): Promise<ResponseOrError<Community>> => {
+    return await get(`/api/community/${id}/about`)
+}
+
+export const getPostComments = async (communityid: number, postid: number) : Promise<ResponseOrError<Post>> => {
+    return await get(`/api/community/${communityid}/post/${postid}`)
+}
+
+export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
+    return await get(`/api/${username}/posts`)
+}
+
+export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
+    try {
+        const req = await fetch(`${URL}/api/posts`, {
+            method: "POST",
+            headers: withAuth(token, {
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(post)
+        })
+        if (!req.ok) {
+            const json = req.json()
+            return json as unknown as ServerError
+        }
+        return await req.json()
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
+    }
+}
