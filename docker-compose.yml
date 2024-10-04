@@ -60,17 +60,19 @@ services:
       timeout: 5s
       retries: 3
 
-  phpmyadmin:
-     image: phpmyadmin/phpmyadmin:latest
-     container_name: phpmyadmin
-     ports:
-       - "8080:80"
-     environment:
-       PMA_HOST: db
-       PMA_USER: root
-       PMA_PASSWORD: secret
-     networks:
-       - instareddit-network
+  chat:
+      image: node:current-alpine3.19
+      container_name: chat
+      command: "yarn dev"
+      ports:
+        - "10000:10000"
+      environment:
+          TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
+          NODE_ENV: "development"
+      volumes: 
+        - ./chat:/usr/src/app
+
+
 
  
   
