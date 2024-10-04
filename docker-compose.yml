@@ -64,6 +64,7 @@ services:
       image: node:current-alpine3.19
       container_name: chat
       command: "yarn dev"
+      working_dir: /usr/src/app
       ports:
         - "10000:10000"
       environment:
@@ -71,6 +72,18 @@ services:
           NODE_ENV: "development"
       volumes: 
         - ./chat:/usr/src/app
+      networks:
+        - instareddit-network
+
+  redis:
+      image: redis:latest
+      container_name: chatlog
+      command: "redis-server --save 60 1"
+      volumes:
+        - instareddit-chatlog:/data
+      networks:
+        - instareddit-network
+      
 
 
 
@@ -78,3 +91,5 @@ services:
   
 volumes:
   instareddit-db:  
+
+  instareddit-chatlog:
