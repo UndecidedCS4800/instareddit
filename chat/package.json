@@ -1,0 +1,23 @@
+{
+  "name": "chat",
+  "version": "0.0.1",
+  "description": "chat application for instareddit using socket.io",
+  "main": "index.ts",
+  "repository": "https://github.com/UndecidedCS4800/instareddit",
+  "author": "Undecided LLC",
+  "license": "None",
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.0",
+    "socketio": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "ts-dev": "^2.1.16",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  },
+  "scripts": {
+    "dev": "tsx watch ."
+  }
+}
