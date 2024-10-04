@@ -25,9 +25,10 @@ export const CommunityCard = ({ community }: CommunityCardProps) => {
                 <img className="w-[29px] h-[29px]" src={ThumbDown} alt="Thumb Down" />
                 <img className="w-[29px] h-[29px]" src={ToolTip} alt="Tooltip" />
                 <img className="w-[29px] h-[29px] ml-auto" src={Reply} alt="Reply" />
-</div>
-
+            </div>
+            
             <p className="px-4 py-2 text-white flex">{description}</p>
         </Card>
     );
 };
+
