@@ -49,7 +49,7 @@ export const Login: React.FC = () => {
 
             <div className="flex justify-center items-center min-h-screen bg-stone-800">
                 <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-sm">
-                    {error && <div>{error.message}</div>}
+                    {error && <div>{error.error}</div>}
                     <form onSubmit={handleSubmit}>
                         <h1 className="text-3xl font-bold text-center mb-8 text-pink-300">
                             <span className="text-stone-700">Only</span>
