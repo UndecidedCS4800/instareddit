@@ -2,20 +2,24 @@
   "name": "chat",
   "version": "0.0.1",
   "description": "chat application for instareddit using socket.io",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "repository": "https://github.com/UndecidedCS4800/instareddit",
   "author": "Undecided LLC",
   "license": "None",
   "private": true,
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
-    "node-redis": "^0.1.7",
+    "mariadb": "^3.3.2",
+    "redis": "^4.7.0",
     "socketio": "^1.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/redis": "^4.0.11",
     "ts-dev": "^2.1.16",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2"
