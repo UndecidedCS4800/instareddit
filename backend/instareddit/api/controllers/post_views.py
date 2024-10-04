@@ -130,7 +130,7 @@ class PostLikesView(views.APIView):
 
         #check if the post is already liked by user
         if models.Like.objects.filter(user=user, post=post).exists():
-            return Response({'message': "You have already liked this post"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "You have already liked this post"}, status=status.HTTP_400_BAD_REQUEST)
 	 
         
 	 #create like and save
@@ -176,7 +176,7 @@ class PostDislikesView(views.APIView):
 
         #check if the post is already disliked by user
         if models.Dislike.objects.filter(user=user, post=post).exists():
-            return Response({'message': "You have already disliked this post"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "You have already disliked this post"}, status=status.HTTP_400_BAD_REQUEST)
 	 
         
 	 #create dislike and save
