@@ -9,10 +9,12 @@
   "private": true,
   "dependencies": {
     "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
     "socketio": "^1.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "ts-dev": "^2.1.16",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2"
