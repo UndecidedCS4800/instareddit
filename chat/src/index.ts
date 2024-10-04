@@ -5,6 +5,7 @@ import cors, { CorsOptions } from "cors"
 import { createClient as createRedisClient } from "redis"
 
 const corsOptions: CorsOptions = {
+    // Note: need to expand this for instareddit
     origin: ["localhost"]
 }
 
@@ -18,8 +19,11 @@ exp.get('/', (_req, res) => {
 // redis connection
 const redisClient = createRedisClient({
     socket: {
+        // note: need to have version for render redis/amazon elasticsotrage
         host: "chatlog"
     },
+
+    // need to have version for render
     username: "instareddit",
     password: "secret",
     database: 0,
@@ -34,6 +38,7 @@ redisClient.connect().then(() => console.log("connected to redis client"))
 
 // mariadb connection
 const pool = mariadb.createPool({
+    // note: need version for render/production
     host: "db",
     user: "root",
     password: "secret",
