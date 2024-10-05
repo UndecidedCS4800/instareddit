@@ -63,7 +63,7 @@ services:
   chat:
       image: node:current-alpine3.19
       container_name: chat
-      command: "yarn dev"
+      command: "yarn install && yarn add socket.io && yarn dev"
       working_dir: /usr/src/app
       ports:
         - "10000:10000"
@@ -71,6 +71,10 @@ services:
           TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
           NODE_ENV: "development"
           PORT: "10000"
+          MARIA_DB_NAME: "dummy"  
+          MARIA_DB_HOST: "db"
+          MARIA_DB_USER: "root"
+          MARIA_DB_PASSWORD: "secret"
       volumes: 
         - ./chat:/usr/src/app
       networks:
