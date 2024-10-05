@@ -38,7 +38,7 @@ redisClient.connect().then(() => console.log("connected to redis client"))
 
 // mariadb connection
 const pool = mariadb.createPool({
-    // note: need version for render/production
+    // note: need version for render/production 
     host: "db",
     user: "root",
     password: "secret",
