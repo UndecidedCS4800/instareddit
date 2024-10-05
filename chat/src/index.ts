@@ -3,6 +3,7 @@ import http from "http"
 import mariadb from "mariadb"
 import cors, { CorsOptions } from "cors"
 import { createClient as createRedisClient } from "redis"
+import { Server } from "socket.io"
 
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
@@ -42,12 +43,31 @@ const pool = mariadb.createPool({
     host: "db",
     user: "root",
     password: "secret",
-    database: "dummy" 
+    database: "milosz_dev" 
 })
 
 pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
                     .catch(err => console.error("Failed to connect:", err))
 const server = http.createServer(exp)
+
+const io = new Server(server)
+io.on('connection', (socket) => {
+    //allow to join chat between two users
+
+    //get username of whoever connected from query params
+    const { username } = socket.handshake.query;
+
+    //join a chat (should be a unique id for chat between two users)
+    socket.on('joinChat', ({roomId}) => {
+        socket.join(roomId)
+        io.to(roomId).emit('userConnected', `${username} connected to chat ${roomId}`)
+    })
+
+    //emit any messages received back to the Room
+    socket.on('message', ({roomId, text}) => {
+        io.to(roomId).emit('message', `${username} says: ${text}`)
+    })
+})
 
 server.listen(process.env.PORT, () => {
     console.log("Server started on", process.env.PORT)
