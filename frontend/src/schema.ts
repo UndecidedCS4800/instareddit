@@ -92,6 +92,8 @@ export interface PaginationResponse<T> {
   results: T[],
 }
 
+export type Friend = User;
+
 export type ServerError = {
   error: string
 }
