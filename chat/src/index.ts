@@ -8,7 +8,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
-    origin: ["localhost"]
+    origin: ["localhost:5173"]
 }
 
 // note: express might not be needed at all, but we use it for cors currently
@@ -44,7 +44,7 @@ const pool = mariadb.createPool({
     host: "db",
     user: "root",
     password: "secret",
-    database: "milosz_dev" 
+    database: "dummy",
 })
 
 pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
