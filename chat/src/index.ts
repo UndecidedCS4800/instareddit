@@ -7,7 +7,7 @@ import { Server } from "socket.io"
 
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
-    origin: ["localhost"]
+    origin: ["localhost:5173"]
 }
 
 // note: express might not be needed at all, but we use it for cors currently
@@ -43,7 +43,7 @@ const pool = mariadb.createPool({
     host: "db",
     user: "root",
     password: "secret",
-    database: "milosz_dev" 
+    database: "dummy",
 })
 
 pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
@@ -51,7 +51,11 @@ pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
 const server = http.createServer(exp)
 
 //socket.io
-const io = new Server(server)
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+    }
+})
 io.on('connection', (socket) => {
     //allow to join chat between two users
 
