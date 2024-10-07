@@ -91,18 +91,18 @@ io.on('connection', async (socket) => {
 
     //handle incoming message
     socket.on('message', async ({ to, message }) => {
-        //get receiver's socketID
-        const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
-        if (otherSocketId === null) {
-            console.log("Invalid recevier ID")
-            return
-        }
 
         //save message to logs
         const chatName = getChatName(userId, to)
         console.log(chatName)
         const messageLog = JSON.stringify({ "from": userId, "to": to, "message": message})
         await redisClient.rPush(`logs:${chatName}`, messageLog)
+        
+        //get receiver's socketID
+        const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
+        if (otherSocketId === null) {
+            return
+        }
 
         //send message to receiver
         const content = { 'from': userId, 'message': message }
