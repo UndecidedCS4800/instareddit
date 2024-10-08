@@ -51,11 +51,6 @@ pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
                     .catch(err => console.error("Failed to connect:", err))
 const server = http.createServer(exp)
 
-//function to generate room name based on users' ids
-function getChatName(userId1: string, userId2: string) {
-    return (userId1 > userId2) ? `${userId1}-${userId2}-chat` : `${userId2}-${userId1}-chat`
-}
-
 //socket.io
 
 //function to generate room name based on users' ids
@@ -69,12 +64,7 @@ function verifyToken(token: string) {
     return decodedToken
 }
 
-const io = new Server(server, {
-    cors: {
-        origin: ['http://localhost:3000', 'http://localhost:3030'], //used this for testing
-        methods: ['GET', 'POST']
-    }
-})
+const io = new Server(server)
 
 //authorization
 let idFromToken: string
