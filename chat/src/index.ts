@@ -64,9 +64,6 @@ interface ClientToServerEvents {
 }
 
 interface SocketData {
-    auth: {
-        token: string
-    }
     userID: number
     username: string
     friends?: string[]
@@ -96,7 +93,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsM
 io.use((socket, next) => {
     //try to verify the token, if failed send connect_error with the error message
     try {
-        const decodedToken = verifyToken(socket.data.auth.token)
+        const decodedToken = verifyToken(socket.handshake.auth.token)
         socket.data.userID = decodedToken.id
         socket.data.username = decodedToken.username
         next()
@@ -122,7 +119,7 @@ io.use(async (socket, next) => {
     }
     //store the friends' id's and proceed to connection
     const data = await response.json();
-    socket.data.friends = data;
+    socket.data.friends = data.friendsIds;
     next()
 })
 
