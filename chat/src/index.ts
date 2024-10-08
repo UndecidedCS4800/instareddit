@@ -64,7 +64,12 @@ function verifyToken(token: string) {
     return decodedToken
 }
 
-const io = new Server(server)
+const io = new Server(server, {
+    cors: {
+        origin: ['http://localhost:3000', 'http://localhost:3030'], //used this for testing
+        methods: ['GET', 'POST']
+    }
+})
 
 //authorization
 let idFromToken: string
@@ -122,6 +127,11 @@ io.on('connection', async (socket) => {
 
     //handle incoming message
     socket.on('message', async ({ to, message }) => {
+
+        //verify message format
+        if (!to || !message) {
+            return console.error('Invalid message format: must be { to, message }')
+        }
 
         //save message to logs
         const chatName = getChatName(userId, to)
