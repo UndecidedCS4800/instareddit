@@ -51,39 +51,70 @@ pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
                     .catch(err => console.error("Failed to connect:", err))
 const server = http.createServer(exp)
 
+//socket.io
+
 //function to generate room name based on users' ids
 function getChatName(userId1: string, userId2: string) {
     return (userId1 > userId2) ? `${userId1}-${userId2}-chat` : `${userId2}-${userId1}-chat`
 }
 
-//socket.io
-const io = new Server(server)
-io.on('connection', async (socket) => {
-    // get token from header
-    const token = socket.handshake.headers.authorization?.split(' ')[1] as string;
-    //decode token
+//verifies the token and throws error if failed
+function verifyToken(token: string) {
     const decodedToken = jwt.verify(token, process.env.TOKEN_KEY as string) as { username: string, id: string }
-    const userId: string = decodedToken.id
+    return decodedToken
+}
 
+const io = new Server(server)
+
+//authorization
+let idFromToken: string
+let friendsIdsFromRequest: Array<string>
+
+io.use((socket, next) => {
+    //try to verify the token, if failed send connect_error with the error message
+    try {
+        const decodedToken = verifyToken(socket.handshake.auth.token)
+        idFromToken = decodedToken.id
+        next()
+    } catch (error) {
+        next(error as Error)
+    }
+})
+
+io.use(async (socket, next) => {
     //get friends' IDs
     const response = await fetch("http://backend:8000/api/friends", { //change url later, for some reason localhost didn't work here, gotta use the container name
         method: 'GET',
         headers: {
-            'Authorization': `bearer ${token}`, // Add the Authorization header
+            'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
             'Content-Type': 'application/json',
         },
     }) 
+    // if request to django fails, send connect_error with the error message
     if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const error =  new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
+        next(error)
     }
-    const data = await response.json();
-    const friendsIds: Array<string> = data.friendsIds
+    else{
+        //store the friends' id's and proceed to connection
+        const data = await response.json();
+        friendsIdsFromRequest = data.friendsIds
+        next()
+    }
+})
+
+io.on('connection', async (socket) => {
+    //save client's user ID & friends list
+    const userId = idFromToken
+    const friendsIds = friendsIdsFromRequest
+
+    console.log(`CLIENT CONNECTED, ID: ${userId}`)
 
     //send restored chats with each friend
     friendsIds.forEach(async (fId: string) => {
         let chatName = getChatName(userId, fId)
         let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
-        io.to(socket.id).emit('restoredMessages', { "with": fId, "messages": prevMessages })
+        socket.emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
     });
 
     //map user id to socket id
@@ -94,7 +125,6 @@ io.on('connection', async (socket) => {
 
         //save message to logs
         const chatName = getChatName(userId, to)
-        console.log(chatName)
         const messageLog = JSON.stringify({ "from": userId, "to": to, "message": message})
         await redisClient.rPush(`logs:${chatName}`, messageLog)
         
