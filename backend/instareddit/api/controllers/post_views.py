@@ -163,6 +163,16 @@ class PostLikesView(views.APIView):
         serializer = serializers.LikeSerializer(likes, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class DeleteLikesView(generics.DestroyAPIView):
+    queryset = models.Like.objects.all()
+    serializer_class = serializers.LikeSerializer
+    lookup_field = 'like_id'
+    def delete(self, request, *args, **kwargs):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        return self.destroy(request, *args, **kwargs)
+
 #create dislike on a post
 class PostDislikesView(views.APIView):
     def post(self, request,post_id):
