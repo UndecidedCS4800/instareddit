@@ -5,6 +5,9 @@ import Pane from './components/Pane';
 import FriendsList from './components/FriendsList';
 import { Friend, isError } from './schema';
 import { getFriends } from './remote';
+import  socket  from './socket';
+import { useEffect, useState } from 'react';
+import { useAuth } from './components/auth';
 
 export const loader: LoaderFunction<{friends: Friend[]}> = async (_args) => {
     const token = localStorage.getItem("token")
@@ -25,12 +28,46 @@ export const loader: LoaderFunction<{friends: Friend[]}> = async (_args) => {
 
 const App: React.FC = () => {
   const loaderData = useLoaderData() as { friends: Friend[] };
+  const [chatConnected, setChatConnected] = useState(socket.connected)
+
+  const auth = useAuth()
+
+  useEffect(() => {
+    const connect = () => {
+      if (auth) {
+        socket.auth = { token: auth.token }
+        socket.connect()
+      }
+      
+    }
+    connect()
+  }, [auth])
+
+
+  useEffect(() => {
+    const onConnect = () => {
+      setChatConnected(true)
+    }
+
+    const onDisconnect = () => {
+      setChatConnected(false)
+    }
+
+    socket.on("connect", onConnect)
+    socket.on("disconnect", onDisconnect)
+    socket.on("message", () => {})
+    return () => {
+      socket.off("connect", onConnect)
+      socket.off("disconnect", onDisconnect)
+    }
+
+  }, [])
 
   return (
     <>
         <Pane>
           <NavBar />
-          <FriendsList friends={loaderData.friends} />
+          {chatConnected && <FriendsList friends={loaderData.friends} />}
         </Pane>
         <CenterViewContainer>
           <Outlet />
