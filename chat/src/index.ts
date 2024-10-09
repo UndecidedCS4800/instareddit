@@ -66,7 +66,7 @@ interface ClientToServerEvents {
 interface SocketData {
     userID: number
     username: string
-    friends?: string[]
+    friends?: number[]
 }
 
 //function to generate room name based on users' ids
@@ -131,10 +131,10 @@ io.on('connection', async (socket) => {
     console.log(`CLIENT CONNECTED, ID: ${userId}`)
 
     //send restored chats with each friend
-    friendsIds?.forEach(async (fId: string) => {
+    friendsIds?.forEach(async (fId: number) => {
         let chatName = getChatName(userId, fId)
         let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
-        socket.emit('restoredMessages', { "withUser": Number(fId), "messages": prevMessages })
+        socket.emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
     });
 
     //map user id to socket id
@@ -168,4 +168,3 @@ io.on('connection', async (socket) => {
 server.listen(process.env.PORT, () => {
     console.log("Server started on", process.env.PORT)
 })
-
