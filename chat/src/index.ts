@@ -99,7 +99,7 @@ io.use((socket, next) => {
         next()
 
     } catch (error) {
-        throw error;
+        throw next(error as Error)
     }
 })
 
@@ -115,7 +115,7 @@ io.use(async (socket, next) => {
     // if request to django fails, send connect_error with the error message
     if (!response.ok) {
         const error =  new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
-        throw error;
+        throw next(error);
     }
     //store the friends' id's and proceed to connection
     const data = await response.json();
