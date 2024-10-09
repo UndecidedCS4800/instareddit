@@ -3,7 +3,7 @@ import http from "http"
 import mariadb from "mariadb"
 import cors, { CorsOptions } from "cors"
 import { createClient as createRedisClient } from "redis"
-import { Server } from "socket.io"
+import { DefaultEventsMap, Server } from "socket.io"
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const corsOptions: CorsOptions = {
@@ -52,37 +52,54 @@ pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
 const server = http.createServer(exp)
 
 //socket.io
+// types
+interface ServerToClientEvents {
+    message: (message: {from: number, message: string}) => void;
+    restoredMessages: (msgs: { withUser: number, messages: string[] }) => void;
+}
+
+
+interface ClientToServerEvents {
+    message: (message: { to: number, message: string }) => void;
+}
+
+interface SocketData {
+    userID: number
+    username: string
+    friends?: number[]
+}
 
 //function to generate room name based on users' ids
-function getChatName(userId1: string, userId2: string) {
+function getChatName(userId1: string | number, userId2: string | number) {
     return (userId1 > userId2) ? `${userId1}-${userId2}-chat` : `${userId2}-${userId1}-chat`
 }
 
 //verifies the token and throws error if failed
 function verifyToken(token: string) {
-    const decodedToken = jwt.verify(token, process.env.TOKEN_KEY as string) as { username: string, id: string }
+    const decodedToken = jwt.verify(token, process.env.TOKEN_KEY as string) as { username: string, id: number }
     return decodedToken
 }
 
-const io = new Server(server, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, SocketData>(server, {
     cors: {
         origin: ['http://localhost:3000', 'http://localhost:3030'], //used this for testing
         methods: ['GET', 'POST']
     }
 })
 
+
 //authorization
-let idFromToken: string
-let friendsIdsFromRequest: Array<string>
 
 io.use((socket, next) => {
     //try to verify the token, if failed send connect_error with the error message
     try {
         const decodedToken = verifyToken(socket.handshake.auth.token)
-        idFromToken = decodedToken.id
+        socket.data.userID = decodedToken.id
+        socket.data.username = decodedToken.username
         next()
+
     } catch (error) {
-        next(error as Error)
+        throw next(error as Error)
     }
 })
 
@@ -98,25 +115,23 @@ io.use(async (socket, next) => {
     // if request to django fails, send connect_error with the error message
     if (!response.ok) {
         const error =  new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
-        next(error)
+        throw next(error);
     }
-    else{
-        //store the friends' id's and proceed to connection
-        const data = await response.json();
-        friendsIdsFromRequest = data.friendsIds
-        next()
-    }
+    //store the friends' id's and proceed to connection
+    const data = await response.json();
+    socket.data.friends = data.friendsIds;
+    next()
 })
 
 io.on('connection', async (socket) => {
     //save client's user ID & friends list
-    const userId = idFromToken
-    const friendsIds = friendsIdsFromRequest
+    const userId = socket.data.userID
+    const friendsIds = socket.data.friends
 
     console.log(`CLIENT CONNECTED, ID: ${userId}`)
 
     //send restored chats with each friend
-    friendsIds.forEach(async (fId: string) => {
+    friendsIds?.forEach(async (fId: number) => {
         let chatName = getChatName(userId, fId)
         let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
         socket.emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
@@ -153,4 +168,3 @@ io.on('connection', async (socket) => {
 server.listen(process.env.PORT, () => {
     console.log("Server started on", process.env.PORT)
 })
-
