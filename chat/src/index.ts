@@ -4,6 +4,7 @@ import mariadb from "mariadb"
 import cors, { CorsOptions } from "cors"
 import { createClient as createRedisClient } from "redis"
 import { Server } from "socket.io"
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
@@ -51,40 +52,102 @@ pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
 const server = http.createServer(exp)
 
 //socket.io
+
+//function to generate room name based on users' ids
+function getChatName(userId1: string, userId2: string) {
+    return (userId1 > userId2) ? `${userId1}-${userId2}-chat` : `${userId2}-${userId1}-chat`
+}
+
+//verifies the token and throws error if failed
+function verifyToken(token: string) {
+    const decodedToken = jwt.verify(token, process.env.TOKEN_KEY as string) as { username: string, id: string }
+    return decodedToken
+}
+
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: ['http://localhost:3000', 'http://localhost:3030'], //used this for testing
+        methods: ['GET', 'POST']
     }
 })
-io.on('connection', (socket) => {
-    //allow to join chat between two users
 
-    //get username of whoever is connected and room ID from query params
-    const { username } = socket.handshake.query;
-    
-    //join room for chat between 2 users (frontend can decide how to specify room ID's)
-    socket.on('joinRoom', async ({roomId}) => {
-        socket.join(roomId)
-        //get and emit previous messages in this room
-        const messages = await redisClient.lRange(`messages:${roomId}`, 0, -1)
-        socket.emit('previousMessages', messages)
-    })
+//authorization
+let idFromToken: string
+let friendsIdsFromRequest: Array<string>
 
-    //emit any messages received back to the the Room and save them to redis
-    socket.on('message', async ({roomId, text}) => {
-        if (!roomId) {
+io.use((socket, next) => {
+    //try to verify the token, if failed send connect_error with the error message
+    try {
+        const decodedToken = verifyToken(socket.handshake.auth.token)
+        idFromToken = decodedToken.id
+        next()
+    } catch (error) {
+        next(error as Error)
+    }
+})
+
+io.use(async (socket, next) => {
+    //get friends' IDs
+    const response = await fetch("http://backend:8000/api/friends", { //change url later, for some reason localhost didn't work here, gotta use the container name
+        method: 'GET',
+        headers: {
+            'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
+            'Content-Type': 'application/json',
+        },
+    }) 
+    // if request to django fails, send connect_error with the error message
+    if (!response.ok) {
+        const error =  new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
+        next(error)
+    }
+    else{
+        //store the friends' id's and proceed to connection
+        const data = await response.json();
+        friendsIdsFromRequest = data.friendsIds
+        next()
+    }
+})
+
+io.on('connection', async (socket) => {
+    //save client's user ID & friends list
+    const userId = idFromToken
+    const friendsIds = friendsIdsFromRequest
+
+    console.log(`CLIENT CONNECTED, ID: ${userId}`)
+
+    //send restored chats with each friend
+    friendsIds.forEach(async (fId: string) => {
+        let chatName = getChatName(userId, fId)
+        let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
+        socket.emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
+    });
+
+    //map user id to socket id
+    await redisClient.hSet('user-socket-map', userId, socket.id)
+
+    //handle incoming message
+    socket.on('message', async ({ to, message }) => {
+
+        //verify message format
+        if (!to || !message) {
+            return console.error('Invalid message format: must be { to, message }')
+        }
+
+        //save message to logs
+        const chatName = getChatName(userId, to)
+        const messageLog = JSON.stringify({ "from": userId, "to": to, "message": message})
+        await redisClient.rPush(`logs:${chatName}`, messageLog)
+        
+        //get receiver's socketID
+        const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
+        if (otherSocketId === null) {
             return
         }
-        const message = `${username}: ${text}`
-        //emit new message to the room
-        io.to(roomId).emit('message', message)
-        //store message in db
-        await redisClient.rPush(`messages:${roomId}`, message)
-    })
 
-    socket.on('leaveRoom', ({roomId}) => {
-        socket.leave(roomId)
-    })
+        //send message to receiver
+        const content = { 'from': userId, 'message': message }
+        socket.to(`${otherSocketId}`).emit('message', content)
+    }) 
 })
 
 server.listen(process.env.PORT, () => {
