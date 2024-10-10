@@ -24,7 +24,7 @@ const NavBar: React.FC = () => {
             />
     }
     return (
-        <nav className="min-h-max basis-4/12 bg-stone-800 text-white">
+        <nav className="h-screen basis-4/12 bg-stone-800 text-white">
             <div className="flex items-center justify-center bg-stone-800 h-20">
                 <h1 className="text-2xl">
                     <span className="text-white font-normal">Only</span>
@@ -48,5 +48,6 @@ const NavBar: React.FC = () => {
             </ul>
         </nav>
     );
-};
-export default NavBar;
+ };
+ export default NavBar;
+ 

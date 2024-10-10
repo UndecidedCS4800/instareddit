@@ -65,8 +65,8 @@ const App: React.FC = () => {
 
   return (
     <>
-        <Pane>
-          <NavBar />
+        <Pane className='h-screen basis-4/12'>
+          <NavBar/>
           {chatConnected && <FriendsList friends={loaderData.friends} />}
         </Pane>
         <CenterViewContainer>
@@ -74,6 +74,7 @@ const App: React.FC = () => {
         </CenterViewContainer>
     </>
   );
+ 
 }
 
 export default App;
