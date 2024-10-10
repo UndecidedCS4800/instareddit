@@ -2,11 +2,12 @@ import { Friend } from "../schema"
 
 interface FriendsListItemProps {
     friend: Friend;
+    handler: () => void;
 }
 
-const FriendsListItem = ({friend}: FriendsListItemProps) => {
+const FriendsListItem = ({friend, handler}: FriendsListItemProps) => {
     return (
-        <div>{friend}</div>
+        <div onClick={() => handler()}>{friend}</div>
     )
 }
 

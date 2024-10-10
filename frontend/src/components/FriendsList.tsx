@@ -1,20 +1,21 @@
-import { Friend } from "../schema";
+import {Friend } from "../schema";
 import FriendsListItem from "./FriendsListItem";
 
 
 // TODO: when we want user profile pages this should be updated
 interface FriendsListProps {
     friends: Friend[];
+    setWindowHandler: React.Dispatch<React.SetStateAction<number| null>>
 }
 
-const FriendsList = ({friends}: FriendsListProps) => {
+const FriendsList = ({friends, setWindowHandler}: FriendsListProps) => {
     if (friends.length === 0) {
         return <></>
     }
     
     return (
         <div>
-            {friends.map(friend => <FriendsListItem key={friend} friend={friend} />)}
+            {friends.map(friend => <FriendsListItem key={friend} friend={friend} handler={() => setWindowHandler(friend)} />)}
         </div>
     )
 

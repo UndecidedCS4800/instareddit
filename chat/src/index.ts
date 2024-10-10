@@ -82,7 +82,7 @@ function verifyToken(token: string) {
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, SocketData>(server, {
     cors: {
-        origin: ['http://localhost:3000', 'http://localhost:3030'], //used this for testing
+        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173"], //used this for testing
         methods: ['GET', 'POST']
     }
 })

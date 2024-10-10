@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, RouterProviderProps } from "react-router-dom"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import About from "./About";
 import App from "./App";
 import { CenterPane } from "./components/CenterPane";
@@ -8,10 +8,12 @@ import { Post } from "./components/Post";
 import { Login } from "./Login";
 import { loader as communityLoader } from "./components/Community"
 import { loader as postLoader } from "./components/Post"
+import { loader as appLoader } from "./App"
 
 const router = createBrowserRouter([
     { path: "/",
       element: <App />,
+      loader: appLoader,
       children: [
         {
           index: true,

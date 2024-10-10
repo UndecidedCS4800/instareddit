@@ -93,12 +93,22 @@ export interface PaginationResponse<T> {
   results: T[],
 }
 
+export interface FriendResponse {
+  userId: number,
+  friendsIds: number[]
+}
+
 export type Friend = number;
 
 export type ServerError = {
   error: string
 }
-
+export interface ChatMessage {
+  from: number,
+  to: number,
+  message: string
+}
+export type ChatHistory = Record<number, ChatMessage[]>
 export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
   return (obj as ServerError).error !== undefined

@@ -1,4 +1,4 @@
-import { Community, Friend, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
+import { Community, Friend, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -139,7 +139,10 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
 }
 
 export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {
-    return await get('/api/friends', token)
+    const json =  await get('/api/friends', token) as FriendResponse
+    console.log("json", json)
+
+    return json.friendsIds
 }
 
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
