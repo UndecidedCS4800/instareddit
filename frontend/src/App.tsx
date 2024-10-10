@@ -9,6 +9,7 @@ import  socket  from './socket';
 import { useEffect, useState } from 'react';
 import { useAuth } from './components/auth';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const loader: LoaderFunction<{friends: Friend[]}> = async (_args) => {
     const token = localStorage.getItem("token")
 

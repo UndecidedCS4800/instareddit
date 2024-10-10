@@ -1,10 +1,10 @@
-import { User } from "../schema";
+import { Friend } from "../schema";
 import FriendsListItem from "./FriendsListItem";
 
 
 // TODO: when we want user profile pages this should be updated
 interface FriendsListProps {
-    friends: User[];
+    friends: Friend[];
 }
 
 const FriendsList = ({friends}: FriendsListProps) => {

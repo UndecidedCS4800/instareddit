@@ -1,12 +1,12 @@
-import { User } from "../schema"
+import { Friend } from "../schema"
 
 interface FriendsListItemProps {
-    friend: User;
+    friend: Friend;
 }
 
 const FriendsListItem = ({friend}: FriendsListItemProps) => {
     return (
-        <div>{friend.id} {friend.username}</div>
+        <div>{friend}</div>
     )
 }
 
