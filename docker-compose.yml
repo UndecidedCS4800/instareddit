@@ -4,7 +4,7 @@ networks:
 services:
   frontend:
     image: node:latest
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "yarn --non-interactive && yarn dev"
     ports:
       - 5173:5173
     working_dir: /frontend
@@ -19,13 +19,13 @@ services:
   backend:
     build: backend
     command:  
-         sh -c  "pip3 install -r requirements.txt; python3 instareddit/manage.py makemigrations && python3 instareddit/manage.py migrate && python instareddit/manage.py runserver 0.0.0.0:8000"
+         sh -c  "pip3 install -r requirements.txt;  python instareddit/manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     environment:
       PORT: "8000"
       DJANGO_DEBUG: "TRUE"
-      MARIA_DB_NAME: "name"
+      MARIA_DB_NAME: "dummy"
       MARIA_DB_HOST: "db"
       MARIA_DB_USER: "root"
       MARIA_DB_PASSWORD: "secret"
@@ -60,19 +60,41 @@ services:
       timeout: 5s
       retries: 3
 
-  phpmyadmin:
-     image: phpmyadmin/phpmyadmin:latest
-     container_name: phpmyadmin
-     ports:
-       - "8080:80"
-     environment:
-       PMA_HOST: db
-       PMA_USER: root
-       PMA_PASSWORD: secret
-     networks:
-       - instareddit-network
+  chat:
+      image: node:current-alpine3.19
+      container_name: chat
+      command: "yarn --non-interactive && yarn dev"
+      working_dir: /usr/src/app
+      ports:
+        - "10000:10000"
+      environment:
+          TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
+          NODE_ENV: "development"
+          PORT: "10000"
+      volumes: 
+        - ./chat:/usr/src/app
+      networks:
+        - instareddit-network
+      depends_on:
+        - redis
+    
+
+  redis:
+      image: redis:latest
+      container_name: chatlog
+      command: "redis-server /usr/local/etc/redis/redis.conf"
+      volumes:
+        - instareddit-chatlog:/data
+        - ./redis/config:/usr/local/etc/redis/
+      networks:
+        - instareddit-network
+      
+
+
 
  
   
 volumes:
   instareddit-db:  
+
+  instareddit-chatlog:

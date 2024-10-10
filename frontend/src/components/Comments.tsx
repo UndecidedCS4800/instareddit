@@ -7,7 +7,7 @@ type CommentsProps = {
 
 export const Comments = ({comments}: CommentsProps) => {
     return (
-        <ul>
+        <ul className="space-y-4">
             {comments.map(comment => <Comment key={comment.id} comment={comment} />)}
         </ul>
     )

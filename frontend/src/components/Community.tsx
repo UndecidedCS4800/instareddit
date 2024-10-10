@@ -52,10 +52,12 @@ export const Community = () => {
     // TODO: add pagination support
     return (
         <React.Fragment>
+            <div className="bg-[#342c33] h-full w-full overflow-auto">
             <Link to="posts/create">Create Post</Link>
             <CommunityCard community={community} />
-            <Posts posts={posts.results} />
+            <div className="h-screen bg-[#342c33]"><Posts posts={posts.results} /></div>
             <Outlet />
+            </div>
         </React.Fragment>
     )
 }

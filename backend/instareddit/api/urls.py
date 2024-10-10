@@ -36,7 +36,7 @@ urlpatterns = [
     path('profile/<str:username>' , profile_views.ProfileView.as_view()),
     path('profile/', profile_views.SelfProfileView.as_view()),
 
-    #friendships
+    #friends
     path('friends/', friendship_views.FriendsIdsGetView.as_view())
 
 ]

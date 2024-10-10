@@ -111,6 +111,97 @@ const About: React.FC = () => {
              so we will be getting ahead next week.
            </td>
          </tr>
+         <tr>
+              <td>9/23</td>
+           <td> On the frontend, We made repo called frontend-browserrouter that migrates from whatever solution 
+            you had for routing to the lastest that we could use for the login page. On the backend, we added routes
+             for /community/id and /community/id/about.
+           </td>
+         </tr>
+         <tr>
+              <td>9/24</td>
+           <td> This meeting was held in the library late afternoon. We started work on the diagram and got the 
+            first draft of it completed. For the log in page, more work was completed for the backend code and 
+            the routes to the frontend.
+           </td>
+         </tr>
+         <tr>
+              <td>9/25</td>
+           <td> The meeting was held in class. On the backend, tony/auth has the new updated register view with
+             more specifc checks and responses to the username, password, and email and also tries to validate
+              the password to make sure it is not too weak.
+           </td>
+         </tr>
+         <tr>
+              <td>9/26</td>
+           <td> The meeting was not held today because of personal reasons with the CEO, but tasks were assigned 
+            online over text. For the frontend, work on the scaffolding and design continued. On the backend,
+            review was done on the code and fixed some of the errors with it, and the diagram also had another
+            draft completed.
+           </td>
+         </tr>
+         <tr>
+              <td>9/27</td>
+           <td> The meeting was held during class hours. We showed professor the completed log in page,
+            but we weren't able to get it deployed in time. Also, the task for next week was assigned.
+            We discussed how we would tackle it for the upcoming week.
+           </td>
+         </tr>
+         <tr>
+              <td>9/30</td>
+           <td> This meeting was held in person during class. For the frontend, we created the types and
+            code for the backend routes. For the backend, we made a route with a list of all the communities
+            paginated, optionally there will be a querystring to filter out results sorted by subscriber count.
+
+           </td>
+         </tr>
+         <tr>
+              <td>10/1</td>
+           <td> This meeting was held in person in the library at the usual meeting time. For the frontend,
+           a lot of code for the frontend about 20 components were completed. Tasks for styling the componenets
+           were assingned. For the backend, the routes were worked on with many decisions on how they should 
+           work was done.
+           </td>
+         </tr>
+         <tr>
+              <td>10/2</td>
+           <td> The meeting was held in person in the library at the usual meeting time. For the frontend,
+            the navbar was updated and tabs for the recent activity and community was added, and more
+            styling was worked on. For the backend, we finalized what functions the posts will have for 
+            the showing on friday.
+           </td>
+         </tr>
+         <tr>
+              <td>10/3</td>
+           <td> This meeting was held in person in the library at the usual meeting time. A basic styling
+            for the community tab post screen, and create post was completed. The backend code for creating post
+            was already completed. We got the build complete and deployed it to the cloud.
+           </td>
+         </tr>
+         <tr>
+              <td>10/4</td>
+           <td> The meeting was held in class on this date. The completed page for creating post was shown to professor
+            along with the community tab. Also, the tasks for next week were revealed.
+           </td>
+         </tr>
+         <tr>
+              <td>10/7</td>
+           <td> Group meeting was held in class. We discussed what needed to be done with messaging system, and
+             tasks were assigned accordingly to each member. There were some employees who worked overtime on the
+            weekend and started progress on the messaging system.
+           </td>
+         </tr>
+         <tr>
+              <td>10/8</td>
+           <td> Due to personal issues with team members, there was no meetings held and just continue on work that
+             needs to be done.
+           </td>
+         </tr>
+         <tr>
+              <td>10/9</td>
+           <td> 
+           </td>
+         </tr>
        </tbody>
      </table>
    </div>

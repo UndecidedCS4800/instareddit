@@ -3,7 +3,7 @@ interface CenterViewportProps {
 }
 export const CenterViewContainer = ({ children }: CenterViewportProps) => {
     return (
-        <main className="">
+        <main className="flex w-full justify-center">
             {children}
         </main>
     )

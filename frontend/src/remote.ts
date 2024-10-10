@@ -1,4 +1,4 @@
-import { Community, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
+import { Community, Friend, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -93,12 +93,13 @@ export const loginUser = async (username: string, password: string): Promise<Res
 
 
 
-async function get<T>(relative_path: string): Promise<ResponseOrError<T>> {
+async function get<T>(relative_path: string, token?: string): Promise<ResponseOrError<T>> {
     try {
+        const baseHeaders = { 'Content-Type': "application/json" }
+        const headers = token ? withAuth(token, baseHeaders) 
+                        : baseHeaders
         const req = await fetch(`${URL}${relative_path}`, {
-            headers: {
-                'Content-Type': "application/json"
-            }
+            headers
         })
         if (!req.ok) {
             const json = req.json()
@@ -135,6 +136,10 @@ export const getPostComments = async (communityid: number, postid: number) : Pro
 
 export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
     return await get(`/api/${username}/posts`)
+}
+
+export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {
+    return await get('/api/friends', token)
 }
 
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
