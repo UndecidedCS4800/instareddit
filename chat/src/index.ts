@@ -55,7 +55,7 @@ const server = http.createServer(exp)
 // types
 interface ServerToClientEvents {
     message: (message: {from: number, message: string}) => void;
-    restoredMessages: (msgs: { withUser: number, messages: string[] }) => void;
+    restoredMessages: (msgs: { withUser: number, messages: string[] }[]) => void;
 }
 
 
@@ -127,16 +127,26 @@ io.on('connection', async (socket) => {
     //save client's user ID & friends list
     const userId = socket.data.userID
     const friendsIds = socket.data.friends
-
+    socket.join(socket.data.userID.toString())
     console.log(`CLIENT CONNECTED, ID: ${userId}`)
 
-    //send restored chats with each friend
-    friendsIds?.forEach(async (fId: number) => {
-        let chatName = getChatName(userId, fId)
-        let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
-        socket.emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
-    });
 
+    //send restored chats with each friend
+    if (friendsIds) {
+        const restoredMessages = await Promise.all(friendsIds?.map(async (fId: number) => {
+            let chatName = getChatName(userId, fId)
+            let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
+            return { "withUser": fId, "messages": prevMessages }
+        }));
+
+        // friendsIds?.forEach(async (fId: number) => {
+        //     let chatName = getChatName(userId, fId)
+        //     let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
+        //     io.to(socket.data.userID.toString()).emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
+        // });
+
+        io.to(socket.data.userID.toString()).emit('restoredMessages', restoredMessages)
+    }
     //map user id to socket id
     await redisClient.hSet('user-socket-map', userId, socket.id)
 
