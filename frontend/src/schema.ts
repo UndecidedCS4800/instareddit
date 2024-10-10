@@ -83,6 +83,7 @@ export interface CommunityMembers {
 export interface JWTTokenResponse {
   username: string,
   token: string,
+  id: number,
 }
 
 export interface PaginationResponse<T> {
