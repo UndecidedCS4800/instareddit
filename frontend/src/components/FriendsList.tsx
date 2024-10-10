@@ -14,7 +14,7 @@ const FriendsList = ({friends}: FriendsListProps) => {
     
     return (
         <div>
-            {friends.map(friend => <FriendsListItem key={friend.id} friend={friend} />)}
+            {friends.map(friend => <FriendsListItem key={friend} friend={friend} />)}
         </div>
     )
 

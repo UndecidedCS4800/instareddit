@@ -1,6 +1,6 @@
-const Pane = ({children}: React.HTMLProps<HTMLDivElement>) => {
+const Pane = ({children, ...props}: React.HTMLProps<HTMLDivElement>) => {
     return (
-        <div>
+        <div {...props}>
             {children}
         </div>
     )
