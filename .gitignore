@@ -2,6 +2,7 @@
 .env
 **/__pycache__/
 json-srv
+**/node_modules/
 .render.env
 cred
 render_credit
