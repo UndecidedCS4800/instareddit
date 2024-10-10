@@ -4,7 +4,7 @@ networks:
 services:
   frontend:
     image: node:latest
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "yarn --non-interactive && yarn dev"
     ports:
       - 5173:5173
     working_dir: /frontend
@@ -63,7 +63,7 @@ services:
   chat:
       image: node:current-alpine3.19
       container_name: chat
-      command: "yarn dev"
+      command: "yarn --non-interactive && yarn dev"
       working_dir: /usr/src/app
       ports:
         - "10000:10000"
