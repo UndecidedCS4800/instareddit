@@ -63,7 +63,7 @@ services:
   chat:
       image: node:current-alpine3.19
       container_name: chat
-      command: "yarn --non-interactive && yarn dev"
+      command: sh -c "yarn --non-interactive && yarn dev"
       working_dir: /usr/src/app
       ports:
         - "10000:10000"
