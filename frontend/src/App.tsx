@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [selectedChatWindow, setChatWindow] = useState<number | null>(null)
 
   const auth = useAuth()
-  console.log("history", chatHistory["34"])
+  console.log("history", chatHistory)
 
   useEffect(() => {
     console.log("effect auth running")
@@ -73,19 +73,20 @@ const App: React.FC = () => {
       setChatConnected(false)
     }
 
-    const chatMessage = (msg: Omit<ChatMessage, "to">) => {
-      const to = (auth as JWTTokenResponse).id
-      console.log("to:", to)
-      console.log("got msg", msg)
-      console.log(chatHistory[msg.from])
-      if (chatHistory == null) {
-        setChatHistory({ [msg.from]: [{to, ...msg}]})
-      } else {
-        setChatHistory(
-          { ...chatHistory, [msg.from]: chatHistory[msg.from].concat([{ to, ...msg }]) }
-        )
-    }}
 
+
+    socket.on("connect", onConnect)
+    socket.on("disconnect", onDisconnect)
+
+    
+    return () => {
+      socket.off("connect", onConnect)
+      socket.off("disconnect", onDisconnect)
+    }
+
+  }, [])
+
+  useEffect(() => {
     const restoredMessages = (messages: { withUser: number, messages: ChatMessage[]}[]) => {
       console.log("restoring")
       console.log(messages)
@@ -94,21 +95,27 @@ const App: React.FC = () => {
       )
     }
 
-    socket.on("connect", onConnect)
-    socket.on("disconnect", onDisconnect)
-    socket.on("message", chatMessage)
-    socket.on("restoredMessages", restoredMessages)
-
-    
-    return () => {
-      socket.off("connect", onConnect)
-      socket.off("disconnect", onDisconnect)
-      socket.off("message", chatMessage)
-      socket.off("restoredMessages", chatMessage)
+    const chatMessage = (msg: Omit<ChatMessage, "to">) => {
+      const to = (auth as JWTTokenResponse).id
+      console.log("got msg", msg)
+      if (chatHistory == null) {
+        setChatHistory({ [msg.from]: [{to, ...msg}]})
+      } else if (!chatHistory[msg.from]) {
+        setChatHistory({...chatHistory, [msg.from]: [{to, ...msg}] })
+      } else {
+        setChatHistory(
+          { ...chatHistory, [msg.from]: chatHistory[msg.from].concat([{ to, ...msg }]) }
+        )
+      }
     }
+    socket.on("restoredMessages", restoredMessages)
+    socket.on("message", chatMessage)
 
-  }, [])
-
+    return () => {
+      socket.off("restoredMessages", restoredMessages)
+      socket.off("message", chatMessage)
+    }
+  }, [] )
   // const revalidator = useRevalidator()
 
   return (
