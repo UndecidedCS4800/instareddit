@@ -32,6 +32,7 @@ urlpatterns = [
     path('posts/<int:post_id>/dislike',post_views.PostDislikesView.as_view()),
     path('posts/<int:post_id>/comment',post_views.PostCommentView.as_view()),
     path('posts/<int:post_id>/likes/<int:like_id>', post_views.DeleteLikesView.as_view()),
+    path('posts/<int:post_id>/likes/<int:dislike>', post_views.DeleteDislikesView.as_view()),
 
     #profiles
     path('profile/<str:username>' , profile_views.ProfileView.as_view()),

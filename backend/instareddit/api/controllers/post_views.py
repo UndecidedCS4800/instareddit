@@ -234,7 +234,7 @@ class PostDislikesView(views.APIView):
         serializer = serializers.DislikeSerializer(dislikes, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)   
     
-class DeleteDislikeView(generics.DestroyAPIView):
+class DeleteDislikesView(generics.DestroyAPIView):
     def delete(self, request, post_id, dislike_id):
         token = verify_token(request)
         if not token:
