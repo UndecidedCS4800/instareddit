@@ -183,7 +183,7 @@ class DeleteLikesView(generics.DestroyAPIView):
         except models.Like.DoesNotExist:
             return Response({'error': "Like does not exist"}, status=status.HTTP_404_NOT_FOUND)
         if like.user != user:
-            return Response("you are not authorized to delete this like", status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': "You are not authorized to delete this like"}, status=status.HTTP_403_FORBIDDEN)
         like.delete()
         return Response("like deleted", status=status.HTTP_200_OK)
         
@@ -233,6 +233,30 @@ class PostDislikesView(views.APIView):
         dislikes = models.Dislike.objects.filter(post = post)
         serializer = serializers.DislikeSerializer(dislikes, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)   
+    
+class DeleteDislikeView(generics.DestroyAPIView):
+    def delete(self, request, post_id, dislike_id):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id = user_id)
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            dislike = models.Dislike.objects.get(post=post, id=dislike_id)
+        except models.Dislike.DoesNotExist:
+            return Response({'error': "Dislike does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        if dislike.user != user:
+            return Response({'error': "You are not authorized to delete this dislike"}, status=status.HTTP_403_FORBIDDEN)
+        dislike.delete()
+        return Response("Dislike deleted", status=status.HTTP_200_OK)
     
 #create comment on a post
 class PostCommentView(views.APIView):
