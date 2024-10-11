@@ -92,28 +92,36 @@ io.use((socket, next) => {
         next()
 
     } catch (error) {
+        console.log("authorization failed")
         throw next(error as Error)
     }
 })
 
 io.use(async (socket, next) => {
     //get friends' IDs
-    const response = await fetch(`http://${BACKEND_URL}/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
-        method: 'GET',
-        headers: {
-            'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
-            'Content-Type': 'application/json',
-        },
-    }) 
-    // if request to django fails, send connect_error with the error message
-    if (!response.ok) {
-        const error =  new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
-        throw next(error);
+    try {
+        const response = await fetch(`http://${BACKEND_URL}/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
+            method: 'GET',
+            headers: {
+                'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
+                'Content-Type': 'application/json',
+            },
+        })
+        const data = await response.json();
+        socket.data.friends = data.friendsIds;
+        next()
+        // if request to django fails, send connect_error with the error message
+        if (!response.ok) {
+            const error = new Error(`HTTP error when requesting friends' ID's. Status: ${response.status}`);
+            throw next(error);
+        }
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log(e.message)
+            next(e)
+        }
     }
     //store the friends' id's and proceed to connection
-    const data = await response.json();
-    socket.data.friends = data.friendsIds;
-    next()
 })
 
 io.on('connection', async (socket) => {
@@ -126,23 +134,35 @@ io.on('connection', async (socket) => {
 
     //send restored chats with each friend
     if (friendsIds) {
-        const restoredMessages = await Promise.all(friendsIds?.map(async (fId: number) => {
-            let chatName = getChatName(userId, fId)
-            let prevMessages = (await redisClient.lRange(`logs:${chatName}`, 0, -1))
+        try {
+            const restoredMessages = await Promise.all(friendsIds?.map(async (fId: number) => {
+                let chatName = getChatName(userId, fId)
+                let prevMessages = (await redisClient.lRange(`logs:${chatName}`, 0, -1))
 
-            return { "withUser": fId, "messages": prevMessages.map(msg => JSON.parse(msg)) }
-        }));
+                return { "withUser": fId, "messages": prevMessages.map(msg => JSON.parse(msg)) }
+            }));
 
-        // friendsIds?.forEach(async (fId: number) => {
-        //     let chatName = getChatName(userId, fId)
-        //     let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
-        //     io.to(socket.data.userID.toString()).emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
-        // });
+            // friendsIds?.forEach(async (fId: number) => {
+            //     let chatName = getChatName(userId, fId)
+            //     let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
+            //     io.to(socket.data.userID.toString()).emit('restoredMessages', { "withUser": fId, "messages": prevMessages })
+            // });
 
-        io.to(socket.data.userID.toString()).emit('restoredMessages', restoredMessages)
+            io.to(socket.data.userID.toString()).emit('restoredMessages', restoredMessages)
+        } catch (e) {
+            if (e instanceof Error) {
+                console.log(e.message)
+            }
+        }
     }
     //map user id to socket id
-    await redisClient.hSet('user-socket-map', userId, socket.id)
+    try {
+        await redisClient.hSet('user-socket-map', userId, socket.id)
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log(e.message)
+        }
+    }
 
     //handle incoming message
     socket.on('message', async ({ to, message }) => {
@@ -155,17 +175,29 @@ io.on('connection', async (socket) => {
         //save message to logs
         const chatName = getChatName(userId, to)
         const messageLog = JSON.stringify({ "from": userId, "to": to, "message": message})
+        try {
         await redisClient.rPush(`logs:${chatName}`, messageLog)
+        } catch(e) {
+            if (e instanceof Error) {
+                console.log(e)
+            }
+        }
         
         //get receiver's socketID
-        const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
-        if (otherSocketId === null) {
-            return
+        try {
+            const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
+            if (otherSocketId === null) {
+                return
+            }
+        const content = { 'from': userId, 'message': message }
+        socket.to(`${otherSocketId}`).emit('message', content)
+        } catch (e) {
+            if (e instanceof Error) {
+                console.log(e.message)
+            }
         }
 
         //send message to receiver
-        const content = { 'from': userId, 'message': message }
-        socket.to(`${otherSocketId}`).emit('message', content)
     }) 
 })
 
