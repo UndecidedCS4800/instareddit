@@ -77,6 +77,7 @@ const App: React.FC = () => {
       const to = (auth as JWTTokenResponse).id
       console.log("to:", to)
       console.log("got msg", msg)
+      console.log(chatHistory[msg.from])
       if (chatHistory == null) {
         setChatHistory({ [msg.from]: [{to, ...msg}]})
       } else {
