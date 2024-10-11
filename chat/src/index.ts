@@ -104,7 +104,7 @@ io.use((socket, next) => {
 io.use(async (socket, next) => {
     //get friends' IDs
     try {
-        const response = await fetch(`http://${BACKEND_URL}/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
+        const response = await fetch(`https://instareddit.onrender.com/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
             method: 'GET',
             headers: {
                 'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
