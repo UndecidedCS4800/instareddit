@@ -140,7 +140,6 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
 
 export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {
     const json =  await get('/api/friends', token) as FriendResponse
-    console.log("json", json)
 
     return json.friendsIds
 }

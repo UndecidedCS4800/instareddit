@@ -82,7 +82,7 @@ function verifyToken(token: string) {
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, SocketData>(server, {
     cors: {
-        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173"], //used this for testing
+        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173", "http://172.25.0.6:5173"], //used this for testing
         methods: ['GET', 'POST']
     }
 })
@@ -135,8 +135,9 @@ io.on('connection', async (socket) => {
     if (friendsIds) {
         const restoredMessages = await Promise.all(friendsIds?.map(async (fId: number) => {
             let chatName = getChatName(userId, fId)
-            let prevMessages = await redisClient.lRange(`logs:${chatName}`, 0, -1)
-            return { "withUser": fId, "messages": prevMessages }
+            let prevMessages = (await redisClient.lRange(`logs:${chatName}`, 0, -1))
+
+            return { "withUser": fId, "messages": prevMessages.map(msg => JSON.parse(msg)) }
         }));
 
         // friendsIds?.forEach(async (fId: number) => {

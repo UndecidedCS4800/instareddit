@@ -1,4 +1,4 @@
-import {LoaderFunction, Outlet, useLoaderData} from 'react-router-dom';
+import {Outlet } from 'react-router-dom';
 import NavBar from './NavBar';
 import { CenterViewContainer } from './components/CenterViewContainer';
 import Pane from './components/Pane';
@@ -8,36 +8,21 @@ import { getFriends } from './remote';
 import  socket  from './socket';
 import { useEffect, useState } from 'react';
 import { useAuth } from './components/auth';
+import ChatWindowView from './components/ChatWindow';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const loader: LoaderFunction<{friends: Friend[]}> = async (_args) => {
-    const token = localStorage.getItem("token")
-
-  if (token) {
-    const friends = await getFriends(token);
-    console.log("friends", friends)
-    if (isError(friends)) {
-      console.error("server error: ", friends)
-    } else {
-      return { friends }
-    }
-  }
-
-  return {
-    friends: [] as Friend[]
-  }
-}
 
 const App: React.FC = () => {
-  const loaderData = useLoaderData() as { friends: Friend[] };
+  const [data, setData] = useState<{ friends: Friend[] } | null>(null)
   const [chatConnected, setChatConnected] = useState(socket.connected)
-  const [chatHistory, setChatHistory] = useState<ChatHistory | null>(null)
+  const [chatHistory, setChatHistory] = useState<ChatHistory>({})
   const [selectedChatWindow, setChatWindow] = useState<number | null>(null)
 
   const auth = useAuth()
-  console.log(auth)
+  console.log("history", chatHistory)
 
   useEffect(() => {
+    console.log("effect auth running")
     const connect = () => {
       if (auth) {
         socket.auth = { token: auth.token }
@@ -49,6 +34,35 @@ const App: React.FC = () => {
     connect()
   }, [auth])
 
+  useEffect(() => {
+    const friends = async () => {
+      if (auth) {
+        const friends = await getFriends(auth.token);
+        if (isError(friends)) {
+          console.error("server error: ", friends)
+        } else {
+          setData( {friends})
+        }
+      }
+    }
+
+    friends()
+
+  }, [auth])
+
+  const pushMessage = (withId: number, msg: ChatMessage) => {
+    if (chatHistory == null) {
+      console.log('new history')
+      setChatHistory({ [withId]: [msg]})
+    } else if (!chatHistory[withId]) {
+      console.log('new chat')
+      setChatHistory({...chatHistory, [withId]: [msg] })
+    } else {
+      console.log('concat')
+      console.log(chatHistory[withId])
+      setChatHistory({...chatHistory, [withId]: chatHistory[withId].concat([msg])})
+    }
+  }
 
   useEffect(() => {
     const onConnect = () => {
@@ -63,16 +77,21 @@ const App: React.FC = () => {
       const to = (auth as JWTTokenResponse).id
       if (chatHistory == null) {
         setChatHistory({ [msg.from]: [{to, ...msg}]})
+      } else if (!chatHistory[msg.from]) {
+
+        setChatHistory({...chatHistory, [msg.from]: [{to, ...msg}] })
       } else {
         setChatHistory(
-          { [msg.from]: chatHistory[msg.from].concat({ to, ...msg }), ...chatHistory }
+          { ...chatHistory, [msg.from]: chatHistory[msg.from].concat([{ to, ...msg }]) }
         )
       }
     }
 
-    const restoredMessages = (messages: { withId: number, messages: ChatMessage[]}[]) => {
+    const restoredMessages = (messages: { withUser: number, messages: ChatMessage[]}[]) => {
+      console.log("restoring")
+      console.log(messages)
       setChatHistory(
-        messages.reduce<ChatHistory>((accum, current) => ({ [current.withId]: current.messages, ...accum}), {})
+        messages.reduce<ChatHistory>((accum, current) => ({ [current.withUser]: current.messages, ...accum}), {})
       )
     }
 
@@ -91,17 +110,20 @@ const App: React.FC = () => {
 
   }, [])
 
+  // const revalidator = useRevalidator()
+
   return (
     <>
         <Pane>
           <NavBar />
-          {chatConnected && <FriendsList friends={loaderData.friends} setWindowHandler={setChatWindow} />}
+          {chatConnected ? <div>Connected to chat</div> : <></>}
+          {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
         </Pane>
         <CenterViewContainer>
           <Outlet />
         </CenterViewContainer>
         <Pane>
-          {/* {selectedChatWindow && <ChatWindow user={selectedChatWindow} history={chatHistory[selectedChatWindow]} />} */}
+          {selectedChatWindow && auth && <ChatWindowView user={selectedChatWindow} pushHistory={pushMessage} history={chatHistory[selectedChatWindow]} />}
         </Pane>
     </>
   );
