@@ -78,3 +78,10 @@ class RecentActivity(models.Model):
     datetime = models.DateTimeField()
     class Meta:
         db_table = 'recent_activity'
+
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friend_requests_sent')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friend_requests_received')
+    class Meta:
+        db_table = 'friend_request'
+        unique_together = ['from_user', 'to_user']
