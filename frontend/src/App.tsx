@@ -80,7 +80,7 @@ const App: React.FC = () => {
       if (chatHistory == null) {
         setChatHistory({ [msg.from]: [{to, ...msg}]})
       } else if (!chatHistory[msg.from]) {
-
+        console.log("rewrite")
         setChatHistory({...chatHistory, [msg.from]: [{to, ...msg}] })
       } else {
         setChatHistory(
