@@ -90,7 +90,7 @@ const App: React.FC = () => {
     const restoredMessages = (messages: { withUser: number, messages: ChatMessage[]}[]) => {
       console.log("restoring")
       console.log(messages)
-      setChatHistory(
+     setChatHistory(
         messages.reduce<ChatHistory>((accum, current) => ({ [current.withUser]: current.messages, ...accum}), {})
       )
     }
@@ -115,7 +115,7 @@ const App: React.FC = () => {
       socket.off("restoredMessages", restoredMessages)
       socket.off("message", chatMessage)
     }
-  }, [] )
+  }, [chatHistory, auth] )
   // const revalidator = useRevalidator()
 
   return (
