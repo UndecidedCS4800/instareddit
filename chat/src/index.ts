@@ -10,7 +10,7 @@ const BACKEND_URL = `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
 const REDIS_URL = `${process.env.REDIS_URL}`
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
-    origin: ["localhost:5173", "instareddit-1.onrender.com"]
+    origin: ["localhost:5173", "instareddit-1.onrender.com:443", "https://instareddit-1.onrender.com"]
 }
 
 // note: express might not be needed at all, but we use it for cors currently
