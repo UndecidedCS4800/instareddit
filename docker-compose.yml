@@ -71,6 +71,9 @@ services:
           TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
           NODE_ENV: "development"
           PORT: "10000"
+          REDIS_URL: "redis://instareddit:secret@chatlog/0"
+          BACKEND_URL: "backend"
+          BACKEND_PORT: "8000"
       volumes: 
         - ./chat:/usr/src/app
       networks:

@@ -6,9 +6,11 @@ import { createClient as createRedisClient } from "redis"
 import { DefaultEventsMap, Server } from "socket.io"
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
+const BACKEND_URL = `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
+const REDIS_URL = `${process.env.REDIS_URL}`
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
-    origin: ["localhost:5173"]
+    origin: ["localhost:5173", "instareddit-1.onrender.com"]
 }
 
 // note: express might not be needed at all, but we use it for cors currently
@@ -20,15 +22,17 @@ exp.get('/', (_req, res) => {
 
 // redis connection
 const redisClient = createRedisClient({
-    socket: {
-        // note: need to have version for render redis/amazon elasticsotrage
-        host: "chatlog"
-    },
+    // socket: {
+    //     // note: need to have version for render redis/amazon elasticsotrage
+    //     host: "chatlog"
+    // },
 
-    // need to have version for render
-    username: "instareddit",
-    password: "secret",
-    database: 0,
+
+    // // need to have version for render
+    // username: "instareddit",
+    // password: "secret",
+    // database: 0,
+    url: REDIS_URL,
 })
 
 redisClient.on("connection", conn => console.log("Connected", conn))
@@ -38,17 +42,6 @@ redisClient.connect().then(() => console.log("connected to redis client"))
                      .catch(err => console.error("Failed to connect:", err))
 
 
-// mariadb connection
-const pool = mariadb.createPool({
-    // note: need version for render/production
-    host: "db",
-    user: "root",
-    password: "secret",
-    database: "dummy",
-})
-
-pool.getConnection().then(_conn => console.log("Connected to MariaDB"))
-                    .catch(err => console.error("Failed to connect:", err))
 const server = http.createServer(exp)
 
 //socket.io
@@ -82,7 +75,7 @@ function verifyToken(token: string) {
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, SocketData>(server, {
     cors: {
-        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173", "http://172.25.0.6:5173"], //used this for testing
+        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173", "http://172.25.0.6:5173", "https://instareddit-1.onrender.com"], //used this for testing
         methods: ['GET', 'POST']
     }
 })
@@ -105,7 +98,7 @@ io.use((socket, next) => {
 
 io.use(async (socket, next) => {
     //get friends' IDs
-    const response = await fetch("http://backend:8000/api/friends", { //change url later, for some reason localhost didn't work here, gotta use the container name
+    const response = await fetch(`http://${BACKEND_URL}/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
         method: 'GET',
         headers: {
             'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header

@@ -26,6 +26,7 @@
     "typescript": "^5.6.2"
   },
   "scripts": {
+    "build": "tsc --build",
     "dev": "tsx watch ."
   }
 }
