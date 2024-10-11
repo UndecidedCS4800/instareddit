@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [selectedChatWindow, setChatWindow] = useState<number | null>(null)
 
   const auth = useAuth()
-  console.log("history", chatHistory)
+  console.log("history", chatHistory[34])
 
   useEffect(() => {
     console.log("effect auth running")
