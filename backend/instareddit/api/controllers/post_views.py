@@ -164,14 +164,29 @@ class PostLikesView(views.APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class DeleteLikesView(generics.DestroyAPIView):
-    queryset = models.Like.objects.all()
-    serializer_class = serializers.LikeSerializer
-    lookup_field = 'like_id'
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, post_id, like_id):
         token = verify_token(request)
         if not token:
             return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.destroy(request, *args, **kwargs)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id = user_id)
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            like = models.Like.objects.get(post=post, id=like_id)
+        except models.Like.DoesNotExist:
+            return Response({'error': "Like does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        if like.user != user:
+            return Response("you are not authorized to delete this like", status=status.HTTP_403_FORBIDDEN)
+        like.delete()
+        return Response("like deleted", status=status.HTTP_200_OK)
+        
 
 #create dislike on a post
 class PostDislikesView(views.APIView):
