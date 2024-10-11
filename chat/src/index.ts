@@ -93,6 +93,10 @@ io.use((socket, next) => {
 
     } catch (error) {
         console.log("authorization failed")
+        if (error instanceof Error) {
+        console.log(error.message)
+
+        }
         throw next(error as Error)
     }
 })
