@@ -10,7 +10,7 @@ const BACKEND_URL = `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
 const REDIS_URL = `${process.env.REDIS_URL}`
 const corsOptions: CorsOptions = {
     // Note: need to expand this for instareddit
-    origin: ["localhost:5173", "instareddit-1.onrender.com:443", "https://instareddit-1.onrender.com"]
+    origin: ["localhost:5173", "instareddit-1.onrender.com:443", "https://instareddit-1.onrender.com:443"]
 }
 
 // note: express might not be needed at all, but we use it for cors currently
@@ -75,7 +75,7 @@ function verifyToken(token: string) {
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, DefaultEventsMap, SocketData>(server, {
     cors: {
-        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173", "http://172.25.0.6:5173", "https://instareddit-1.onrender.com"], //used this for testing
+        origin: ['http://localhost:3000', 'http://localhost:3030', "http://localhost:5173", "http://172.25.0.6:5173", "https://instareddit-1.onrender.com", "https://instareddit-1.onrender.com:443"], //used this for testing
         methods: ['GET', 'POST']
     }
 })
