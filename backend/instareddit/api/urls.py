@@ -40,6 +40,7 @@ urlpatterns = [
     path('profile/', profile_views.SelfProfileView.as_view()),
 
     #friends
-    path('friends/', friendship_views.FriendsIdsGetView.as_view())
+    path('friends/', friendship_views.FriendsIdsGetView.as_view()),
+    path('friendrequest/', friendship_views.FriendRequestCreateView.as_view())
 
 ]
