@@ -52,18 +52,18 @@ class FriendRequestCreateView(views.APIView):
             return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
         
         #get both user ids
-        user_id = decoded_token['id']
-        other_id = request.data.get('other_id', None)
-        if not other_id:
-            return Response({'error': 'Other user ID not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        username = decoded_token['username']
+        other_username = request.data.get('other_username', None)
+        if not other_username:
+            return Response({'error': 'Other username not provided'}, status=status.HTTP_400_BAD_REQUEST)
         
         #get user objects
-        user1 = models.User.objects.filter(id=user_id).first()
-        user2 = models.User.objects.filter(id=other_id).first()
+        user1 = models.User.objects.filter(username=username).first()
+        user2 = models.User.objects.filter(username=other_username).first()
         if not user1:
-            return Response({'error': 'Invalid sender ID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid sender username'}, status=status.HTTP_400_BAD_REQUEST)
         if not user2:
-            return Response({'error': 'Invalid receiver ID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid receiver username'}, status=status.HTTP_400_BAD_REQUEST)
 
         #create friend request
         fr = models.FriendRequest(from_user=user1, to_user=user2)

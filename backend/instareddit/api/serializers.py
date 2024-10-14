@@ -52,6 +52,8 @@ class RecentActivitySerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'username', 'post' ,'type', 'datetime']
 
 class FriendRequestSerializer(serializers.ModelSerializer):
+    from_username = serializers.CharField(source='from_user.username')
+    to_username = serializers.CharField(source='to_user.username')
     class Meta:
         model = models.FriendRequest
-        fields = ['id', 'from_user', 'to_user']
+        fields = ['id', 'from_user', 'from_username', 'to_user', 'to_username']
