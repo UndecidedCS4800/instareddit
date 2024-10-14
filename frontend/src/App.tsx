@@ -120,7 +120,7 @@ const App: React.FC = () => {
 
   return (
     <>
-        <Pane>
+        <Pane className='h-screen basis-4/12'>
           <NavBar />
           {chatConnected ? <div>Connected to chat</div> : <></>}
           {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
