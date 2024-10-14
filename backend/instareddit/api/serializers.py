@@ -13,34 +13,43 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ['user', 'first_name', 'last_name', 'date_of_birth', 'profile_picture']
 
 class CommunitySerializer(serializers.ModelSerializer):
+    owner_username = serializers.CharField(source='owner.username')
+    admins = serializers.SerializerMethodField()
+    def get_admins(self, obj):
+        return [user.username for user in obj.admins.all()]
     class Meta:
         model = models.Community
-        fields = ['id', 'name', 'description', 'picture', 'owner', 'num_members']
+        fields = ['id', 'name', 'description', 'picture', 'owner', 'owner_username', 'admins', 'num_members']
 
 class PostSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
     class Meta:
         model = models.Post
-        fields = ['id', 'user', 'text', 'image', 'datetime', 'community']
-        
+        fields = ['id', 'user', 'username', 'text', 'image', 'datetime', 'community']
+
 class LikeSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
     class Meta:
         model = models.Like
-        fields = ['id', 'user', 'post' , 'datetime']
+        fields = ['id', 'user', 'username', 'post' , 'datetime']
         
 class DislikeSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
     class Meta:
         model = models.Dislike
-        fields = ['id', 'user', 'post' , 'datetime']
+        fields = ['id', 'user', 'username', 'post' , 'datetime']
         
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
     class Meta:
         model = models.Comment
-        fields = ['id', 'user', 'post' ,'text', 'datetime']
+        fields = ['id', 'user', 'username', 'post' ,'text', 'datetime']
         
 class RecentActivitySerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
     class Meta:
         model = models.RecentActivity
-        fields = ['id', 'user', 'post' ,'type', 'datetime']
+        fields = ['id', 'user', 'username', 'post' ,'type', 'datetime']
 
 class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
