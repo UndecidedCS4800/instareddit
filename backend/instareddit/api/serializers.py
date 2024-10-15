@@ -23,6 +23,7 @@ class CommunitySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
+    community_name = serializers.CharField(source='community.name')
     class Meta:
         model = models.Post
         fields = ['id', 'user', 'username', 'text', 'image', 'datetime', 'community']
