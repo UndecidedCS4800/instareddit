@@ -1,4 +1,4 @@
-from rest_framework import views, status
+from rest_framework import views, status, generics
 from rest_framework.response import Response
 from .auth_views import verify_token
 from .. import models, serializers
@@ -39,6 +39,8 @@ class FriendsIdsGetView(views.APIView):
         return Response(response)
     
 #send friend request
+#POST /api/friendrequest
+#with 'other_username' in body
 class FriendRequestCreateView(views.APIView):
     def post(self, request):
         #authorize
@@ -83,3 +85,27 @@ TODO
 - accept/decline friend request
 - cancel friend request
 """
+
+#get list of friend request for the logged in user
+#GET /api/user/<username>/friendrequests
+class FriendRequestListView(generics.ListAPIView):
+    serializer_class = serializers.FriendRequestSerializer
+    def get(self, request, username):
+        #authorize
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        #get user id from token
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get user
+        token_username = decoded_token['username']
+        if token_username != username:
+            return Response({'error': "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+        user = models.User.objects.get(username=username)
+        #get and return list of received FRs
+        self.queryset = user.friend_requests_received.all()
+        return self.list(request)
