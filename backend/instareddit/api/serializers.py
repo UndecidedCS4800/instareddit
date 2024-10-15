@@ -23,10 +23,12 @@ class CommunitySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
-    community_name = serializers.CharField(source='community.name')
+    community_name = serializers.SerializerMethodField()
+    def get_community_name(self, obj):
+        return obj.community.name if obj.community is not None else None
     class Meta:
         model = models.Post
-        fields = ['id', 'user', 'username', 'text', 'image', 'datetime', 'community']
+        fields = ['id', 'user', 'username', 'text', 'image', 'datetime', 'community', 'community_name']
 
 class LikeSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
