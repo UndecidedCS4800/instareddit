@@ -77,14 +77,6 @@ class FriendRequestCreateView(views.APIView):
         
         serializer = serializers.FriendRequestSerializer(fr)
         return Response(serializer.data)
-    
-"""
-TODO
-- get all received FR's
-- get friendship status (friends/request sent/request received/not friends)
-- accept/decline friend request
-- cancel friend request
-"""
 
 #get list of friend request for the logged in user
 #GET /api/user/<username>/friendrequests
