@@ -5,6 +5,7 @@ from .auth_views import verify_token
 import os
 import jwt
 from datetime import datetime
+from django.db.models import Q
 
 #GET recent posts of users friends and communities
 class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
@@ -58,21 +59,50 @@ class UserPostsListView(generics.GenericAPIView, mixins.ListModelMixin):
         return self.list(request)
 
 #general view to get/update/delete post
-class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Post.objects.all()
-    serializer_class = serializers.PostSerializer
-    lookup_field = 'pk'
+class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin):
+    def get_post(self, username, post_pk):
+        user = models.User.objects.filter(username=username).first()
+        if not user:
+            return None
+        return models.Post.objects.filter(Q(user=user), Q(id=post_pk)).first()
 
-    def put(self, request, *args, **kwargs):
+    def get(self, request, username, post_pk):
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.PostSerializer(post)
+        return Response(serializer.data)
+    
+    def patch(self, request, username, post_pk):
         token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.update(request, args, kwargs)
-    def delete(self, request, *args, **kwargs):
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        
+    def delete(self, request, username, post_pk):
         token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.destroy(request, *args, **kwargs)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        post.delete()
+        return Response({}, status=status.HTTP_200_OK)
+
 
 #general view to create a post
 #POST /api/posts

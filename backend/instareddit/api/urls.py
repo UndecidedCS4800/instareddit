@@ -27,7 +27,7 @@ urlpatterns = [
     path('', post_views.RecentPostsView.as_view()),
     path('user/<str:username>/posts', post_views.UserPostsListView.as_view()),
     path('posts', post_views.PostCreateView.as_view()),
-    path('posts/<int:pk>', post_views.PostGetUpdateDestroyView.as_view()),
+    path('user/<str:username>/posts/<int:post_pk>', post_views.PostGetUpdateDestroyView.as_view()),
     path('posts/<int:post_id>/like', post_views.PostLikesView.as_view()),
     path('posts/<int:post_id>/dislike',post_views.PostDislikesView.as_view()),
     path('posts/<int:post_id>/comment',post_views.PostCommentView.as_view()),
