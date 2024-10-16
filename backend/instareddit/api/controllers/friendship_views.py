@@ -1,6 +1,6 @@
 from rest_framework import views, status, generics
 from rest_framework.response import Response
-from .auth_views import verify_token
+from .auth_views import verify_token, authorize
 from .. import models, serializers
 import jwt
 import os
@@ -95,19 +95,48 @@ class FriendRequestListView(generics.ListAPIView):
     def get(self, request, username):
         #authorize
         token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        #get user id from token
         try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
         except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
             return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
         
         #get user
-        token_username = decoded_token['username']
+        token_username = decoded_token[1]
         if token_username != username:
             return Response({'error': "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
         user = models.User.objects.get(username=username)
         #get and return list of received FRs
         self.queryset = user.friend_requests_received.all()
         return self.list(request)
+    
+#accept friend request
+#POST /api/friendrequests/accept
+#provide 'fr_id' in body
+class AcceptView(views.APIView):
+    def post(self, request):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #verify that FR exists
+        fr_id = request.data.get('fr_id', None)
+        #get user
+        user_id = decoded_token[0]
+        user = models.User.objects.get(id=user_id)
+        fr = user.friend_requests_received.filter(id=fr_id).first()
+        if not fr:
+            return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
+
+        #add friend
+        other_user = fr.from_user
+        user.friends.add(other_user)
+        fr.delete() #remove friend request from DB
+
+        return Response(status=status.HTTP_200_OK)
