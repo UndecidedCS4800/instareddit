@@ -12,6 +12,8 @@ const ChatPage: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<ChatHistory>({});
   const [selectedChatWindow, setChatWindow] = useState<number | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const auth = useAuth();
 
   useEffect(() => {
@@ -93,6 +95,7 @@ const ChatPage: React.FC = () => {
       socket.off('message', chatMessage);
     };
   }, [chatHistory, auth]);
+  // const revalidator = useRevalidator()
 
   return (
     <>
