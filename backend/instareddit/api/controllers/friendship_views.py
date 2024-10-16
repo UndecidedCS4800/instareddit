@@ -59,16 +59,26 @@ class FriendRequestCreateView(views.APIView):
         if not other_username:
             return Response({'error': 'Other username not provided'}, status=status.HTTP_400_BAD_REQUEST)
         
+        #check if usernames not the same
+        if username == other_username:
+            return Response({'error': 'Sender and receiver usernames must be different'}, status=status.HTTP_400_BAD_REQUEST)
+        
         #get user objects
         user1 = models.User.objects.filter(username=username).first()
         user2 = models.User.objects.filter(username=other_username).first()
         if not user1:
-            return Response({'error': 'Invalid sender username'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid sender username'}, status=status.HTTP_404_NOT_FOUND)
         if not user2:
-            return Response({'error': 'Invalid receiver username'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid receiver username'}, status=status.HTTP_404_NOT_FOUND)
+        
+        #check if already friends
+        friend = user1.friends.filter(username=user2.username).first()
+        if friend:
+            return Response({'error': 'Users are already friends'}, status=status.HTTP_400_BAD_REQUEST)
 
         #create friend request
         fr = models.FriendRequest(from_user=user1, to_user=user2)
+        #check if FR already exists
         try:
             fr.save()
         except IntegrityError:
