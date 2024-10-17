@@ -5,6 +5,7 @@ import socket from './socket';
 import { useAuth } from './components/auth';
 import FriendsList from './components/FriendsList';
 import ChatWindowView from './components/ChatWindow';
+import MessageBubble from '../public/Messages.png';
 
 const ChatPage: React.FC = () => {
   const [data, setData] = useState<{ friends: Friend[] } | null>(null);
@@ -100,8 +101,8 @@ const ChatPage: React.FC = () => {
   return (
     <>
     
-      <div className='h-screen basis-2/12 bg-[#342c33] p-4'>
-        {chatConnected ? <div>Messages</div> : <></>}
+      <div className='h-screen basis-3/12 bg-[#342c33] p-8 border-r border-[#514350]'>
+        {chatConnected ? <div><img src={MessageBubble} alt="Message Bubble" className="px-7 w-35 h-7" /></div> : <></>}
         {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
       </div>
     
