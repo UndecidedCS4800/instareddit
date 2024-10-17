@@ -146,7 +146,7 @@ class AcceptView(views.APIView):
 
 class DeclineView(views.APIView):
     #what method?
-    def post(self, request):
+    def delete(self, request):
         #authorize
         token = verify_token(request)
         try:
@@ -160,6 +160,29 @@ class DeclineView(views.APIView):
         fr_id = request.data.get('fr_id', None)
         user = models.User.objects.get(id=decoded_token[0])
         fr = user.friend_requests_received.filter(id=fr_id).first()
+        if not fr:
+            return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
+        
+        #remove friend request
+        fr.delete()
+        return Response(status=status.HTTP_200_OK)
+    
+class CancelView(views.APIView):
+    #what method?
+    def delete(self, request):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get fr
+        fr_id = request.data.get('fr_id', None)
+        user = models.User.objects.get(id=decoded_token[0])
+        fr = user.friend_requests_sent.filter(id=fr_id).first()
         if not fr:
             return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
         
