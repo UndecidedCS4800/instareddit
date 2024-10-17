@@ -25,15 +25,18 @@ class FriendsIdsGetView(views.APIView):
         if not user:
             return Response({'error': 'Invalid user ID'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #get and return friends IDs
+        #get friends IDs and usernames
         friends_ids = []
+        friends_usernames = []
         for f in user.friends.all():
             friends_ids.append(f.id)
-
+            friends_usernames.append(f.username)
+        
         response = {
             'userId': user_id,
             'username': user.username,
-            'friendsIds': friends_ids
+            'friendsIds': friends_ids,
+            'friendsUsernames': friends_usernames
         } 
 
         return Response(response)
