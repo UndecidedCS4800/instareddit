@@ -7,7 +7,7 @@ interface FriendsListItemProps {
 
 const FriendsListItem = ({friend, handler}: FriendsListItemProps) => {
     return (
-        <div onClick={() => handler()}>{friend}</div>
+        <div onClick={() => handler()}>{friend.username}</div>
     )
 }
 

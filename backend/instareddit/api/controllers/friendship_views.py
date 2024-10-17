@@ -8,7 +8,7 @@ from django.db import IntegrityError
 
 #GET /api/friends
 #is used by 'chat' to get a list of friend ID's for the logged in user
-class FriendsIdsGetView(views.APIView):
+class GetFriendsView(views.APIView):
     def get(self, request):
         #verify token
         token = verify_token(request)
@@ -28,12 +28,12 @@ class FriendsIdsGetView(views.APIView):
         #get and return friends IDs
         friends_ids = []
         for f in user.friends.all():
-            friends_ids.append(f.id)
+            friends_ids.append({ "id": f.id, "username": f.username })
 
         response = {
             'userId': user_id,
             'username': user.username,
-            'friendsIds': friends_ids
+            'friends': friends_ids
         } 
 
         return Response(response)

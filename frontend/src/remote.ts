@@ -8,30 +8,6 @@ const withAuth = (token: string, headers: HeadersInit): HeadersInit => ({
 })
 
 export type ResponseOrError<T> = T | ServerError;
-// export const getData = async <T>(relative_path: string): Promise<T[]> => {
-//     try {
-//         const response = await fetch(`${URL}/api/${relative_path}`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//         });
-
-//         if (!response.ok) {
-//             // Check if there's a response body and log it
-//             const errorData = (await response.json() as ServerError);
-//             return errorData
-//         }
-
-//         const json = await response.json();
-//         return json as T[];
-//     } catch (error) {
-//         console.error('Error in getData function:', error);
-//         throw error; // Rethrow to allow further handling if needed
-//     }
-// };
-
-
 
 // Function to register a new user
 export const registerUser = async (username: string, email: string, password: string): Promise<ResponseOrError<JWTTokenResponse>> => {
@@ -141,7 +117,7 @@ export const getUserPosts = async (username: string): Promise<ResponseOrError<Po
 export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {
     const json =  await get('/api/friends', token) as FriendResponse
 
-    return json.friendsIds
+    return json.friends
 }
 
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
