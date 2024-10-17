@@ -1,9 +1,10 @@
-from rest_framework import views, status
+from rest_framework import views, status, generics
 from rest_framework.response import Response
-from .auth_views import verify_token
-from .. import models
+from .auth_views import verify_token, authorize
+from .. import models, serializers
 import jwt
 import os
+from django.db import IntegrityError
 
 #GET /api/friends
 #is used by 'chat' to get a list of friend ID's for the logged in user
@@ -27,11 +28,115 @@ class FriendsIdsGetView(views.APIView):
         #get and return friends IDs
         friends_ids = []
         for f in user.friends.all():
-            friends_ids.append(str(f.id))
+            friends_ids.append(f.id)
 
         response = {
             'userId': user_id,
+            'username': user.username,
             'friendsIds': friends_ids
         } 
 
         return Response(response)
+    
+#send friend request
+#POST /api/friendrequest
+#with 'other_username' in body
+class FriendRequestCreateView(views.APIView):
+    def post(self, request):
+        #authorize
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        #get user id from token
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get both user ids
+        username = decoded_token['username']
+        other_username = request.data.get('other_username', None)
+        if not other_username:
+            return Response({'error': 'Other username not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #check if usernames not the same
+        if username == other_username:
+            return Response({'error': 'Sender and receiver usernames must be different'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #get user objects
+        user1 = models.User.objects.filter(username=username).first()
+        user2 = models.User.objects.filter(username=other_username).first()
+        if not user1:
+            return Response({'error': 'Invalid sender username'}, status=status.HTTP_404_NOT_FOUND)
+        if not user2:
+            return Response({'error': 'Invalid receiver username'}, status=status.HTTP_404_NOT_FOUND)
+        
+        #check if already friends
+        friend = user1.friends.filter(username=user2.username).first()
+        if friend:
+            return Response({'error': 'Users are already friends'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #create friend request
+        fr = models.FriendRequest(from_user=user1, to_user=user2)
+        #check if FR already exists
+        try:
+            fr.save()
+        except IntegrityError:
+            fr = None
+            return Response({'error': 'Friend request already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = serializers.FriendRequestSerializer(fr)
+        return Response(serializer.data)
+
+#get list of friend request for the logged in user
+#GET /api/user/<username>/friendrequests
+class FriendRequestListView(generics.ListAPIView):
+    serializer_class = serializers.FriendRequestSerializer
+    def get(self, request, username):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get user
+        token_username = decoded_token[1]
+        if token_username != username:
+            return Response({'error': "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+        user = models.User.objects.get(username=username)
+        #get and return list of received FRs
+        self.queryset = user.friend_requests_received.all()
+        return self.list(request)
+    
+#accept friend request
+#POST /api/friendrequests/accept
+#provide 'fr_id' in body
+class AcceptView(views.APIView):
+    def post(self, request):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #verify that FR exists
+        fr_id = request.data.get('fr_id', None)
+        #get user
+        user_id = decoded_token[0]
+        user = models.User.objects.get(id=user_id)
+        fr = user.friend_requests_received.filter(id=fr_id).first()
+        if not fr:
+            return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
+
+        #add friend
+        other_user = fr.from_user
+        user.friends.add(other_user)
+        fr.delete() #remove friend request from DB
+
+        return Response(status=status.HTTP_200_OK)
