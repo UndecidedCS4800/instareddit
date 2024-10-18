@@ -113,6 +113,15 @@ export interface ChatMessage {
   to: number,
   message: string
 }
+
+export interface FriendRequest {
+  id: number,
+  from_user: number,
+  from_username: string,
+  to_user: number,
+  to_username: string,
+}
+
 export type ChatHistory = Record<number, ChatMessage[]>
 export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {

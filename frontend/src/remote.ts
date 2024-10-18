@@ -1,4 +1,4 @@
-import { Community, Friend, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError } from "./schema";
+import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User } from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -120,6 +120,12 @@ export const getFriends = async (token: string): Promise<ResponseOrError<Friend[
     return json.friends
 }
 
+export const getFriendRequests = async (token: JWTTokenResponse['token'], username: string): Promise<ResponseOrError<FriendRequest[]>> => {
+    const json = await get(`/api/user/${username}/friendrequests`, token) as FriendRequest[];
+
+    return json;
+}
+
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
     try {
         const req = await fetch(`${URL}/api/posts`, {
@@ -141,5 +147,55 @@ export const createPost = async (token: JWTTokenResponse['token'], post: PostReq
         }
         console.log("Unknown exception thrown")
         return {error: "Unknown exception thrown"}
+    }
+}
+
+export const sendFriendRequest = async (token: JWTTokenResponse['token'], friend: Friend['username']): Promise<ResponseOrError<User>> => {
+    try {
+        const req = await fetch(`${URL}/api/friendrequest`, {
+            method: "POST",
+            headers: withAuth(token, {
+                'Content-Type': "application/json"
+            }),
+            body: JSON.stringify({ friend })
+        })
+
+        if (!req.ok) {
+            const json = await req.json();
+            return json as unknown as ServerError
+        }
+        return await req.json();
+    } catch(e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error", e.name, e.message)
+            return { error: e.message }
+        }
+        console.log("unknown exception thrown");
+        return {error: "unknown exception thrown"}
+    }
+}
+
+export const acceptFriendRequest = async (token: JWTTokenResponse['token'], friend_id: number): Promise<ServerError | null> => {
+    try {
+        const req = await fetch(`${URL}/api/friendrequest`, {
+            method: "POST",
+            headers: withAuth(token, {
+                'Content-Type': "application/json"
+            }),
+            body: JSON.stringify({ fr_id: friend_id })
+        })
+
+        if (!req.ok) {
+            const json = await req.json();
+            return json as unknown as ServerError
+        }
+        return null;
+    } catch(e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error", e.name, e.message)
+            return { error: e.message }
+        }
+        console.log("unknown exception thrown");
+        return {error: "unknown exception thrown"}
     }
 }
