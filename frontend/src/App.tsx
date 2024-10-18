@@ -3,15 +3,16 @@ import NavBar from './NavBar';
 import { CenterViewContainer } from './components/CenterViewContainer';
 import Pane from './components/Pane';
 import FriendsList from './components/FriendsList';
-import { ChatHistory, ChatMessage, Friend, isError, JWTTokenResponse } from './schema';
-import { getFriends } from './remote';
+import { ChatHistory, ChatMessage, Friend, FriendRequest, isError, JWTTokenResponse } from './schema';
+import { getFriendRequests, getFriends } from './remote';
 import  socket  from './socket';
 import { useEffect, useState } from 'react';
 import { useAuth } from './components/auth';
 import ChatWindowView from './components/ChatWindow';
+import FriendRequestList from './components/FriendRequestList';
 
 const App: React.FC = () => {
-  const [data, setData] = useState<{ friends: Friend[] } | null>(null)
+  const [data, setData] = useState<{ friends: Friend[], friend_requests: FriendRequest[] } | null>(null)
   const [chatConnected, setChatConnected] = useState(socket.connected)
   const [chatHistory, setChatHistory] = useState<ChatHistory>({})
   const [selectedChatWindow, setChatWindow] = useState<Friend | null>(null)
@@ -30,18 +31,24 @@ const App: React.FC = () => {
   }, [auth])
 
   useEffect(() => {
-    const friends = async () => {
+    const getData = async () => {
       if (auth) {
         const friends = await getFriends(auth.token);
+        const friend_requests = await getFriendRequests(auth.token, auth.username);
         if (isError(friends)) {
           console.error("server error: ", friends)
+        } else if (isError(friend_requests)) {
+          console.error("server error", friend_requests)
         } else {
-          setData( {friends})
+          setData({
+            friends,
+            friend_requests,
+          })
         }
       }
     }
 
-    friends()
+    getData()
 
   }, [auth])
 
@@ -77,7 +84,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const restoredMessages = (messages: { withUser: number, messages: ChatMessage[]}[]) => {
-      console.log("restoring")
       console.log(messages)
      setChatHistory(
         messages.reduce<ChatHistory>((accum, current) => ({ [current.withUser]: current.messages, ...accum}), {})
@@ -111,6 +117,7 @@ const App: React.FC = () => {
           <NavBar />
           {chatConnected ? <div>Connected to chat</div> : <></>}
           {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
+          {auth && data && <FriendRequestList friend_requests={data.friend_requests} />}
         </Pane>
         <CenterViewContainer>
           <Outlet />

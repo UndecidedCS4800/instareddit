@@ -10,6 +10,7 @@ export interface User {
     password_hash: string,
   }
 
+export type UserResponse = Omit<User, "email" | "password_hash">
 export interface UserInfo {
     user: number,
     first_name: string,
@@ -125,6 +126,6 @@ export interface FriendRequest {
 export type ChatHistory = Record<number, ChatMessage[]>
 export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
-  return (obj as ServerError).error !== undefined
+  return obj && (obj as ServerError).error !== undefined
 }
 

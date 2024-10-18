@@ -8,6 +8,7 @@ import { Post } from "./components/Post";
 import { Login } from "./Login";
 import { loader as communityLoader } from "./components/Community"
 import { loader as postLoader } from "./components/Post"
+import ProfilePage from "./components/ProfilePage";
 
 const router = createBrowserRouter([
     { path: "/",
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
               element: <CreatePost />
             }
           ]
+        },
+        {
+          path: "/user/:username",
+          element: <ProfilePage />
         }
       ],
     },

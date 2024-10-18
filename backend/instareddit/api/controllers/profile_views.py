@@ -12,11 +12,11 @@ class ProfileView(views.APIView):
 		if profile is None:
 			return Response("Invalid Username",status=status.HTTP_400_BAD_REQUEST)
 
-		user_info = models.UserInfo.objects.filter(user = profile).first()
-		if user_info is None:
-			return Response("No user info for given username", status = status.HTTP_400_BAD_REQUEST)
-		serializer = serializers.UserInfoSerializer(user_info)
-		return Response(serializer.data,status=status.HTTP_200_OK)
+		# user_info = models.UserInfo.objects.filter(user = profile).first()
+		# if user_info is None:
+		# 	return Response("No user info for given username", status = status.HTTP_400_BAD_REQUEST)
+		serializer = serializers.UserSerializer(profile)
+		return Response({ id: serializer.id, username: serializer.id })
 
 #get profile of the currently logged in user
 class SelfProfileView(views.APIView):
