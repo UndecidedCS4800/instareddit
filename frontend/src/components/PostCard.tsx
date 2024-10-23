@@ -11,12 +11,12 @@ const Elem = ({link, to, children}: { link?: boolean, to: string, children: Reac
 }
 export const PostCard = ({post, link}: PostCardProps) => {
     // TODO?: truncate post preview text
-    const { datetime, image, user, text } = post
+    const { datetime, image,  username, text } = post
 
     return (
         <Elem link={link} to={`posts/${post.id}`}>
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
-                <div className="text-white text-xl font-bold font-sans">{user}</div>
+                <div className="text-white text-xl font-bold font-sans">{username}</div>
                 {image && <img className="h-[350px] w-full object-cover"src={image} />}
                 <div className="ml-auto">{datetime}</div>
             </div>

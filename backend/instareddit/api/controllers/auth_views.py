@@ -112,3 +112,10 @@ def verify_token(request):
         token = None
 
     return token
+
+def authorize(token):
+    if not token:
+            raise ValueError
+    #get user id and username from token
+    decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+    return decoded_token['id'], decoded_token['username']
