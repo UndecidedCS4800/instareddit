@@ -5,6 +5,7 @@ from .auth_views import verify_token
 import os
 import jwt
 from datetime import datetime
+from django.db.models import Q
 
 #GET recent posts of users friends and communities
 class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
@@ -58,21 +59,50 @@ class UserPostsListView(generics.GenericAPIView, mixins.ListModelMixin):
         return self.list(request)
 
 #general view to get/update/delete post
-class PostGetUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Post.objects.all()
-    serializer_class = serializers.PostSerializer
-    lookup_field = 'pk'
+class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin):
+    def get_post(self, username, post_pk):
+        user = models.User.objects.filter(username=username).first()
+        if not user:
+            return None
+        return models.Post.objects.filter(Q(user=user), Q(id=post_pk)).first()
 
-    def put(self, request, *args, **kwargs):
+    def get(self, request, username, post_pk):
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.PostSerializer(post)
+        return Response(serializer.data)
+    
+    def patch(self, request, username, post_pk):
         token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.update(request, args, kwargs)
-    def delete(self, request, *args, **kwargs):
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        
+    def delete(self, request, username, post_pk):
         token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        return self.destroy(request, *args, **kwargs)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
+        post = self.get_post(username, post_pk)
+        if not post:
+            return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        post.delete()
+        return Response({}, status=status.HTTP_200_OK)
+
 
 #general view to create a post
 #POST /api/posts
@@ -163,6 +193,37 @@ class PostLikesView(views.APIView):
         serializer = serializers.LikeSerializer(likes, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class DeleteLikesView(generics.DestroyAPIView):
+    def delete(self, request, post_id, like_id):
+        token = verify_token(request)
+        #verify the token
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        #get the user from the token
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id = user_id)
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #check if like exists
+        try:
+            like = models.Like.objects.get(post=post, id=like_id)
+        except models.Like.DoesNotExist:
+            return Response({'error': "Like does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #make sure user created the like
+        if like.user != user:
+            return Response({'error': "You are not authorized to delete this like"}, status=status.HTTP_403_FORBIDDEN)
+        #delete the like
+        like.delete()
+        return Response("like deleted", status=status.HTTP_200_OK)
+        
+
 #create dislike on a post
 class PostDislikesView(views.APIView):
     def post(self, request,post_id):
@@ -208,6 +269,36 @@ class PostDislikesView(views.APIView):
         dislikes = models.Dislike.objects.filter(post = post)
         serializer = serializers.DislikeSerializer(dislikes, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)   
+    
+class DeleteDislikesView(generics.DestroyAPIView):
+    def delete(self, request, post_id, dislike_id):
+        token = verify_token(request)
+        #verify the token
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        #get the user from token
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id = user_id)
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #check if the dislike exists
+        try:
+            dislike = models.Dislike.objects.get(post=post, id=dislike_id)
+        except models.Dislike.DoesNotExist:
+            return Response({'error': "Dislike does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #make sure user created the dislike
+        if dislike.user != user:
+            return Response({'error': "You are not authorized to delete this dislike"}, status=status.HTTP_403_FORBIDDEN)
+        #delete dislike
+        dislike.delete()
+        return Response("Dislike deleted", status=status.HTTP_200_OK)
     
 #create comment on a post
 class PostCommentView(views.APIView):
@@ -257,3 +348,36 @@ class PostCommentView(views.APIView):
         serializer = serializers.CommentSerializer(comments, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)   
 
+
+class DeleteCommentsView(generics.DestroyAPIView):
+    def delete(self, request, post_id, comment_id):
+        token = verify_token(request)
+        #verify the token
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        #get the user from token
+        user_id = decoded_token['id']
+        user = models.User.objects.get(id = user_id)
+        #check if post exists
+        try:
+            post = models.Post.objects.get(id=post_id)
+        except models.Post.DoesNotExist:
+            return Response({'error': "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #check if the comment exists
+        try:
+            comment = models.Comment.objects.get(post=post, id=comment_id)
+        except models.Comment.DoesNotExist:
+            return Response({'error': "Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        #make sure user created the comment or the user is the owner of the post
+        if (comment.user == user or post.user == user):
+        #delete dislike
+            comment.delete()
+            return Response("Comment deleted", status=status.HTTP_200_OK)
+        else:
+            return Response({'error': "You are not authorized to delete this comment"},status=status.HTTP_403_FORBIDDEN)
+
+        

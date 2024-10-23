@@ -11,7 +11,7 @@ const ChatPage: React.FC = () => {
   const [data, setData] = useState<{ friends: Friend[] } | null>(null);
   const [chatConnected, setChatConnected] = useState(socket.connected);
   const [chatHistory, setChatHistory] = useState<ChatHistory>({});
-  const [selectedChatWindow, setChatWindow] = useState<number | null>(null);
+  const [selectedChatWindow, setChatWindow] = useState<Friend | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
@@ -44,13 +44,14 @@ const ChatPage: React.FC = () => {
 
   const pushMessage = (withId: number, msg: ChatMessage) => {
     if (chatHistory == null) {
-      setChatHistory({ [withId]: [msg] });
+      setChatHistory({ [withId]: [msg]})
     } else if (!chatHistory[withId]) {
-      setChatHistory({ ...chatHistory, [withId]: [msg] });
+      setChatHistory({...chatHistory, [withId]: [msg] })
     } else {
-      setChatHistory({ ...chatHistory, [withId]: chatHistory[withId].concat([msg]) });
+      console.log(chatHistory[withId])
+      setChatHistory({...chatHistory, [withId]: chatHistory[withId].concat([msg])})
     }
-  };
+  }
 
   useEffect(() => {
     const onConnect = () => {
@@ -107,7 +108,7 @@ const ChatPage: React.FC = () => {
       </div>
     
       <div className='h-screen flex-1 bg-[#342c33]'>
-        {selectedChatWindow && auth && <ChatWindowView user={selectedChatWindow} pushHistory={pushMessage} history={chatHistory[selectedChatWindow]} />}
+        {selectedChatWindow && auth && <ChatWindowView user={selectedChatWindow} pushHistory={pushMessage} history={chatHistory[selectedChatWindow.id]} />}
       </div>
     </>
   );

@@ -10,6 +10,7 @@ export interface User {
     password_hash: string,
   }
 
+export type UserResponse = Omit<User, "email" | "password_hash">
 export interface UserInfo {
     user: number,
     first_name: string,
@@ -21,16 +22,19 @@ export interface UserInfo {
 export interface Post {
   id: number, // Primary key for Post
   user: number, // Foreign key to the user
+  username: string,
   text: string,
   image: string | null,
   datetime: string,
   community: number, // Foreign key to the community
+  community_name: string,
   comments?: Comment[]
 }
 
 export interface Comment {
   id: number, // primary key for Comment
   user: number, // reference to the user who made the comment
+  username: string,
   post: number, // reference to the associated Post
   text: string, // the content of the comment
   datetime: string, // timestamp of the comment
@@ -48,8 +52,8 @@ export interface Community {
 
 export interface RecentActivity {
   id: number, // Primary key for Recent Activity
-  userid: number, // Foreign key for the User
-  postid: number, //Foreign key for the Post
+  user: number,
+  username: string,
   type: string,
   datetime: string,
 }
@@ -57,6 +61,7 @@ export interface RecentActivity {
 export interface Like {
   id: number, //primary key for like
   user: number, //Foreign key for the User
+  username: string,
   post: number, //Foreign key for the Post
   datetime: string,
 }
@@ -64,6 +69,7 @@ export interface Like {
 export interface Dislike {
   id: number, //primary key for like
   user: number, //Foreign key for the User
+  username: string,
   post: number, //Foreign key for the Post
   datetime: string,
 }
@@ -95,10 +101,10 @@ export interface PaginationResponse<T> {
 
 export interface FriendResponse {
   userId: number,
-  friendsIds: number[]
+  friends: Friend[]
 }
 
-export type Friend = number;
+export type Friend = Pick<User, "id" | "username">
 
 export type ServerError = {
   error: string
@@ -108,9 +114,18 @@ export interface ChatMessage {
   to: number,
   message: string
 }
+
+export interface FriendRequest {
+  id: number,
+  from_user: number,
+  from_username: string,
+  to_user: number,
+  to_username: string,
+}
+
 export type ChatHistory = Record<number, ChatMessage[]>
 export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
-  return (obj as ServerError).error !== undefined
+  return obj && (obj as ServerError).error !== undefined
 }
 

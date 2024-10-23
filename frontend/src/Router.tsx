@@ -8,7 +8,8 @@ import { Post } from "./components/Post";
 import { Login } from "./Login";
 import { loader as communityLoader } from "./components/Community"
 import { loader as postLoader } from "./components/Post"
-import ChatPage from "./Messages";
+import Messages from "./Messages";
+import ProfilePage from "./components/ProfilePage";
 
 const router = createBrowserRouter([
     { path: "/",
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
         },
         {
           path: "/messages",
-          element: <ChatPage />,
+          element: <Messages />,
         },
         {
           path: "/community/:communityid",
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
               element: <CreatePost />
             }
           ]
+        },
+        {
+          path: "/user/:username",
+          element: <ProfilePage />
         }
       ],
     },

@@ -1,11 +1,11 @@
 import { FormEvent, useState } from "react";
-import { ChatMessage } from "../schema";
+import { ChatMessage, Friend } from "../schema";
 import socket from "../socket";
 import { useAuth } from "./auth";
 import { v4 } from 'uuid'
 
 interface ChatWindowViewProps {
-    user: number
+    user: Friend;
     history: ChatMessage[];
     pushHistory: (withId: number, msg: ChatMessage) => void;
 }
@@ -20,18 +20,15 @@ const ChatWindowView = ({user, history, pushHistory}: ChatWindowViewProps) => {
     
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
-        const message = {from: auth.id, to: user, message: messageText}
+        const message = {from: auth.id, to: user.id, message: messageText}
         socket.emit("message", {to: user, message: messageText})
-        pushHistory(user, message)
+        pushHistory(user.id, message)
         setMessageText("");
 
     }
-
-    console.log("hist", history)
-
     return (
         <div className="flex flex-col h-full w-full">
-            <h2 className="w-full p-4 px-5 text-white text-xl font-bold font-sans border-b border-[#514350]">{user}</h2>
+            <h2 className="w-full p-4 px-5 text-white text-xl font-bold font-sans border-b border-[#514350]">{user.username}</h2>
             <div className="flex flex-col h-full space-y-3 p-4 rounded-lg overflow-y-auto">
                 {history && history.map((msg) => (
                     <div key={v4()} className={`flex ${msg.from === auth.id ? 'justify-end' : 'justify-start'}`}>

@@ -59,7 +59,7 @@ interface ClientToServerEvents {
 interface SocketData {
     userID: number
     username: string
-    friends?: number[]
+    friends?: { id: number, username: string }[]
 }
 
 //function to generate room name based on users' ids
@@ -112,7 +112,7 @@ io.use(async (socket, next) => {
             },
         })
         const data = await response.json();
-        socket.data.friends = data.friendsIds;
+        socket.data.friends = data.friends;
         next()
         // if request to django fails, send connect_error with the error message
         if (!response.ok) {
@@ -139,11 +139,11 @@ io.on('connection', async (socket) => {
     //send restored chats with each friend
     if (friendsIds) {
         try {
-            const restoredMessages = await Promise.all(friendsIds?.map(async (fId: number) => {
-                let chatName = getChatName(userId, fId)
+            const restoredMessages = await Promise.all(friendsIds.map(async ({id, username}: {id: number, username: string}) => {
+                let chatName = getChatName(userId, id)
                 let prevMessages = (await redisClient.lRange(`logs:${chatName}`, 0, -1))
 
-                return { "withUser": fId, "messages": prevMessages.map(msg => JSON.parse(msg)) }
+                return { "withUser": id, "messages": prevMessages.map(msg => JSON.parse(msg)) }
             }));
 
             // friendsIds?.forEach(async (fId: number) => {
@@ -193,6 +193,7 @@ io.on('connection', async (socket) => {
             if (otherSocketId === null) {
                 return
             }
+            
         const content = { 'from': userId, 'message': message }
         socket.to(`${otherSocketId}`).emit('message', content)
         } catch (e) {
