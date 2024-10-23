@@ -7,16 +7,6 @@ urlpatterns = [
     path("auth/register", auth_views.RegisterUserView.as_view()), #register new user
     path("auth/login", auth_views.LoginView.as_view()),#login user
 
-    #GET/POST for each table
-    # path("users", views.UserListCreateView.as_view()),
-    # path("userinfo", views.UserInfoListCreateView.as_view()),
-    # path("posts", views.PostListCreateView.as_view()),
-    # path("communities", views.CommunityListCreateView.as_view()),
-    # path('likes', views.LikeListCreateView.as_view()),
-    # path('dislikes', views.DislikeListCreateView.as_view()),
-    # path('comments', views.CommentListCreateView.as_view()),
-    # path('recentactivity', views.RecentActivityListCreateView.as_view()),
-
     #communities
     path('community/<int:pk>', community_views.CommunityPostsView.as_view()),
     path('community/<int:pk>/about', community_views.CommunityDetailView.as_view()),
@@ -41,6 +31,7 @@ urlpatterns = [
 
     #friends
     path('friends/', friendship_views.FriendsIdsGetView.as_view()),
+    path('friends/status/', friendship_views.FriendshipStatusView.as_view()),
     path('friendrequest/', friendship_views.FriendRequestCreateView.as_view()),
     path('friendrequests/accept/', friendship_views.AcceptView.as_view()),
     path('friendrequests/decline/', friendship_views.DeclineView.as_view()),

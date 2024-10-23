@@ -118,4 +118,4 @@ def authorize(token):
             raise ValueError
     #get user id and username from token
     decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-    return decoded_token['id'], decoded_token['username']
+    return {'id': decoded_token['id'], 'username': decoded_token['username']}
