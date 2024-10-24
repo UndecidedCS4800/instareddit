@@ -24,7 +24,7 @@ const NavBar: React.FC = () => {
             />
     }
     return (
-        <nav className="min-h-max basis-4/12 bg-stone-800 text-white">
+        <nav className="h-screen basis-4/12 bg-stone-800 text-white">
             <div className="flex items-center justify-center bg-stone-800 h-20">
                 <h1 className="text-2xl">
                     <span className="text-white font-normal">Only</span>
@@ -43,10 +43,15 @@ const NavBar: React.FC = () => {
                     </Link>
                 </li>
                 <li className="nav-item">
+                    <Link to="/messages" className="flex items-center justify-center px-4 py-2 text-white hover:bg-pink-300 hover:text-white transition-colors duration-200">
+                        Messages
+                    </Link>
+                </li>
+                <li className="nav-item">
                     {loginLink}
                 </li>
             </ul>
         </nav>
     );
-};
-export default NavBar;
+ };
+ export default NavBar;
