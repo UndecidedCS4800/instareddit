@@ -53,6 +53,7 @@ const App: React.FC = () => {
   }, [auth])
 
   const pushMessage = (withId: number, msg: ChatMessage) => {
+    console.log(msg);
     if (chatHistory == null) {
       setChatHistory({ [withId]: [msg]})
     } else if (!chatHistory[withId]) {
@@ -92,6 +93,7 @@ const App: React.FC = () => {
 
     const chatMessage = (msg: Omit<ChatMessage, "to">) => {
       const to = (auth as JWTTokenResponse).id
+      console.log("chatMessage", msg)
       if (chatHistory == null) {
         setChatHistory({ [msg.from]: [{to, ...msg}]})
       } else if (!chatHistory[msg.from]) {

@@ -44,16 +44,25 @@ redisClient.connect().then(() => console.log("connected to redis client"))
 
 const server = http.createServer(exp)
 
+interface ChatMessage {
+    from: number,
+    to: number,
+    message: string,
+}
+
+interface User {
+    id: number,
+    username: string,
+}
 //socket.io
 // types
 interface ServerToClientEvents {
     message: (message: {from: number, message: string}) => void;
-    restoredMessages: (msgs: { withUser: number, messages: string[] }[]) => void;
+    restoredMessages: (msgs: { withUser: number, messages: ChatMessage[] }[]) => void;
 }
 
-
 interface ClientToServerEvents {
-    message: (message: { to: number, message: string }) => void;
+    message: (message: { to: User, message: string }) => void;
 }
 
 interface SocketData {
@@ -104,7 +113,7 @@ io.use((socket, next) => {
 io.use(async (socket, next) => {
     //get friends' IDs
     try {
-        const response = await fetch(`https://instareddit.onrender.com/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
+        const response = await fetch(`http://backend:8000/api/friends`, { //change url later, for some reason localhost didn't work here, gotta use the container name
             method: 'GET',
             headers: {
                 'Authorization': `bearer ${socket.handshake.auth.token}`, // Add the Authorization header
@@ -133,7 +142,7 @@ io.on('connection', async (socket) => {
     const userId = socket.data.userID
     const friendsIds = socket.data.friends
     socket.join(socket.data.userID.toString())
-    console.log(`CLIENT CONNECTED, ID: ${userId}`)
+    console.log(`CLIENT CONNECTED, ID: ${userId}, ${socket.id}`)
 
 
     //send restored chats with each friend
@@ -175,10 +184,11 @@ io.on('connection', async (socket) => {
         if (!to || !message) {
             return console.error('Invalid message format: must be { to, message }')
         }
+        console.log(message)
 
         //save message to logs
-        const chatName = getChatName(userId, to)
-        const messageLog = JSON.stringify({ "from": userId, "to": to, "message": message})
+        const chatName = getChatName(userId, to.id)
+        const messageLog = JSON.stringify({ "from": userId, "to": to.id, "message": message })
         try {
         await redisClient.rPush(`logs:${chatName}`, messageLog)
         } catch(e) {
@@ -189,12 +199,12 @@ io.on('connection', async (socket) => {
         
         //get receiver's socketID
         try {
-            const otherSocketId = await redisClient.hGet('user-socket-map', `${to}`)
+            const otherSocketId = await redisClient.hGet('user-socket-map', `${to.id}`)
             if (otherSocketId === null) {
                 return
             }
             
-        const content = { 'from': userId, 'message': message }
+        const content: Omit<ChatMessage, "to"> = { 'from': userId, 'message': message }
         socket.to(`${otherSocketId}`).emit('message', content)
         } catch (e) {
             if (e instanceof Error) {
