@@ -102,6 +102,41 @@ class SelfProfileView(views.APIView):
         # Serialize and return the new user info
         response = serializers.UserInfoSerializer(new_userinfo).data
         return Response(response, status=status.HTTP_201_CREATED)
+    
+    def put(self, request):
+         # Get the token from the request
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            # Decode the token
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Get the user
+        user_id = decoded_token.get('id')
+        try:
+            user = models.User.objects.get(id=user_id)
+        except models.User.DoesNotExist:
+            return Response({'error': "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+             userinfo = models.UserInfo.objects.get(user = user)
+        except models.UserInfo.DoesNotExist:
+             return Response({'error': "User Info not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = request.data.copy()
+        data.pop('user', None)  # Remove 'user' if present
+        
+        serializer = serializers.UserInfoSerializer(userinfo, data = data)
+        if serializer.is_valid():
+             serializer.save()
+             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+         
 
         
 			
