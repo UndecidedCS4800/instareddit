@@ -1,6 +1,6 @@
 from rest_framework import views, status, generics
 from rest_framework.response import Response
-from .auth_views import verify_token, authorize
+from .auth_views import requires_token, verify_token, authorize
 from .. import models, serializers
 import jwt
 import os
@@ -46,16 +46,17 @@ class FriendsIdsGetView(views.APIView):
 #POST /api/friendrequest
 #with 'other_username' in body
 class FriendRequestCreateView(views.APIView):
+    @requires_token
     def post(self, request):
-        #authorize
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        #get user id from token
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        # #authorize
+        # token = verify_token(request)
+        # if not token:
+        #     return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        # #get user id from token
+        # try:
+        #     decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        # except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+        #     return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
         
         #get both user ids
         username = decoded_token['username']
@@ -194,6 +195,7 @@ class CancelView(views.APIView):
 
 #get friendship status between the logged in user and another user
 #GET /api/friends/status?other_username=<username>
+#possible status: friends, request sent, request received, not friends
 class FriendshipStatusView(views.APIView):
     def get(self, request):
         #authorization

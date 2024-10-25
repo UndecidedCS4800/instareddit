@@ -1,3 +1,4 @@
+from functools import wraps
 from rest_framework import views, status
 from rest_framework.response import Response
 from .. import models, forms
@@ -119,3 +120,16 @@ def authorize(token):
     #get user id and username from token
     decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
     return {'id': decoded_token['id'], 'username': decoded_token['username']}
+
+def requires_token(view):
+    @wraps(view)
+    def with_token(request):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        return view(request)
+    return with_token
