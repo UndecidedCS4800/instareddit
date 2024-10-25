@@ -7,7 +7,8 @@ interface FriendsListItemProps {
 
 const FriendsListItem = ({friend, handler}: FriendsListItemProps) => {
     return (
-        <div onClick={() => handler()}>{friend.username}</div>
+        <div onClick={() => handler()}
+        className="flex items-center justify-between p-2 text-white text-xl font-bold font-sans rounded-lg cursor-pointer">{friend.username}</div>
     )
 }
 

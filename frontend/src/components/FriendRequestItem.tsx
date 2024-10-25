@@ -25,11 +25,17 @@ const FriendRequestItem = ({from}: FriendRequestItemProps) => {
     }
 
     return (
-        <div>
-            <span>{from.username}</span>
-            <button disabled={buttonDisabled} onClick={handleAccept}>{buttonText}</button>
+        <div className="flex rounded-[30px] bg-[#514350] p-2 text-xl font-sans">
+            <span className="px-4 py-3">{from.username}</span>
+            <button 
+                disabled={buttonDisabled} 
+                onClick={handleAccept} 
+                className="ml-auto px-2 py-2 text-xl font-sans"
+            >
+                {buttonText}
+            </button>
         </div>
-    )
+    );
 }
 
 export default FriendRequestItem;
