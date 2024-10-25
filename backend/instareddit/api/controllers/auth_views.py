@@ -114,16 +114,12 @@ def verify_token(request):
 
     return token
 
-def authorize(token):
-    if not token:
-            raise ValueError
-    #get user id and username from token
-    decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-    return {'id': decoded_token['id'], 'username': decoded_token['username']}
-
 def requires_token(view):
+    """
+    Decorator to verify that a valid token was passed in the request before executing the view logic.
+    """
     @wraps(view)
-    def with_token(request):
+    def with_token(self, request, **kwargs):
         token = verify_token(request)
         if not token:
             return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -131,5 +127,5 @@ def requires_token(view):
             decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
         except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
             return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
-        return view(request)
+        return view(self, request, **kwargs, token=decoded_token)
     return with_token

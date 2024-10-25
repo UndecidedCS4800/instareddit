@@ -1,7 +1,7 @@
 from rest_framework import status, mixins, generics, views
 from rest_framework.response import Response
 from .. import serializers, models, pagination_classes
-from .auth_views import verify_token
+from .auth_views import requires_token
 import os
 import jwt
 from datetime import datetime
@@ -12,17 +12,11 @@ class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
     serializer_class = serializers.PostSerializer
     pagination_class = pagination_classes.StandardPostSetPagination
 
-    def get(self, request):
+    @requires_token
+    def get(self, request, **kwargs):
         #verify token
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        #get username from token
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        decoded_token = kwargs['token']
+
         username = decoded_token['username']
         #get logged in user
         user = models.User.objects.get(username=username)
@@ -73,12 +67,9 @@ class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin)
         serializer = serializers.PostSerializer(post)
         return Response(serializer.data)
     
-    def patch(self, request, username, post_pk):
-        token = verify_token(request)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def patch(self, request, username, post_pk, **kwargs):
+        decoded_token = kwargs['token']
         if decoded_token['username'] != username:
             return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         post = self.get_post(username, post_pk)
@@ -89,12 +80,9 @@ class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin)
             self.perform_update(serializer)
             return Response(serializer.data)
         
-    def delete(self, request, username, post_pk):
-        token = verify_token(request)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def delete(self, request, username, post_pk, **kwargs):
+        decoded_token = kwargs['token']
         if decoded_token['username'] != username:
             return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         post = self.get_post(username, post_pk)
@@ -110,15 +98,10 @@ class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin)
 #required in body: text
 #optional in body: image. community
 class PostCreateView(views.APIView):
-    def post(self, request):
+    @requires_token
+    def post(self, request, **kwargs):
         #verify token
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        decoded_token = kwargs['token']
         
         #get user data
         user_id = decoded_token['id']
@@ -149,14 +132,9 @@ class PostCreateView(views.APIView):
     
 #post like on a post and get likes from a post
 class PostLikesView(views.APIView):
-    def post(self, request,post_id):
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def post(self, request,post_id, **kwargs):
+        decoded_token = kwargs['token']
 	#get the user
         user_id = decoded_token['id']
         try:
@@ -194,15 +172,9 @@ class PostLikesView(views.APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class DeleteLikesView(generics.DestroyAPIView):
-    def delete(self, request, post_id, like_id):
-        token = verify_token(request)
-        #verify the token
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def delete(self, request, post_id, like_id, **kwargs):
+        decoded_token = kwargs['token']
         #get the user from the token
         user_id = decoded_token['id']
         user = models.User.objects.get(id = user_id)
@@ -226,14 +198,9 @@ class DeleteLikesView(generics.DestroyAPIView):
 
 #create dislike on a post
 class PostDislikesView(views.APIView):
-    def post(self, request,post_id):
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def post(self, request,post_id, **kwargs):
+        decoded_token = kwargs['token']
 	#get the user
         user_id = decoded_token['id']
         try:
@@ -271,15 +238,9 @@ class PostDislikesView(views.APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)   
     
 class DeleteDislikesView(generics.DestroyAPIView):
-    def delete(self, request, post_id, dislike_id):
-        token = verify_token(request)
-        #verify the token
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def delete(self, request, post_id, dislike_id, **kwargs):
+        decoded_token = kwargs['token']
         #get the user from token
         user_id = decoded_token['id']
         user = models.User.objects.get(id = user_id)
@@ -302,14 +263,9 @@ class DeleteDislikesView(generics.DestroyAPIView):
     
 #create comment on a post
 class PostCommentView(views.APIView):
-    def post(self, request,post_id):
-        token = verify_token(request)
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def post(self, request,post_id, **kwargs):
+        decoded_token = kwargs['token']
 	#get the user
         user_id = decoded_token['id']
         try:
@@ -350,15 +306,9 @@ class PostCommentView(views.APIView):
 
 
 class DeleteCommentsView(generics.DestroyAPIView):
-    def delete(self, request, post_id, comment_id):
-        token = verify_token(request)
-        #verify the token
-        if not token:
-            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
-        try:
-            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
-            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    @requires_token
+    def delete(self, request, post_id, comment_id, **kwargs):
+        decoded_token = kwargs['token']
         #get the user from token
         user_id = decoded_token['id']
         user = models.User.objects.get(id = user_id)
