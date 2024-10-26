@@ -73,7 +73,6 @@ const ChatPage: React.FC = () => {
 
   return (
     <>
-    
       <div className='h-screen basis-3/12 bg-[#342c33] p-8 border-r border-[#514350]'>
         <div><img src={MessageBubble} alt="Message Bubble" className="px-7 w-35 h-7" /></div>
         {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}

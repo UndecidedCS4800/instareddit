@@ -2,31 +2,50 @@
 
 import { useParams } from "react-router-dom";
 import { useAuth } from "./auth";
-import { getUserProfile, sendFriendRequest } from "../remote";
+import { getFriends, getUserProfile, sendFriendRequest } from "../remote";
 import { MouseEvent, useEffect, useState } from "react";
-import { isError, JWTTokenResponse, UserInfo, UserMeta } from "../schema";
+import { Friend, isError, JWTTokenResponse, , UserMeta } from "../schema";
 import UserInfoDisplay from "./UserInfoDisplay";
+import FriendsList from "./FriendsList";
 
 
 const ProfilePage = () => {
     // this will be different once we have an actual profile page
     const [userinfo, setUserInfo] = useState<UserMeta | null>(null)
+    const [friends, setFriends] = useState<Friend[] | null>(null)
     const [editable, toggleEditable] = useState<boolean>(false)
     const params = useParams();
     const auth = useAuth();
     const [buttonText, setButtonText] = useState("Send friend request")
 
     useEffect(() => {
+        const friends = async () => {
+          if (auth) {
+            const friends = await getFriends(auth.token);
+            if (isError(friends)) {
+              console.error('server error: ', friends);
+            } else {
+              setFriends(friends)
+          }
+        };
+    
+        friends();
+      }, [auth]);
+    
+    useEffect(() => {
         const get = async () => {
             if (params?.username) {
                 const req = await getUserProfile(params.username)
-                if (!isError) 
+                if (!isError(req)) {
+                    console.error(req)
+                } else {
+                }
             }
         }
 
         get()
-
     }, [])
+
     const handleClick = async (e: MouseEvent) => {
         e.preventDefault();
         const a = auth as JWTTokenResponse;
@@ -57,6 +76,8 @@ const ProfilePage = () => {
 
             <h2>User Information {editButton} </h2>
             <UserInfoDisplay userinfo={userinfo} editable={editable} uiHandler={handleModify} />
+            <h2>Friends</h2>
+            <FriendsList friends={friends}/>
         </div>
     )
 }
