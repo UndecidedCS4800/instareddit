@@ -9,7 +9,6 @@ import MessageBubble from '../public/Messages.png';
 
 const ChatPage: React.FC = () => {
   const [data, setData] = useState<{ friends: Friend[] } | null>(null);
-  const [chatConnected, setChatConnected] = useState(socket.connected);
   const [chatHistory, setChatHistory] = useState<ChatHistory>({});
   const [selectedChatWindow, setChatWindow] = useState<Friend | null>(null);
 
@@ -17,15 +16,6 @@ const ChatPage: React.FC = () => {
 
   const auth = useAuth();
 
-  useEffect(() => {
-    const connect = () => {
-      if (auth) {
-        socket.auth = { token: auth.token };
-        socket.connect();
-      }
-    };
-    connect();
-  }, [auth]);
 
   useEffect(() => {
     const friends = async () => {
@@ -52,23 +42,6 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const onConnect = () => {
-      setChatConnected(true);
-    };
-
-    const onDisconnect = () => {
-      setChatConnected(false);
-    };
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-    };
-  }, []);
 
   useEffect(() => {
     const restoredMessages = (messages: { withUser: number; messages: ChatMessage[] }[]) => {
@@ -102,7 +75,7 @@ const ChatPage: React.FC = () => {
     <>
     
       <div className='h-screen basis-3/12 bg-[#342c33] p-8 border-r border-[#514350]'>
-        {chatConnected ? <div><img src={MessageBubble} alt="Message Bubble" className="px-7 w-35 h-7" /></div> : <></>}
+        <div><img src={MessageBubble} alt="Message Bubble" className="px-7 w-35 h-7" /></div>
         {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
       </div>
     

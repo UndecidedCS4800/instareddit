@@ -42,6 +42,11 @@ const NavBar: React.FC = () => {
                         About Us
                     </Link>
                 </li>
+                {auth && <li className="nav-item">
+                    <Link to={`/profile/${auth.username}`} className="flex items-center justify-center px-4 py-2 text-white hover:bg-pink-300 hover:text-white transition-colors duration-200">
+                        Profile
+                    </Link>
+                </li>}
                 <li className="nav-item">
                     <Link to="/messages" className="flex items-center justify-center px-4 py-2 text-white hover:bg-pink-300 hover:text-white transition-colors duration-200">
                         Messages

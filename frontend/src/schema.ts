@@ -13,10 +13,10 @@ export interface User {
 export type UserResponse = Omit<User, "email" | "password_hash">
 export interface UserInfo {
     user: number,
-    first_name: string,
-    last_name: string,
-    date_of_birth: string,
-    profile_picture: string,
+    first_name: string | null,
+    last_name: string | null,
+    date_of_birth: string | null,
+    profile_picture: string | null,
   }
 
 export interface Post {
@@ -124,6 +124,7 @@ export interface FriendRequest {
 }
 
 export type ChatHistory = Record<number, ChatMessage[]>
+export type UserMeta = Omit<UserInfo, "user">
 export type PostRequest = Pick<Post, "text" | "community">
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
   return obj && (obj as ServerError).error !== undefined
