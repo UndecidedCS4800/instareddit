@@ -1,4 +1,4 @@
-import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User, UserMeta, UserResponse } from "./schema";
+import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User, UserMeta} from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
