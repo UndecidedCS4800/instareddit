@@ -5,10 +5,10 @@ import FriendsListItem from "./FriendsListItem";
 // TODO: when we want user profile pages this should be updated
 interface FriendsListProps {
     friends: Friend[] | null;
-    setWindowHandler?: React.Dispatch<React.SetStateAction<Friend | null>>
+    onClick?: (f: Friend) => void;
 }
 
-const FriendsList = ({friends, setWindowHandler}: FriendsListProps) => {
+const FriendsList = ({friends, onClick: setWindowHandler}: FriendsListProps) => {
     if (!friends || friends?.length === 0) {
         return <></>
     }

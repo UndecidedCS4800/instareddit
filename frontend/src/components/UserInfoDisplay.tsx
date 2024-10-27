@@ -28,15 +28,16 @@ const Editor = ({def, uiHandler}: EditorProps) => {
             first_name: firstName,
             last_name: lastName,
             date_of_birth: dateOfBirth,
+            profile_picture: null,
         }
 
         uiHandler(composed)
     }
     return (
         <form onSubmit={onSubmit}>
-            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}></input>
-            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)}></input>
-            <input type="date" value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)}></input>
+            <span>First Name<input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}></input></span>
+            <span>Last Name<input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)}></input></span>
+            <span>Date of Birth<input type="date" value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)}></input></span>
             <button type="submit">Save Changes</button>
         </form>
     )

@@ -6,8 +6,6 @@ import { useEffect } from 'react';
 import socket from './socket';
 import { useAuth } from './components/auth';
 
-
-
 const App: React.FC = () => {
   const auth = useAuth()
   useEffect(() => {

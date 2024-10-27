@@ -2,9 +2,9 @@
 
 import { useParams } from "react-router-dom";
 import { useAuth } from "./auth";
-import { getFriends, getUserProfile, sendFriendRequest } from "../remote";
+import { getFriends, getUserProfile, modifyProfile, sendFriendRequest } from "../remote";
 import { MouseEvent, useEffect, useState } from "react";
-import { Friend, isError, JWTTokenResponse, , UserMeta } from "../schema";
+import { Friend, isError, JWTTokenResponse, UserMeta } from "../schema";
 import UserInfoDisplay from "./UserInfoDisplay";
 import FriendsList from "./FriendsList";
 
@@ -30,15 +30,16 @@ const ProfilePage = () => {
         };
     
         friends();
-      }, [auth]);
+    }}, [auth]);
     
     useEffect(() => {
         const get = async () => {
             if (params?.username) {
                 const req = await getUserProfile(params.username)
                 if (!isError(req)) {
-                    console.error(req)
+                    setUserInfo(req)
                 } else {
+                    console.error(req)
                 }
             }
         }
@@ -59,20 +60,23 @@ const ProfilePage = () => {
     }
 
     const handleModify = async (ui: UserMeta) => {
-        const res = await modifyProfile(auth?.token, ui);
+        if (auth?.token) {
+            const res = await modifyProfile(auth.token, ui);
 
-        if (!isError(res)) {
-            setUserInfo(res)
-        } else {
-            console.error(res)
+            if (!isError(res)) {
+                setUserInfo(res)
+            } else {
+                console.error(res)
+            }
         }
     }
 
 
-    const editButton = auth && auth.username === params?.username ? <button onClick={() => toggleEditable(!editable)}></button> : <></>
+    const editButton = auth && auth.username === params?.username ? <button onClick={() => toggleEditable(!editable)}>Edit</button> : <></>
     return (
         <div>
-            {auth && <button onClick={handleClick}>{buttonText}</button>}
+            <h1>{params?.username}</h1>
+            {auth && auth.username !== params?.username && <button onClick={handleClick}>{buttonText}</button>}
 
             <h2>User Information {editButton} </h2>
             <UserInfoDisplay userinfo={userinfo} editable={editable} uiHandler={handleModify} />

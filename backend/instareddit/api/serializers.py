@@ -8,6 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password_hash']
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = models.UserInfo
         fields = ['user', 'first_name', 'last_name', 'date_of_birth', 'profile_picture']
