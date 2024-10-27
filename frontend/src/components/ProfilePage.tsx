@@ -19,18 +19,21 @@ const ProfilePage = () => {
     const [buttonText, setButtonText] = useState("Send friend request")
 
     useEffect(() => {
-        const friends = async () => {
+        const getsfs = async () => {
           if (auth) {
             const friends = await getFriends(auth.token);
+            console.log(friends)
             if (isError(friends)) {
               console.error('server error: ', friends);
             } else {
               setFriends(friends)
           }
         };
+        console.log('firing')
+    }
     
-        friends();
-    }}, [auth]);
+        getsfs();
+    }, [auth]);
     
     useEffect(() => {
         const get = async () => {
