@@ -45,7 +45,7 @@ const Editor = ({def, uiHandler}: EditorProps) => {
 
 const Display = ({ userinfo }: DisplayProps) => {
     if (!userinfo) {
-        return <p>User has no information.</p>
+        return <p>Loading...</p>
     }
     return (
         <div>

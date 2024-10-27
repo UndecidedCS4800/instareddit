@@ -65,6 +65,7 @@ const ProfilePage = () => {
 
             if (!isError(res)) {
                 setUserInfo(res)
+                toggleEditable(false)
             } else {
                 console.error(res)
             }
