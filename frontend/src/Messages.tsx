@@ -46,7 +46,6 @@ const ChatPage: React.FC = () => {
         setChatHistory(restoredHistory);
       });
 
-      // Listen for new chat messages
       socket.on('message', (msg: Omit<ChatMessage, 'to'>) => {
         const to = (auth as JWTTokenResponse).id;
         setChatHistory(prevHistory => ({
