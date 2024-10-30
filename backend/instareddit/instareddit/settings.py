@@ -95,6 +95,10 @@ db = {
     'PORT':'3306',
     'USER': os.environ.get('MARIA_DB_USER'),
     'PASSWORD': os.environ.get('MARIA_DB_PASSWORD'),
+    'TEST': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory'
+    }
 }
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
