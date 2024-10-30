@@ -18,5 +18,32 @@ class MissingUsernameRegister(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
 
-#try with username that already exists
+class MissingPasswordRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'email':EMAIL})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
 
+class MissingEmailRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class InvalidEmailRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD, 'email':'hej.com'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class PasswordTooShortRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':'a', 'email':EMAIL})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class PasswordTooCommonRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':'12345678', 'email':EMAIL})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
