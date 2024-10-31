@@ -1,10 +1,8 @@
 from django.test import TestCase, Client
 from rest_framework.test import APIClient
+from . import models
 
 #set up client
-#using USER1's data
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVTRVIxIiwiaWQiOjF9.YdYTk6mLJMS4oEdeibADHR53nLppjQRN9qyJKReUehs'
-CLIENT_AUTH = APIClient(headers={'Authorization': f'bearer {TOKEN}'})
 CLIENT = APIClient()
 
 #set up username, password, email for new user
@@ -15,6 +13,12 @@ PASSWORD = 'TestPassword2137'
 class MissingUsernameRegister(TestCase):
     def test(self):
         response = CLIENT.post('/api/auth/register', {'password':PASSWORD, 'email':EMAIL})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class InvalidUsernameRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username': '', 'password':PASSWORD, 'email':EMAIL})
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
 
@@ -45,5 +49,30 @@ class PasswordTooShortRegister(TestCase):
 class PasswordTooCommonRegister(TestCase):
     def test(self):
         response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':'12345678', 'email':EMAIL})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class CorrectInputRegister(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD, 'email':EMAIL})
+        self.assertTrue('username' in response.json())
+        self.assertTrue('token' in response.json())
+        self.assertEqual(response.status_code, 201)
+        user = models.User.objects.filter(username=USERNAME).first()
+        self.assertIsNotNone(user)
+        user = models.User.objects.filter(email=EMAIL).first()
+        self.assertIsNotNone(user)
+
+class TakenUsernameRegister(TestCase):
+    def test(self):
+        CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD, 'email':EMAIL})
+        response = CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD, 'email':'test@email.com'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class TakenEmailRegister(TestCase):
+    def test(self):
+        CLIENT.post('/api/auth/register', {'username':USERNAME, 'password':PASSWORD, 'email':EMAIL})
+        response = CLIENT.post('/api/auth/register', {'username':'SomeOtherUser', 'password':PASSWORD, 'email':EMAIL})
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
