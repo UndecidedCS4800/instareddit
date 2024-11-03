@@ -1,0 +1,104 @@
+networks:
+  instareddit-network:
+    driver: bridge
+services:
+  frontend:
+    image: node:latest
+    command: sh -c "yarn --non-interactive && yarn dev"
+    ports:
+      - 5173:5173
+    working_dir: /frontend
+    volumes:
+      - ./frontend:/frontend
+    depends_on:
+      - backend
+    networks:
+      - instareddit-network
+    environment:
+      - NODE_ENV=development
+  backend:
+    build: backend
+    command:  
+         sh -c  "pip3 install -r requirements.txt; python instareddit/manage.py migrate ; python instareddit/manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    environment:
+      PORT: "8000"
+      DJANGO_DEBUG: "TRUE"
+      MARIA_DB_NAME: "dummy"
+      MARIA_DB_HOST: "db"
+      MARIA_DB_USER: "root"
+      MARIA_DB_PASSWORD: "secret"
+      USE_LOCAL_DB: True
+      TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
+    volumes:
+        - ./backend:/usr/src/app
+    networks:
+      - instareddit-network
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  db:
+    image: mariadb:latest
+    restart: always
+    networks:
+      - instareddit-network
+    volumes:
+      - instareddit-db:/var/lib/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=secret
+      - MARIADB_ROOT_HOST=%
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+
+  chat:
+      image: node:current-alpine3.19
+      container_name: chat
+      command: sh -c "yarn --non-interactive && yarn dev"
+      working_dir: /usr/src/app
+      ports:
+        - "10000:10000"
+      environment:
+          TOKEN_KEY: "U/gOsbdymaCTxG>EF'b{2JBb-nO@9#LP,M($285^EkJ%3?8h6y.<GDVN.~pX.DF"
+          NODE_ENV: "development"
+          PORT: "10000"
+          REDIS_URL: "redis://instareddit:secret@chatlog/0"
+          BACKEND_URL: "backend"
+          BACKEND_PORT: "8000"
+      volumes: 
+        - ./chat:/usr/src/app
+      networks:
+        - instareddit-network
+      depends_on:
+        - redis
+        - backend
+    
+
+  redis:
+      image: redis:latest
+      container_name: chatlog
+      command: "redis-server /usr/local/etc/redis/redis.conf"
+      volumes:
+        - instareddit-chatlog:/data
+        - ./redis/config:/usr/local/etc/redis/
+      networks:
+        - instareddit-network
+      
+
+
+
+ 
+  
+volumes:
+  instareddit-db:  
+
+  instareddit-chatlog:

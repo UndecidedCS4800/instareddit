@@ -76,3 +76,92 @@ class TakenEmailRegister(TestCase):
         response = CLIENT.post('/api/auth/register', {'username':'SomeOtherUser', 'password':PASSWORD, 'email':EMAIL})
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
+        
+#login tests
+class MissingUsernameLogin(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/login', {'password':PASSWORD})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+        self.assertEqual(response.json()['error'], 'Invalid form')
+        
+class MissingPasswordLogin(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/login', {'username': USERNAME})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+        self.assertEqual(response.json()['error'], 'Invalid form')
+        
+class UsernameDoesNotExistLogin(TestCase):
+    def test(self):
+        response = CLIENT.post('/api/auth/login', {'username': 'DoesNotExist', 'password': PASSWORD})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+        self.assertEqual(response.json()['error'], 'User with this username does not exist')
+        
+class IncorrectPasswordLogin(TestCase):   
+    def setUp(self):
+        response = CLIENT.post('/api/auth/register', {'username': USERNAME, 'password': PASSWORD, 'email': EMAIL})
+        self.assertEqual(response.status_code, 201)
+        
+    def test(self):
+        response = CLIENT.post('/api/auth/login', {'username': USERNAME, 'password': 'WrongPassword'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+        self.assertEqual(response.json()['error'], 'Incorrect password')
+    
+    def tearDown(self):
+        models.User.objects.filter(username=USERNAME).delete()
+        
+class CorrectLogin(TestCase):
+    def setUp(self):
+        response = CLIENT.post('/api/auth/register', {'username': USERNAME, 'password': PASSWORD, 'email': EMAIL})
+        self.assertEqual(response.status_code, 201)
+    
+    def test(self):
+        response = CLIENT.post('/api/auth/login', {'username': USERNAME, 'password': PASSWORD})
+        self.assertTrue('username' in response.json())
+        self.assertTrue('token' in response.json())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['username'], USERNAME)
+        
+    def tearDown(self):
+        models.User.objects.filter(username=USERNAME).delete()
+        
+
+#profile views tests
+class MissingUsernameProfile(TestCase):
+    def test(self):
+        response = CLIENT.get('/api/profile/invalid_username')
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.json(), 'Invalid Username')
+ 
+#valid username but no userinfo
+class MissingUserInfo(TestCase):
+    def test(self):
+        models.User.objects.create(username=USERNAME, email=EMAIL)
+        response = CLIENT.get(f'/api/profile/{USERNAME}')
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.json(), 'No user info for given username')
+
+#valid username and userinfo
+class ValidProfileRetrival(TestCase):
+    def setUp(self):
+        self.user = models.User.objects.create(username=USERNAME, email=EMAIL)
+        self.user_info = models.UserInfo.objects.create(
+            user = self.user,
+            first_name = 'Boop',
+            last_name = 'Doop',
+            date_of_birth = '2000-01-01'
+        )
+        
+    def tearDown(self):
+        self.user.delete()
+        self.user_info.delete()
+        
+    def test(self):     
+        response = CLIENT.get(f'/api/profile/{USERNAME}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['first_name'], 'Boop')
+        self.assertEqual(response.json()['last_name'], 'Doop')
+        self.assertEqual(response.json()['date_of_birth'], '2000-01-01')
