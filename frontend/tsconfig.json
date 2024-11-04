@@ -6,6 +6,6 @@
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "esModuleInterop": true // Add this line
+    "esModuleInterop": true
   }
 }
