@@ -9,7 +9,7 @@ import { Login } from "./Login";
 import { loader as communityLoader } from "./components/Community"
 import { loader as postLoader } from "./components/Post"
 import ProfilePage from "./components/ProfilePage";
-import ChatPage from "./Messages";
+import ChatPage from "./ChatPage";
 import Notifications from "./Notifications";
 
 const router = createBrowserRouter([
