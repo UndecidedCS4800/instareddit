@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from .. import models
+from ..models import User
 
 CLIENT = APIClient()
 
@@ -13,7 +13,7 @@ PASSWORD_HASH = '$2b$12$09H17WQZl5bZ6jjF4A60.ehJ0ZW2Gms/0Fbpc/AwkUbM6QjmtYNqi'
 #setup class
 class TestUserSetup(TestCase):
     def setUp(self):
-        models.User.objects.create(username=USERNAME, email=EMAIL, password_hash=PASSWORD_HASH)
+        User.objects.create(username=USERNAME, email=EMAIL, password_hash=PASSWORD_HASH)
 
 class MissingUsernameLogin(TestUserSetup):
     def test(self):
