@@ -1,4 +1,4 @@
-import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User, UserResponse } from "./schema";
+import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User, UserMeta} from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -110,7 +110,7 @@ export const getPostComments = async (communityid: number, postid: number) : Pro
     return await get(`/api/community/${communityid}/post/${postid}`)
 }
 
-export const getUserProfile = async (username: string): Promise<ResponseOrError<UserResponse>> => {
+export const getUserProfile = async (username: string): Promise<ResponseOrError<UserMeta>> => {
     return await get(`/api/profile/${username}`);
 }
 
@@ -202,6 +202,33 @@ export const sendFriendRequest = async (token: JWTTokenResponse['token'], friend
         console.log("unknown exception thrown");
         return {error: "unknown exception thrown"}
     }
+}
+
+export const modifyProfile = async (token: JWTTokenResponse['token'], meta: UserMeta): Promise<ResponseOrError<UserMeta>> => {
+    try {
+        const req = await fetch(`${URL}/api/profile/`, {
+            method: "PUT",
+            headers: withAuth(token, {
+                'Content-Type': "application/json"
+            }),
+            body: JSON.stringify(meta)
+        })
+
+        if (!req.ok) {
+            const json = await req.json();
+            return json as unknown as ServerError
+        }
+
+        return meta;
+    } catch(e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error", e.name, e.message)
+            return { error: e.message }
+        }
+        console.log("unknown exception thrown");
+        return {error: "unknown exception thrown"}
+    }
+
 }
 
 export const acceptFriendRequest = async (token: JWTTokenResponse['token'], friend_id: number): Promise<ServerError | null> => {

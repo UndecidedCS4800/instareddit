@@ -62,7 +62,7 @@ class RegisterUserView(views.APIView):
         key = os.environ.get('TOKEN_KEY')
         token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
 
-        response = {'username': username, 'token': token, 'id': user_id}
+        response = {'username': username, 'id': user_id, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
 
 class LoginView(views.APIView):

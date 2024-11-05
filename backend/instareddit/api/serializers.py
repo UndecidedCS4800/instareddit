@@ -8,10 +8,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password_hash']
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = models.UserInfo
-        fields = ['user', 'username', 'first_name', 'last_name', 'date_of_birth', 'profile_picture']
+        fields = ['user', 'first_name', 'last_name', 'date_of_birth', 'profile_picture']
 
 class CommunitySerializer(serializers.ModelSerializer):
     owner_username = serializers.CharField(source='owner.username')

@@ -8,7 +8,7 @@ from django.db import IntegrityError
 
 #GET /api/friends
 #is used by 'chat' to get a list of friend ID's for the logged in user
-class GetFriendsView(views.APIView):
+class FriendsIdsGetView(views.APIView):
     def get(self, request):
         #verify token
         token = verify_token(request)
@@ -25,15 +25,18 @@ class GetFriendsView(views.APIView):
         if not user:
             return Response({'error': 'Invalid user ID'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #get and return friends IDs
-        friends_ids = []
+        #get friends IDs and usernames
+        friends = []
         for f in user.friends.all():
-            friends_ids.append({ "id": f.id, "username": f.username })
-
+            friends.append({
+                'id': f.id,
+                'username': f.username
+            })
+        
         response = {
             'userId': user_id,
             'username': user.username,
-            'friends': friends_ids
+            'friends': friends
         } 
 
         return Response(response)
@@ -139,4 +142,50 @@ class AcceptView(views.APIView):
         user.friends.add(other_user)
         fr.delete() #remove friend request from DB
 
+        return Response(status=status.HTTP_200_OK)
+
+class DeclineView(views.APIView):
+    #what method?
+    def delete(self, request):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get fr
+        fr_id = request.data.get('fr_id', None)
+        user = models.User.objects.get(id=decoded_token[0])
+        fr = user.friend_requests_received.filter(id=fr_id).first()
+        if not fr:
+            return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
+        
+        #remove friend request
+        fr.delete()
+        return Response(status=status.HTTP_200_OK)
+    
+class CancelView(views.APIView):
+    #what method?
+    def delete(self, request):
+        #authorize
+        token = verify_token(request)
+        try:
+            decoded_token = authorize(token)
+        except ValueError:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #get fr
+        fr_id = request.data.get('fr_id', None)
+        user = models.User.objects.get(id=decoded_token[0])
+        fr = user.friend_requests_sent.filter(id=fr_id).first()
+        if not fr:
+            return Response({'error': 'Invalid request ID or not provided'}, status=status.HTTP_404_NOT_FOUND)
+        
+        #remove friend request
+        fr.delete()
         return Response(status=status.HTTP_200_OK)
