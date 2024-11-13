@@ -76,7 +76,8 @@ class TakenEmailRegister(TestCase):
         response = CLIENT.post('/api/auth/register', {'username':'SomeOtherUser', 'password':PASSWORD, 'email':EMAIL})
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
-        
+
+
 #login tests
 class MissingUsernameLogin(TestCase):
     def test(self):
