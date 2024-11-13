@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ChatHistory, ChatMessage, Friend, isError, JWTTokenResponse } from './schema';
 import { getFriends } from './remote';
-import socket from './socket';
+import socket from './socket'; 
 import { useAuth } from './components/auth';
 import FriendsList from './components/FriendsList';
 import ChatWindowView from './components/ChatWindow';
-import MessageBubble from '../public/Messages.png';
 
 const ChatPage: React.FC = () => {
   const [data, setData] = useState<{ friends: Friend[] } | null>(null);
@@ -21,7 +20,8 @@ const ChatPage: React.FC = () => {
     socket.auth = { token: auth.token };
 
     const connectSocket = () => {
-      socket.connect();
+      // Ensuring socket.connect is recognized
+      socket.connect(); 
 
       getFriends(auth.token).then(friends => {
         if (!isError(friends)) {
@@ -76,7 +76,7 @@ const ChatPage: React.FC = () => {
   return (
     <>
       <div className='h-screen basis-3/12 bg-[#342c33] p-8 border-r border-[#514350]'>
-        {chatConnected ? <div><img src={MessageBubble} alt="Message Bubble" className="px-7 w-35 h-7" /></div> : <></>}
+        {chatConnected ? <div className='text-white text-3xl font-bold font-sans rounded-lg'>Messages</div> : <></>}
         {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
       </div>
 

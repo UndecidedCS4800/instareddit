@@ -1,10 +1,6 @@
 import { Community } from "../schema";
 import { Card } from "./Card";
 import Rectangle from "../../public/Rectangle1.png"
-//import ThumbUp from "../../public/thumb_up(1).png"
-//import ThumbDown from "../../public/thumb_down(1).png"
-//import ToolTip from "../../public/tooltip(1).png"
-//import Reply from "../../public/Reply(1).png"
 interface CommunityCardProps {
     community: Community;
 }

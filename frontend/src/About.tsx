@@ -1,5 +1,4 @@
 import React from 'react';
-import './About.css'; // Import CSS
 
 
 const About: React.FC = () => {
@@ -260,7 +259,7 @@ const About: React.FC = () => {
             </td>
           </tr>
           <tr>
-            <td>10/24</td>
+            <td>10/23</td>
             <td> The meeting was held in person today. The backend and frontend progress was
               continued with no issues arising.
             </td>

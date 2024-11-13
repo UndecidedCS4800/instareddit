@@ -38,11 +38,11 @@ describe('NavBar Component', () => {
             </Router>
         );
 
-        expect(screen.getByText(/hello, johndoe/i)).toBeInTheDocument();
+        expect(screen.getByText(/Logout of johndoe/i)).toBeInTheDocument();
         expect(screen.queryByText(/login/i)).not.toBeInTheDocument();
 
         
-        fireEvent.click(screen.getByText(/hello, johndoe/i));
+        fireEvent.click(screen.getByText(/Logout of johndoe/i));
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'logout' });
     });
 

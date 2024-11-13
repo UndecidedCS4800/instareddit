@@ -1,9 +1,7 @@
-// src/Tests/Notifications.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
-import Notifications from '../Notifications'; // Adjust the import according to your file structure
+import Notifications from '../Notifications';
 import { useAuth } from '../components/auth';
 import { getFriendRequests } from '../remote';
-import FriendRequestList from '../components/FriendRequestList';
 import '@testing-library/jest-dom';
 
 // Mocking the necessary modules
