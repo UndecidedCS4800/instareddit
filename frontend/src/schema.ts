@@ -126,11 +126,15 @@ export interface FriendRequest {
 export interface PostNotifications {
   username: string,
   post_id: number,
+  community_id: number,
+  when: number,
 }
 
 export interface LikeNotifications {
   username: string,
-  post_id: number
+  post_id: number,
+  community_id: number,
+  when: number,
 }
 
 export type ChatHistory = Record<number, ChatMessage[]>
