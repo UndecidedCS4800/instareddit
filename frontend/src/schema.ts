@@ -137,6 +137,8 @@ export interface LikeNotifications {
   when: number,
 }
 
+export type Notification = {type: "like" | "comment" } & (PostNotifications | LikeNotifications)
+
 export type ChatHistory = Record<number, ChatMessage[]>
 export type UserMeta = Omit<UserInfo, "user">
 export type PostRequest = Pick<Post, "text" | "community">
