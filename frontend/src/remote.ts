@@ -1,4 +1,4 @@
-import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, PaginationResponse, Post, PostRequest, ServerError, User, UserMeta} from "./schema";
+import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, LikeNotifications, PaginationResponse, Post, PostNotifications, PostRequest, ServerError, User, UserMeta} from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -129,6 +129,29 @@ export const getFriendRequests = async (token: JWTTokenResponse['token'], userna
 
     return json;
 }
+
+export const getLikeNotifications = async (token: JWTTokenResponse['token'], since?: number): Promise<ResponseOrError<LikeNotifications[]>> => {
+    let url = "/api/profile/notifications/likes"
+    if (since) {
+        url += `?since=${since}`
+    }
+
+    const json = await get(url, token) as LikeNotifications[];
+
+    return json;
+}
+
+export const getPostCommentNotifications = async (token: JWTTokenResponse['token'], since?: number): Promise<ResponseOrError<PostNotifications[]>> => {
+    let url = "/api/profile/notifications/comments"
+    if (since) {
+        url += `?since=${since}`
+    }
+    const json = await get(url, token) as PostNotifications[];
+
+
+    return json;
+}
+
 
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
     try {

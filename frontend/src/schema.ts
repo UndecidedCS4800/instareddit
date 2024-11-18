@@ -123,6 +123,16 @@ export interface FriendRequest {
   to_username: string,
 }
 
+export interface PostNotifications {
+  username: string,
+  post_id: number,
+}
+
+export interface LikeNotifications {
+  username: string,
+  post_id: number
+}
+
 export type ChatHistory = Record<number, ChatMessage[]>
 export type UserMeta = Omit<UserInfo, "user">
 export type PostRequest = Pick<Post, "text" | "community">
