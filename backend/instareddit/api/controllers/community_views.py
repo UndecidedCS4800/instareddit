@@ -87,6 +87,33 @@ class CommunityPostDetailView(views.APIView):
         response['comments'] = comment_serializer.data
         return Response(response)
     
+    #delete post withing a community
+    # DELETE /api/community/<community_id>/post/<post_id>
+    @requires_token
+    def delete(self, request, community_pk, post_pk, **kwargs):
+        decoded_token = kwargs['token']
+
+        #check if community id valid
+        community = models.Community.objects.filter(id=community_pk).first()
+        if not community:
+            return Response({'error': 'Invalid Community ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #check if authorized
+        username = decoded_token['username']
+        user = models.User.objects.get(username=username)
+        if not community.admins.contains(user):
+            return Response({'error': 'Not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        #check if post id valid
+        post = community.post_set.filter(id=post_pk).first()
+        if not post: 
+            return Response({'error': 'Invalid Post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #delete post
+        post.delete()
+        return Response(status=status.HTTP_200_OK)
+
+    
 #adding/removing admins
 class CommunityAdminCreateDestroyView(views.APIView):
     @requires_token
