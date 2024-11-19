@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from .. import serializers, models, pagination_classes
 from django.db.models import Q
 from .. import forms
+from .auth_views import requires_token
 
 #GET /api/communities
 #optional query param: 'query' (search by name)
@@ -87,3 +88,60 @@ class CommunityPostDetailView(views.APIView):
         return Response(response)
     
 #adding/removing admins
+class CommunityAdminCreateDestroyView(views.APIView):
+    @requires_token
+    def post(self, request, pk,**kwargs):
+        decoded_token = kwargs['token']
+
+        #add admin
+        #POST community/<pk>/admin
+        #with body { username: <username> }
+        community = models.Community.objects.filter(id=pk).first()
+        if not community:
+            return Response({'error': 'Invalid community ID'})
+        #chekc if user authorzied
+        admin = models.User.objects.get(username=decoded_token['username'])
+        if not community.admins.contains(admin):
+            return Response({'error': 'Not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        username = request.data.get('username', None)
+        if not username:
+            return Response({'error': 'Username not provided'})
+        user = models.User.objects.filter(username=username).first()
+        if not user:
+            return Response({'error': 'Username invalid'})
+        a = community.admins.filter(username=username).first()
+        if a:
+            return Response({'error': 'User already an admin'})
+        
+        community.admins.add(user)
+        return Response(status=status.HTTP_200_OK)
+    
+    @requires_token
+    def delete(self, request, pk, **kwargs):
+        decoded_token = kwargs['token']
+
+        #delete an admin
+        #DELETE community/<pk>/admin
+        #with body { username: <username> }
+
+        community = models.Community.objects.filter(id=pk).first()
+        if not community:
+            return Response({'error': 'Invalid community ID'})
+        #chekc if user authorzied
+        admin = models.User.objects.get(username=decoded_token['username'])
+        if not community.admins.contains(admin):
+            return Response({'error': 'Not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        username = request.data.get('username', None)
+        if not username:
+            return Response({'error': 'Username not provided'})
+        user = models.User.objects.filter(username=username).first()
+        if not user:
+            return Response({'error': 'Username invalid'})
+        a = community.admins.filter(username=username).first()
+        if not a:
+            return Response({'error': 'User not an admin'})
+        
+        community.admins.remove(user)
+        return Response(status=status.HTTP_200_OK)
