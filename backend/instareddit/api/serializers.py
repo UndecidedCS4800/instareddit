@@ -61,3 +61,14 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FriendRequest
         fields = ['id', 'from_user', 'from_username', 'to_user', 'to_username']
+
+#for search
+class UserSearchSerailizer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['username']
+
+class CommunitySearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Community
+        fields = ['name', 'id']

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .controllers import community_views, auth_views, post_views, profile_views, friendship_views
+from .controllers import community_views, auth_views, post_views, profile_views, friendship_views, search_view
 
 urlpatterns = [
     #authentication routes
@@ -36,6 +36,9 @@ urlpatterns = [
     path('friendrequests/accept/', friendship_views.AcceptView.as_view()),
     path('friendrequests/decline/', friendship_views.DeclineView.as_view()),
     path('friendrequests/cancel/', friendship_views.CancelView.as_view()),
-    path('user/<str:username>/friendrequests', friendship_views.FriendRequestListView.as_view())
+    path('user/<str:username>/friendrequests', friendship_views.FriendRequestListView.as_view()),
+
+    #search
+    path('search/', search_view.SearchView.as_view())
 
 ]
