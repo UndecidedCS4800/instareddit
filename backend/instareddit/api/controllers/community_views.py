@@ -64,6 +64,29 @@ class CommunityDetailView(views.APIView):
             return Response({'error': "Invalid Community ID"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers.CommunitySerializer(community[0])
         return Response(serializer.data)
+    
+    #for admins - edit community details
+    # PATCH /api/community/<pk>/about
+    # with body {name, description}
+    @requires_token
+    def patch(self, request, pk, **kwargs):
+        decoded_token = kwargs['token']
+
+        data = request.data
+        if not ('name' in request.data or 'description' in request.data):
+            return Response({'error': 'Data not provided'})
+        
+        #update community
+        community = models.Community.objects.filter(id=pk).first()
+        if not community:
+            return Response({'error': "Invalid Community ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        name = data.get('name', None)
+        community.name = name if name else community.name
+        description = data.get('description', None)
+        community.description = description if description else community.description
+
+        return Response(serializers.CommunitySerializer(community).data, status=status.HTTP_200_OK)
 
 #get community post with its comments - GET /api/community/<community_pk>/post/<post_pk>
 class CommunityPostDetailView(views.APIView):
