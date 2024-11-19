@@ -2,6 +2,7 @@ from rest_framework import views, status, generics, mixins
 from rest_framework.response import Response
 from .. import serializers, models, pagination_classes
 from django.db.models import Q
+from .. import forms
 
 #GET /api/communities
 #optional query param: 'query' (search by name)
@@ -19,6 +20,28 @@ class CommunityListCreateView(generics.ListCreateAPIView):
         communities = sorted(list(communities), key=lambda c: c.num_members, reverse=True)
         self.queryset = communities
         return self.list(request)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Expects body: name, description, picture(optional), owner (username)
+        """
+        form = forms.CommunityCreateForm(request.data)
+        if not form.is_valid():
+            return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        data = form.cleaned_data
+        
+        owner = models.User.objects.get(username=data.get('owner'))
+        community = models.Community.objects.create(
+            name = data.get('name'),
+            description = data.get('description'),
+            picture = data.get('picture', None),
+            owner = owner
+        )
+        community.admins.add(owner)
+        community.save()
+
+        serializer = serializers.CommunitySerializer(community)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # get all posts from a community - GET /api/community/<pk>
 class CommunityPostsView(generics.GenericAPIView, mixins.ListModelMixin):
@@ -62,3 +85,5 @@ class CommunityPostDetailView(views.APIView):
         response.update(post_serializer.data)
         response['comments'] = comment_serializer.data
         return Response(response)
+    
+#adding/removing admins
