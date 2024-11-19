@@ -59,6 +59,10 @@ class RegisterUserView(views.APIView):
         new_user.save()
         user_id = new_user.id
 
+        #add blank UserInfo
+        new_user_info = models.UserInfo(user=new_user)
+        new_user_info.save()
+
         #generate token
         key = os.environ.get('TOKEN_KEY')
         token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
