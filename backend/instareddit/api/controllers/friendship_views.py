@@ -36,6 +36,27 @@ class FriendsIdsGetView(views.APIView):
 
         return Response(response)
     
+    #remove a friend
+    #DELETE /api/friends with body {username}
+    @requires_token
+    def delete(self, request, **kwargs):
+        decoded_token = kwargs['token']
+
+        username = request.data.get('username', None)
+        if not username:
+            return Response({'error': 'Username not provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_to_remove = models.User.objects.filter(username=username).first()
+        if not user_to_remove:
+            return Response({'error': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
+
+        this_user = models.User.objects.get(username=decoded_token['username'])
+        if not this_user.friends.contains(user_to_remove):
+            return Response({'error': 'Not friends'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        this_user.friends.remove(user_to_remove)
+        return Response(status=status.HTTP_200_OK)
+    
 #send friend request
 #POST /api/friendrequest
 #with 'other_username' in body
