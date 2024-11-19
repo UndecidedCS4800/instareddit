@@ -13,7 +13,7 @@ urlpatterns = [
     path('community/<int:community_pk>/post/<int:post_pk>', community_views.CommunityPostDetailView.as_view()),
     path('communities', community_views.CommunityListCreateView.as_view()),
     #admins
-    path('community/<int:pk>/admin', community_views.CommunityAdminCreateDestroyView.as_view),
+    path('community/<int:pk>/admin', community_views.CommunityAdminCreateDestroyView.as_view()),
 
     #posts
     path('', post_views.RecentPostsView.as_view()),
