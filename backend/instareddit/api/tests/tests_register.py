@@ -1,6 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from ..models import User
+from ..models import User, UserInfo
 
 #set up client
 CLIENT = APIClient()
@@ -62,6 +62,8 @@ class CorrectInputRegister(TestCase):
         self.assertIsNotNone(user)
         user = User.objects.filter(email=EMAIL).first()
         self.assertIsNotNone(user)
+        user_info = UserInfo.objects.filter(user=user).first()
+        self.assertIsNotNone(user_info)
 
 class TakenUsernameRegister(TestCase):
     def test(self):

@@ -85,6 +85,7 @@ class CommunityDetailView(views.APIView):
         community.name = name if name else community.name
         description = data.get('description', None)
         community.description = description if description else community.description
+        community.save()
 
         return Response(serializers.CommunitySerializer(community).data, status=status.HTTP_200_OK)
 
