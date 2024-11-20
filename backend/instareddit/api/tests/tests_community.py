@@ -52,7 +52,30 @@ class GetCommunityDetail(SetUpTest):
 
 class ChangeCommunityDetailName(SetUpTest):
     def test(self):
-        response = CLIENT.patch(f'/api/community/{COMMUNITY_ID}/about', data={'name': 'NEW NAME'}, headers={'Authorization':f'bearer {TOKEN}'})
+        response = CLIENT.patch(
+            f'/api/community/{COMMUNITY_ID}/about', 
+            data={'name': 'NEW NAME'}, 
+            headers={'Authorization':f'bearer {TOKEN}'})
+        c = Community.objects.get(id=COMMUNITY_ID)
+        c_dict = CommunitySerializer(c).data
+        self.assertDictEqual(c_dict, response.json())
+
+class ChangeCommunityDetailDescription(SetUpTest):
+    def test(self):
+        response = CLIENT.patch(
+            f'/api/community/{COMMUNITY_ID}/about', 
+            data={'description': 'NEW DESCRIPTION'}, 
+            headers={'Authorization':f'bearer {TOKEN}'})
+        c = Community.objects.get(id=COMMUNITY_ID)
+        c_dict = CommunitySerializer(c).data
+        self.assertDictEqual(c_dict, response.json())
+
+class ChangeCommunityDetailBoth(SetUpTest):
+    def test(self):
+        response = CLIENT.patch(
+            f'/api/community/{COMMUNITY_ID}/about', 
+            data={'name':'NEW NAME 2', 'description': 'NEW DESCRIPTION 2'}, 
+            headers={'Authorization':f'bearer {TOKEN}'})
         c = Community.objects.get(id=COMMUNITY_ID)
         c_dict = CommunitySerializer(c).data
         self.assertDictEqual(c_dict, response.json())
