@@ -5,6 +5,7 @@ import Pane from './components/Pane';
 import { useEffect } from 'react';
 import socket from './socket';
 import { useAuth } from './components/auth';
+import ToastList from './components/ToastList';
 
 const App: React.FC = () => {
   const auth = useAuth()
@@ -24,6 +25,7 @@ const App: React.FC = () => {
         <Pane className='h-screen basis-4/12'>
           <NavBar />
         </Pane>
+        <ToastList />
         <CenterViewContainer>
           <Outlet />
         </CenterViewContainer>

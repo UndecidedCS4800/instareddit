@@ -1,0 +1,124 @@
+[1mdiff --git a/frontend/src/remote.ts b/frontend/src/remote.ts[m
+[1mindex 96c706e..99efe17 100644[m
+[1m--- a/frontend/src/remote.ts[m
+[1m+++ b/frontend/src/remote.ts[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, LikeNotifications, PaginationResponse, Post, PostNotifications, PostRequest, ServerError, User, UserMeta} from "./schema";[m
+[32m+[m[32mimport { Community, Friend, FriendRequest, FriendResponse, FriendshipStatusResponse, JWTTokenResponse, LikeNotifications, PaginationResponse, Post, PostNotifications, PostRequest, SearchResultResponse, ServerError, User, UserMeta} from "./schema";[m
+ [m
+ const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;[m
+ [m
+[36m@@ -93,6 +93,32 @@[m [masync function get<T>(relative_path: string, token?: string): Promise<ResponseOr[m
+     }[m
+ }[m
+ [m
+[32m+[m[32masync function send<T>(method: RequestInit['method'] = "GET", relative_path: string, token?: string, body?: Parameters<JSON["stringify"]>[0]): Promise<ResponseOrError<T>> {[m
+[32m+[m[32m    const baseHeaders = { 'Content-Type': "application/json" }[m
+[32m+[m[32m    const headers = token ? withAuth(token, baseHeaders)[m[41m [m
+[32m+[m[32m                    : baseHeaders[m
+[32m+[m[32m    const b = body || undefined[m
+[32m+[m[32m    try {[m
+[32m+[m[32m        const req = await fetch(`${URL}${relative_path}`, {[m
+[32m+[m[32m            method,[m
+[32m+[m[32m            headers,[m
+[32m+[m[32m            body: JSON.stringify(b)[m
+[32m+[m[32m        })[m
+[32m+[m[32m        if (!req.ok) {[m
+[32m+[m[32m            const json = req.json()[m
+[32m+[m[32m            return json as unknown as ServerError[m
+[32m+[m[32m        }[m
+[32m+[m[32m        return await req.json()[m
+[32m+[m[32m    } catch (e) {[m
+[32m+[m[32m        if (e instanceof Error) {[m
+[32m+[m[32m            console.log("Unhandled error:", e.name, e.message)[m
+[32m+[m[32m            return {error: e.message}[m
+[32m+[m[32m        }[m
+[32m+[m[32m        console.log("Unknown exception thrown")[m
+[32m+[m[32m        return {error: "Unknown exception thrown"}[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+ export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community>>> => {[m
+     const query_string = query ? `?query={${query}}` : ""[m
+     return await get(`/api/communities${query_string}`)[m
+[36m@@ -118,6 +144,10 @@[m [mexport const getUserPosts = async (username: string): Promise<ResponseOrError<Po[m
+     return await get(`/api/${username}/posts`)[m
+ }[m
+ [m
+[32m+[m[32mexport const getRecentPosts = async (token: JWTTokenResponse['token']): Promise<ResponseOrError<PaginationResponse<Post[]>>> => {[m
+[32m+[m[32m    return await get(`/api/`, token)[m
+[32m+[m[32m}[m[41m [m
+[32m+[m
+ export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {[m
+     const json =  await get('/api/friends', token) as FriendResponse[m
+ [m
+[36m@@ -152,6 +182,13 @@[m [mexport const getPostCommentNotifications = async (token: JWTTokenResponse['token[m
+     return json;[m
+ }[m
+ [m
+[32m+[m[32mexport const likePost = async (token: JWTTokenResponse['token'], post_id: Post['id']): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("POST", `/api/posts/${post_id}/like`, token)[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const dislikePost = async (token: JWTTokenResponse['token'], post_id: Post['id']): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("POST", `/api/posts/${post_id}/dislike`, token)[m
+[32m+[m[32m}[m
+ [m
+ export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {[m
+     try {[m
+[36m@@ -204,7 +241,7 @@[m [mexport const postComment = async (token: JWTTokenResponse['token'], text: string[m
+ [m
+ export const sendFriendRequest = async (token: JWTTokenResponse['token'], friend: Friend['username']): Promise<ResponseOrError<User>> => {[m
+     try {[m
+[31m-        const req = await fetch(`${URL}/api/friendrequest/`, {[m
+[32m+[m[32m        const req = await fetch(`${URL}/api/friendrequests/`, {[m
+             method: "POST",[m
+             headers: withAuth(token, {[m
+                 'Content-Type': "application/json"[m
+[36m@@ -227,6 +264,18 @@[m [mexport const sendFriendRequest = async (token: JWTTokenResponse['token'], friend[m
+     }[m
+ }[m
+ [m
+[32m+[m[32mexport const declineFriendRequest = async (token: JWTTokenResponse['token'], id: Friend['id']): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("DELETE", `/api/friendrequests/decline`, token, { fr_id: id })[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const cancelFriendRequest = async (token: JWTTokenResponse['token'], id: Friend['id']): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("DELETE", `/api/friendrequests/cancel`, token, { fr_id: id })[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const getFriendshipStatus = async (token: JWTTokenResponse['token'], username: User['username']): Promise<ResponseOrError<FriendshipStatusResponse>> => {[m
+[32m+[m[32m    return await get(`/api/friends/status?=${username}`, token)[m
+[32m+[m[32m}[m
+[32m+[m
+ export const modifyProfile = async (token: JWTTokenResponse['token'], meta: UserMeta): Promise<ResponseOrError<UserMeta>> => {[m
+     try {[m
+         const req = await fetch(`${URL}/api/profile/`, {[m
+[36m@@ -278,3 +327,27 @@[m [mexport const acceptFriendRequest = async (token: JWTTokenResponse['token'], frie[m
+         return {error: "unknown exception thrown"}[m
+     }[m
+ }[m
+[32m+[m
+[32m+[m[32mexport const addAdmin = async (token: JWTTokenResponse['token'], community_id: number, username: string): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("POST", `/api/community/${community_id}/admin`, token, { username })[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const removeAdmin = async (token: JWTTokenResponse['token'], community_id: number, username: string): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("DELETE", `/api/community/${community_id}/admin`, token, { username })[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const removePost = async (token: JWTTokenResponse['token'], community_id: number, post_id: number): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("DELETE", `/api/community/${community_id}/post/${post_id}`, token)[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const modifyAdmin = async (token: JWTTokenResponse['token'], community_id: number, name: string, description: string): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("PATCH", `/api/community/${community_id}/about`, token, { name, description })[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const searchUsersAndCommunities = async (query: string): Promise<ResponseOrError<SearchResultResponse>> => {[m
+[32m+[m[32m    return await get(`/api/search?query=${query}`) as SearchResultResponse[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport const removeFriend = async (token: JWTTokenResponse['token'], username: string): Promise<ResponseOrError<void>> => {[m
+[32m+[m[32m    return await send("DELETE", `/api/friends`, token, { username })[m
+[32m+[m[32m}[m

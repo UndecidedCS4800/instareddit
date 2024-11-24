@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
-import { Community, isError, PaginationResponse} from "../schema"
-import { getCommunities } from "../remote"
+import { Community, isError, PaginationResponse, SearchResultResponse} from "../schema"
+import { getCommunities, searchUsersAndCommunities } from "../remote"
 import { CommunityCard } from "./CommunityCard"
 
 export const CommunityFeed = () => {
     const [data, setData] = useState<PaginationResponse<Community> | null>(null)
+    const [filter, setFilter] = useState<string>("")
+    const [filterResults, setFilterResults] = useState<SearchResultResponse>()
 
     useEffect(() => {
         let ignore = false;
@@ -35,10 +37,30 @@ export const CommunityFeed = () => {
         //
     }
 
+    const handleFilterSubmit = async () => {
+        const search = await searchUsersAndCommunities(filter)
+        if (isError(search)) {
+            console.error("server error:", search)
+        } else {
+            setFilterResults(search)
+        }
+
+    }
+
     const { results } = data;
+    const users = filterResults ? () => (filterResults.users.map(user => <div key={user}>{user}</div>)) : () => ([])
+    const communities = filterResults ? () => (filterResults.communities.map(comm => <div key={comm.id}>{comm.name}</div>)) : () => results.map(com => <CommunityCard key={com.id} community={com} />)
+
     return (
+        <>
+        <form onSubmit={handleFilterSubmit}>
+            <input type="text" value={filter} placeholder="search" onChange={e => setFilter(e.currentTarget.value)}></input>
+        </form>
         <div>
-            {results.map(com => <CommunityCard key={com.id} community={com} />)}
+            {users.length > 0 ? <><h2>Users</h2>{users()}</> : <></>}
+            {filterResults && <h2>Communities</h2>}
+            {communities()}
         </div>
+        </>
     )
 }

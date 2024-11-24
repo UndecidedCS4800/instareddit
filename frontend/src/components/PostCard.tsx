@@ -1,4 +1,7 @@
-import { Post } from "../schema"
+import { useRevalidator } from "react-router-dom"
+import { removePost } from "../remote"
+import { isError, Post } from "../schema"
+import { useAuth } from "./auth"
 import { Card } from "./Card"
 
 type PostCardProps = {
@@ -12,9 +15,24 @@ const Elem = ({link, to, children}: { link?: boolean, to: string, children: Reac
 export const PostCard = ({post, link}: PostCardProps) => {
     // TODO?: truncate post preview text
     const { datetime, image,  username, text } = post
+    const auth = useAuth()
+    const validator = useRevalidator()
+    const handleRemove = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        if (auth) {
+            const resp = await removePost(auth.token, post.community, post.id)
+            if (!isError(resp)) {
+                validator.revalidate()
+            } else {
+                console.error("server error", resp)
+            }
+
+        }
+    }
 
     return (
         <Elem link={link} to={`posts/${post.id}`}>
+            {auth && <button onClick={handleRemove}></button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
                 <div className="text-white text-xl font-bold font-sans">{username}</div>
                 {image && <img className="h-[350px] w-full object-cover"src={image} />}

@@ -49,7 +49,7 @@ const router = createBrowserRouter([
             {
               path: "/community/:communityid/posts/create",
               element: <CreatePost />
-            }
+            },
           ]
         },
         {

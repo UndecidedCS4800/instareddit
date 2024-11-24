@@ -105,7 +105,9 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "bucket_name": "instareddit-s3"
+            "bucket_name": "instareddit-s3",
+            "region_name": "us-east-2"
+            
         }
     }
 }

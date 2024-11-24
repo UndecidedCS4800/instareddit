@@ -6,17 +6,19 @@ import FriendsListItem from "./FriendsListItem";
 interface FriendsListProps {
     friends: Friend[] | null;
     onClick?: (f: Friend) => void;
+    removeHandler?: (f: Friend) => void;
 }
 
-const FriendsList = ({friends, onClick: setWindowHandler}: FriendsListProps) => {
+const FriendsList = ({friends, onClick, removeHandler}: FriendsListProps) => {
     if (!friends || friends?.length === 0) {
         return <></>
     }
     
-    const handler = setWindowHandler ? (friend: Friend) => setWindowHandler(friend) : () => {}
+    const handler = onClick ? (friend: Friend) => onClick(friend) : () => {}
+    const remove = removeHandler ? (friend: Friend) => removeHandler(friend) : () => {}
     return (
         <div>
-            {friends.map(friend => <FriendsListItem key={friend.id} friend={friend} handler={() => handler(friend)} />)}
+            {friends.map(friend => <FriendsListItem key={friend.id} friend={friend} removeHandler={() => remove(friend)} cardHandler={() => handler(friend)} />)}
         </div>
     )
 

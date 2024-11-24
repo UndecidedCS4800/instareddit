@@ -1,4 +1,4 @@
-import { Community, Friend, FriendRequest, FriendResponse, JWTTokenResponse, LikeNotifications, PaginationResponse, Post, PostNotifications, PostRequest, ServerError, User, UserMeta} from "./schema";
+import { Community, Friend, FriendRequest, FriendResponse, FriendshipStatusResponse, JWTTokenResponse, LikeNotifications, PaginationResponse, Post, PostNotifications, PostRequest, SearchResultResponse, ServerError, User, UserMeta} from "./schema";
 
 const URL = `${import.meta.env.VITE_BACKEND_URL}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -93,6 +93,32 @@ async function get<T>(relative_path: string, token?: string): Promise<ResponseOr
     }
 }
 
+async function send<T>(method: RequestInit['method'] = "GET", relative_path: string, token?: string, body?: Parameters<JSON["stringify"]>[0]): Promise<ResponseOrError<T>> {
+    const baseHeaders = { 'Content-Type': "application/json" }
+    const headers = token ? withAuth(token, baseHeaders) 
+                    : baseHeaders
+    const b = body || undefined
+    try {
+        const req = await fetch(`${URL}${relative_path}`, {
+            method,
+            headers,
+            body: JSON.stringify(b)
+        })
+        if (!req.ok) {
+            const json = req.json()
+            return json as unknown as ServerError
+        }
+        return await req.json()
+    } catch (e) {
+        if (e instanceof Error) {
+            console.log("Unhandled error:", e.name, e.message)
+            return {error: e.message}
+        }
+        console.log("Unknown exception thrown")
+        return {error: "Unknown exception thrown"}
+    }
+}
+
 export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community>>> => {
     const query_string = query ? `?query={${query}}` : ""
     return await get(`/api/communities${query_string}`)
@@ -117,6 +143,10 @@ export const getUserProfile = async (username: string): Promise<ResponseOrError<
 export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
     return await get(`/api/${username}/posts`)
 }
+
+export const getRecentPosts = async (token: JWTTokenResponse['token']): Promise<ResponseOrError<PaginationResponse<Post>>> => {
+    return await get(`/api/`, token)
+} 
 
 export const getFriends = async (token: string): Promise<ResponseOrError<Friend[]>> => {
     const json =  await get('/api/friends', token) as FriendResponse
@@ -152,6 +182,13 @@ export const getPostCommentNotifications = async (token: JWTTokenResponse['token
     return json;
 }
 
+export const likePost = async (token: JWTTokenResponse['token'], post_id: Post['id']): Promise<ResponseOrError<void>> => {
+    return await send("POST", `/api/posts/${post_id}/like`, token)
+}
+
+export const dislikePost = async (token: JWTTokenResponse['token'], post_id: Post['id']): Promise<ResponseOrError<void>> => {
+    return await send("POST", `/api/posts/${post_id}/dislike`, token)
+}
 
 export const createPost = async (token: JWTTokenResponse['token'], post: PostRequest) : Promise<ResponseOrError<Post>> => {
     try {
@@ -204,7 +241,7 @@ export const postComment = async (token: JWTTokenResponse['token'], text: string
 
 export const sendFriendRequest = async (token: JWTTokenResponse['token'], friend: Friend['username']): Promise<ResponseOrError<User>> => {
     try {
-        const req = await fetch(`${URL}/api/friendrequest/`, {
+        const req = await fetch(`${URL}/api/friendrequests/`, {
             method: "POST",
             headers: withAuth(token, {
                 'Content-Type': "application/json"
@@ -225,6 +262,18 @@ export const sendFriendRequest = async (token: JWTTokenResponse['token'], friend
         console.log("unknown exception thrown");
         return {error: "unknown exception thrown"}
     }
+}
+
+export const declineFriendRequest = async (token: JWTTokenResponse['token'], id: Friend['id']): Promise<ResponseOrError<void>> => {
+    return await send("DELETE", `/api/friendrequests/decline`, token, { fr_id: id })
+}
+
+export const cancelFriendRequest = async (token: JWTTokenResponse['token'], id: Friend['id']): Promise<ResponseOrError<void>> => {
+    return await send("DELETE", `/api/friendrequests/cancel`, token, { fr_id: id })
+}
+
+export const getFriendshipStatus = async (token: JWTTokenResponse['token'], username: User['username']): Promise<ResponseOrError<FriendshipStatusResponse>> => {
+    return await get(`/api/friends/status?=${username}`, token)
 }
 
 export const modifyProfile = async (token: JWTTokenResponse['token'], meta: UserMeta): Promise<ResponseOrError<UserMeta>> => {
@@ -277,4 +326,28 @@ export const acceptFriendRequest = async (token: JWTTokenResponse['token'], frie
         console.log("unknown exception thrown");
         return {error: "unknown exception thrown"}
     }
+}
+
+export const addAdmin = async (token: JWTTokenResponse['token'], community_id: number, username: string): Promise<ResponseOrError<void>> => {
+    return await send("POST", `/api/community/${community_id}/admin`, token, { username })
+}
+
+export const removeAdmin = async (token: JWTTokenResponse['token'], community_id: number, username: string): Promise<ResponseOrError<void>> => {
+    return await send("DELETE", `/api/community/${community_id}/admin`, token, { username })
+}
+
+export const removePost = async (token: JWTTokenResponse['token'], community_id: number, post_id: number): Promise<ResponseOrError<void>> => {
+    return await send("DELETE", `/api/community/${community_id}/post/${post_id}`, token)
+}
+
+export const modifyAdmin = async (token: JWTTokenResponse['token'], community_id: number, name: string, description: string): Promise<ResponseOrError<void>> => {
+    return await send("PATCH", `/api/community/${community_id}/admin`, token, { name, description })
+}
+
+export const searchUsersAndCommunities = async (query: string): Promise<ResponseOrError<SearchResultResponse>> => {
+    return await get(`/api/search?query=${query}`) as SearchResultResponse
+}
+
+export const removeFriend = async (token: JWTTokenResponse['token'], username: string): Promise<ResponseOrError<void>> => {
+    return await send("DELETE", `/api/friends`, token, { username })
 }
