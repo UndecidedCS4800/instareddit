@@ -14,7 +14,7 @@ class ProfileView(views.APIView):
 
 		user_info = models.UserInfo.objects.filter(user = profile).first()
 		if user_info is None:
-			return Response({'first_name': None, 'last_name': None, 'date_of_birth': None, 'profile_picture': None}, status = status.HTTP_200_OK)
+			return Response("No user info for given username", status = status.HTTP_400_BAD_REQUEST)
 		serializer = serializers.UserInfoSerializer(user_info)
 		return Response(serializer.data,status=status.HTTP_200_OK)
           
@@ -39,9 +39,9 @@ class SelfProfileView(views.APIView):
                 return Response({'error': "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             
             # Check if user info exists
-            # user_info = models.UserInfo.objects.filter(user=user).first()
-            # if user_info is None:
-            #     return Response({'error': "User info does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            user_info = models.UserInfo.objects.filter(user=user).first()
+            if user_info is None:
+                return Response({'error': "User info does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             
             # Serialize the user info and return it
             serializer = serializers.UserInfoSerializer(user_info)
@@ -117,34 +117,25 @@ class SelfProfileView(views.APIView):
         
         # Get the user
         user_id = decoded_token.get('id')
-
         try:
             user = models.User.objects.get(id=user_id)
         except models.User.DoesNotExist:
             return Response({'error': "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        # try:
-        #      userinfo = models.UserInfo.objects.get(user = user)
-        # except models.UserInfo.DoesNotExist:
-        #      return Response({'error': "User Info not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+             userinfo = models.UserInfo.objects.get(user = user)
+        except models.UserInfo.DoesNotExist:
+             return Response({'error': "User Info not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        # data = request.data.copy()
-        # data.pop('user', None)  # Remove 'user' if present
-        new_userinfo = models.UserInfo(
-            user=user,
-            first_name=request.data['first_name'],
-            last_name=request.data['last_name'],
-            date_of_birth=request.data['date_of_birth'],
-            profile_picture=None
-        )
-
-        serializer = serializers.UserInfoSerializer(new_userinfo)
-        new_userinfo.save()
-        # if serializer.is_valid():
-        #      serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-        # else:
-        #      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data.copy()
+        data.pop('user', None)  # Remove 'user' if present
+        
+        serializer = serializers.UserInfoSerializer(userinfo, data = data)
+        if serializer.is_valid():
+             serializer.save()
+             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
          
 
         

@@ -100,17 +100,6 @@ db = {
 if os.environ.get('MARIA_DB_USE_SSL') is not None:
     db |= { 'OPTIONS': { 'ssl': {'ca': os.environ.get("SSL_PEM_ABSOLUTE_PATH", default="global-bundle.pem") }}}
 
-# Storages
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "bucket_name": "instareddit-s3",
-            "region_name": "us-east-2"
-            
-        }
-    }
-}
 #CORS ORIGINS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:10000",
