@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-a3^=ra1a5v15z)@a#t99wldmwxrpk2(i#sa5oaw7q&ut5vydbz
 if not DEBUG:
     SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
 
-ALLOWED_HOSTS = ["localhost", "52.41.36.82", "54.191.253.12", "44.226.122.3", "instareddit-1.onrender.com", "backend"]
+ALLOWED_HOSTS = ["localhost", "52.41.36.82", "54.191.253.12", "44.226.122.3", "instareddit-1.onrender.com", "backend", "testserver"]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:    
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -95,6 +95,10 @@ db = {
     'PORT':'3306',
     'USER': os.environ.get('MARIA_DB_USER'),
     'PASSWORD': os.environ.get('MARIA_DB_PASSWORD'),
+    'TEST': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory'
+    }
 }
 
 if os.environ.get('MARIA_DB_USE_SSL') is not None:

@@ -1,20 +1,18 @@
 import { v4 } from "uuid";
 import { LikeNotifications, PostNotifications } from "../schema";
 import NotificationCard from "./NotificationCard";
+import { Link } from "react-router-dom";
 
 interface NotificationCardListProps {
     likes: LikeNotifications[],
     comments: PostNotifications[],
 }
 
-type Notification = {type: "like" | "comment" } & (PostNotifications | LikeNotifications)
-
 const NotificationCardList = ({likes, comments}: NotificationCardListProps) => {
-    const labeled_likes: Notification[] = likes.map(like => ({type: "like", ...like}));
-    const labeled_comments: Notification[] = comments.map(comment => ({type: "comment", ...comment}))
 
-    const notifications = [labeled_likes, labeled_comments].flat().sort((a, b) => b.when - a.when)
-
+    const like_nodes = likes.map(li => ({content: "like", render: () =>  <Link to={`/community/${li.community_id}/posts/${li.post_id}`}>{li.username} commented on your post.</Link>  }))
+    const comment_nodes = comments.map(cm => ({content: "comment", render: () =>  <Link to={`/community/${cm.community_id}/posts/${cm.post_id}`}>{cm.username} commented on your post.</Link>  }))
+    const notifications = [like_nodes, comment_nodes].flat()
     return notifications.map(notif => <NotificationCard key={v4()} notification={notif} />)
 }
 

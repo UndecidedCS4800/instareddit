@@ -17,9 +17,9 @@ class User(models.Model):
         
 class UserInfo(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, related_name='user_info')
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField()
+    first_name = models.CharField(max_length=100, null=True)
+    last_name = models.CharField(max_length=100, null=True)
+    date_of_birth = models.DateField(null=True)
     profile_picture = models.ImageField(null=True) #TODO read on usage
     class Meta:
         db_table = 'user_info'
