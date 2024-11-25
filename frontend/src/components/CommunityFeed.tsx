@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Community, isError, PaginationResponse, SearchResultResponse} from "../schema"
 import { getCommunities, searchUsersAndCommunities } from "../remote"
 import { CommunityCard } from "./CommunityCard"
+import { Link } from "react-router-dom"
 
 export const CommunityFeed = () => {
     const [data, setData] = useState<PaginationResponse<Community> | null>(null)
@@ -56,6 +57,7 @@ export const CommunityFeed = () => {
         <form onSubmit={handleFilterSubmit}>
             <input type="text" value={filter} placeholder="search" onChange={e => setFilter(e.currentTarget.value)}></input>
         </form>
+        <Link to="/community/create">Create Community</Link>
         <div>
             {users.length > 0 ? <><h2>Users</h2>{users()}</> : <></>}
             {filterResults && <h2>Communities</h2>}

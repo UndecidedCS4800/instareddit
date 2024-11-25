@@ -124,6 +124,10 @@ export const getCommunities = async (query?: string): Promise<ResponseOrError<Pa
     return await get(`/api/communities${query_string}`)
 }
 
+export const createCommunity = async (token: JWTTokenResponse['token'], name: string, description: string, owner: string): Promise<ResponseOrError<Community>> => {
+    return await send("POST", `/api/communities`, token, {name, description, picture: null, owner})
+}
+
 export const getCommunityPosts = async (id: number): Promise<ResponseOrError<PaginationResponse<Post>>> => {
     return await get(`/api/community/${id}`)
 }

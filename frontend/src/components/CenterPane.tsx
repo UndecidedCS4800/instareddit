@@ -14,7 +14,7 @@ const getView = (s: FeedViews, auth: JWTTokenResponse | null, posts: Post[]): Re
             if (!auth) {
                 return <div>Login to see recent posts from your communities and friends.</div>
             }
-            return <Posts posts={posts ? posts : []}/>
+            return <Posts privileged={false} posts={posts ? posts : []}/>
         case "community":
             return <CommunityFeed />
     }

@@ -53,6 +53,10 @@ const router = createBrowserRouter([
           ]
         },
         {
+          path: "/community/create",
+          element: <CreateCommunity />
+        },
+        {
           path: "/user/:username",
           element: <ProfilePage />
         }

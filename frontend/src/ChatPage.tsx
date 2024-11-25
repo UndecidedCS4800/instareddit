@@ -52,6 +52,7 @@ const ChatPage: React.FC = () => {
 
     const chatMessage = (msg: Omit<ChatMessage, 'to'>) => {
       const to = (auth as JWTTokenResponse).id;
+      console.log("got message", msg.message)
       if (chatHistory == null) {
         setChatHistory({ [msg.from]: [{ to, ...msg }] });
       } else if (!chatHistory[msg.from]) {

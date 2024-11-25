@@ -7,12 +7,13 @@ import { Card } from "./Card"
 type PostCardProps = {
     post: Post
     link?: boolean
+    privileged: boolean
 }
 
 const Elem = ({link, to, children}: { link?: boolean, to: string, children: React.ReactNode }) => {
     return link ? <Card to={to}>{children}</Card> : <div>{children}</div>
 }
-export const PostCard = ({post, link}: PostCardProps) => {
+export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
     // TODO?: truncate post preview text
     const { datetime, image,  username, text } = post
     const auth = useAuth()
@@ -32,7 +33,7 @@ export const PostCard = ({post, link}: PostCardProps) => {
 
     return (
         <Elem link={link} to={`posts/${post.id}`}>
-            {auth && <button onClick={handleRemove}></button>}
+            {auth && privileged && <button onClick={handleRemove}>rm</button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
                 <div className="text-white text-xl font-bold font-sans">{username}</div>
                 {image && <img className="h-[350px] w-full object-cover"src={image} />}

@@ -65,7 +65,7 @@ export const Community = () => {
                 {canEnterPage ? <button onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
                 <Link to="posts/create">Create Post</Link>
                 <CommunityCard community={community} />
-                <div className="h-screen bg-[#342c33]"><Posts posts={posts.results} /></div>
+                <div className="h-screen bg-[#342c33]"><Posts privileged={canEnterPage} posts={posts.results} /></div>
                 <Outlet />
             </div>
         </React.Fragment>
