@@ -11,6 +11,7 @@ import { loader as postLoader } from "./components/Post"
 import ProfilePage from "./components/ProfilePage";
 import ChatPage from "./ChatPage";
 import Notifications from "./Notifications";
+import CreateCommunity from "./components/CreateCommunity";
 
 const router = createBrowserRouter([
     { path: "/",
