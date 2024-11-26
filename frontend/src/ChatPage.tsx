@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChatHistory, ChatMessage, Friend, isError, JWTTokenResponse } from './schema';
 import { getFriends } from './remote';
-import socket from './socket'; 
+import socket from './socket';
 import { useAuth } from './components/auth';
 import FriendsList from './components/FriendsList';
 import ChatWindowView from './components/ChatWindow';
@@ -20,8 +20,7 @@ const ChatPage: React.FC = () => {
     socket.auth = { token: auth.token };
 
     const connectSocket = () => {
-      // Ensuring socket.connect is recognized
-      socket.connect(); 
+      socket.connect();
 
       getFriends(auth.token).then(friends => {
         if (!isError(friends)) {
@@ -77,7 +76,7 @@ const ChatPage: React.FC = () => {
     <>
       <div className='h-screen basis-3/12 bg-[#342c33] p-8 border-r border-[#514350]'>
         {chatConnected ? <div className='text-white text-3xl font-bold font-sans rounded-lg'>Messages</div> : <></>}
-        {auth && data && <FriendsList friends={data.friends} setWindowHandler={setChatWindow} />}
+        {auth && data && <FriendsList friends={data.friends} onClick={setChatWindow} />}
       </div>
 
       <div className='h-screen flex-1 bg-[#342c33]'>
