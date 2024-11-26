@@ -1,6 +1,6 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from rest_framework.test import APIClient
-from . import models
+from ..models import User, UserInfo
 
 #set up client
 CLIENT = APIClient()
@@ -58,10 +58,12 @@ class CorrectInputRegister(TestCase):
         self.assertTrue('username' in response.json())
         self.assertTrue('token' in response.json())
         self.assertEqual(response.status_code, 201)
-        user = models.User.objects.filter(username=USERNAME).first()
+        user = User.objects.filter(username=USERNAME).first()
         self.assertIsNotNone(user)
-        user = models.User.objects.filter(email=EMAIL).first()
+        user = User.objects.filter(email=EMAIL).first()
         self.assertIsNotNone(user)
+        user_info = UserInfo.objects.filter(user=user).first()
+        self.assertIsNotNone(user_info)
 
 class TakenUsernameRegister(TestCase):
     def test(self):

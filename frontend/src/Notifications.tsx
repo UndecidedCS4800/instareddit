@@ -1,31 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { FriendRequest, isError } from './schema';
-import { getFriendRequests } from './remote';
+import { FriendRequest, isError, LikeNotifications, PostNotifications } from './schema';
+import { getFriendRequests, getLikeNotifications, getPostCommentNotifications } from './remote';
 import FriendRequestList from './components/FriendRequestList';
 import { useAuth } from './components/auth';
+import NotificationCardList from './components/NotificationCardList';
 
 const Notifications: React.FC = () => {
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [commentNotifications, setCommentNotifications] = useState<PostNotifications[]>([])
+  const [likeNotifications, setLikeNotifications] = useState<LikeNotifications[]>([])
+
   const auth = useAuth();
 
   useEffect(() => {
-    const fetchFriendRequests = async () => {
+    const fetch = async () => {
       if (auth) {
-        const result = await getFriendRequests(auth.token, auth.username);
-        if (isError(result)) {
-          console.error("server error", result);
+        const friendsreq = getFriendRequests(auth.token, auth.username);
+        const postsreq = getPostCommentNotifications(auth.token);
+        const likesreq = getLikeNotifications(auth.token);
+
+        const [friends, posts, likes] = await Promise.all([friendsreq, postsreq, likesreq])
+
+        if (!isError(friends)) 
+          setFriendRequests(friends);
+        else {
+           console.error("server error", friends)
+        }
+
+        if (!isError(posts)) {
+          setCommentNotifications(posts)
         } else {
-          setFriendRequests(result);
+          console.error("server error", posts)
+        }
+
+        if (!isError(likes)) {
+          setLikeNotifications(likes)
+        } else {
+          console.error("server error", likes)
         }
       }
     };
-    fetchFriendRequests();
+    fetch();
   }, [auth]);
+
 
   return (
     <div className='bg-[#342c33] flex-1 p-5'>
       <h2 className="w-[242px] h-12 text-white text-[32px] font-bold font-sans">Notifications</h2>
       <FriendRequestList friend_requests={friendRequests} />
+      <NotificationCardList comments={commentNotifications} likes={likeNotifications} />
     </div>
   );
 };

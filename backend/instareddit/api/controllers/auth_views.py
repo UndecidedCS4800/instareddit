@@ -1,3 +1,4 @@
+from functools import wraps
 from rest_framework import views, status
 from rest_framework.response import Response
 from .. import models, forms
@@ -58,6 +59,10 @@ class RegisterUserView(views.APIView):
         new_user.save()
         user_id = new_user.id
 
+        #add blank UserInfo
+        new_user_info = models.UserInfo(user=new_user)
+        new_user_info.save()
+
         #generate token
         key = os.environ.get('TOKEN_KEY')
         token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
@@ -96,7 +101,7 @@ class LoginView(views.APIView):
         if bcrypt.checkpw(pw_bytes, hashpass_bytes):
             key = os.environ.get('TOKEN_KEY')
             token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
-            response = {'username': username, 'token': token, 'id': user_id}
+            response = {'username': username, 'id': user_id, 'token': token}
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response({'error' : "Incorrect password"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -113,9 +118,18 @@ def verify_token(request):
 
     return token
 
-def authorize(token):
-    if not token:
-            raise ValueError
-    #get user id and username from token
-    decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
-    return decoded_token['id'], decoded_token['username']
+def requires_token(view):
+    """
+    Decorator to verify that a valid token was passed in the request before executing the view logic.
+    """
+    @wraps(view)
+    def with_token(self, request, **kwargs):
+        token = verify_token(request)
+        if not token:
+            return Response({'error': "Token not provided or invalid (must start with 'bearer ')"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            decoded_token = jwt.decode(token, os.environ.get('TOKEN_KEY'), algorithms=['HS256'])
+        except (jwt.DecodeError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
+            return Response({'error': "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+        return view(self, request, **kwargs, token=decoded_token)
+    return with_token

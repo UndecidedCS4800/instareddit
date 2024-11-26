@@ -2,13 +2,15 @@ import { Friend } from "../schema"
 
 interface FriendsListItemProps {
     friend: Friend;
-    handler: () => void;
+    cardHandler: () => void;
+    removeHandler: () => void;
 }
 
-const FriendsListItem = ({friend, handler}: FriendsListItemProps) => {
+const FriendsListItem = ({friend, cardHandler, removeHandler}: FriendsListItemProps) => {
     return (
-        <div onClick={() => handler()}
-        className="flex items-center justify-between p-2 text-white text-xl font-bold font-sans rounded-lg cursor-pointer">{friend.username}</div>
+        <div onClick={() => cardHandler()}
+        className="flex items-center justify-between p-2 text-white text-xl font-bold font-sans rounded-lg cursor-pointer">{friend.username}
+        <button onClick={() => removeHandler()}>X</button></div>
     )
 }
 

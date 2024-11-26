@@ -2,9 +2,11 @@ import { Outlet, useLoaderData } from "react-router"
 import { getCommunity, getCommunityPosts } from "../remote"
 import { isError } from "../schema"
 import { CommunityCard } from "./CommunityCard"
-import React from "react"
+import React, { useState } from "react"
 import { Link, LoaderFunction, useParams } from "react-router-dom"
 import { Posts } from "./Posts"
+import { useAuth } from "./auth"
+import AdminPage from "./AdminPage"
 
 type LoaderParams = {
     communityid: string,
@@ -33,8 +35,10 @@ type LoaderData = {
 
 export const Community = () => {
     // fixme: error should be unwrapped
+    const [showAdmin, setShowAdmin] = useState(false)
     const { community, posts } = useLoaderData() as LoaderData
     const { postid }= useParams()
+    const auth = useAuth();
 
     //fix me: failure should be handled in loader
     if (isError(community)) {
@@ -49,14 +53,20 @@ export const Community = () => {
         return <Outlet />
     }
 
+    const canEnterPage = (auth !== null && community.admins.includes(auth.username))
+    
+    if (showAdmin) {
+        return <AdminPage community_id={community.id} admins={community.admins} returnHandler={() => setShowAdmin(false)}/>
+    }
     // TODO: add pagination support
     return (
         <React.Fragment>
             <div className="bg-[#342c33] h-full w-full overflow-auto">
-            <Link to="posts/create">Create Post</Link>
-            <CommunityCard community={community} />
-            <div className="h-screen bg-[#342c33]"><Posts posts={posts.results} /></div>
-            <Outlet />
+                {canEnterPage ? <button onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
+                <Link to="posts/create">Create Post</Link>
+                <CommunityCard community={community} />
+                <div className="h-screen bg-[#342c33]"><Posts privileged={canEnterPage} posts={posts.results} /></div>
+                <Outlet />
             </div>
         </React.Fragment>
     )

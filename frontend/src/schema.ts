@@ -47,8 +47,8 @@ export interface Community {
   picture: string | null,
   owner: number,
   num_members: number,
+  admins: User['username'][]
 }
-
 
 export interface RecentActivity {
   id: number, // Primary key for Recent Activity
@@ -122,6 +122,36 @@ export interface FriendRequest {
   to_user: number,
   to_username: string,
 }
+
+export interface ClientNotification {
+  content: string,
+  render: () =>  React.ReactNode
+}
+export interface PostNotifications {
+  username: string,
+  post_id: number,
+  community_id: number,
+  when: number,
+}
+
+export interface LikeNotifications {
+  username: string,
+  post_id: number,
+  community_id: number,
+  when: number,
+}
+
+export interface FriendshipStatusResponse {
+  user: User['username'],
+  otherUser: User['username'],
+  status: "friends" | "request sent" | "request received" | "not friends"
+}
+
+export interface SearchResultResponse {
+  users: User["username"][],
+  communities: { id: Community["id"], name: Community["name"] }[]
+}
+export type Notification = ({ type: "like" } & LikeNotifications) | ({type: "comment"} & PostNotifications) | ({type:"friend"} & FriendRequest)
 
 export type ChatHistory = Record<number, ChatMessage[]>
 export type UserMeta = Omit<UserInfo, "user">

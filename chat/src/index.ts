@@ -179,7 +179,7 @@ io.on('connection', async (socket) => {
 
     //handle incoming message
     socket.on('message', async ({ to, message }) => {
-
+        console.log("message",message)
         //verify message format
         if (!to || !message) {
             return console.error('Invalid message format: must be { to, message }')
