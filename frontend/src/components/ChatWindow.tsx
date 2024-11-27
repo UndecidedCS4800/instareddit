@@ -43,8 +43,8 @@ const ChatWindowView = ({user, history, pushHistory}: ChatWindowViewProps) => {
                 ))}
             </div>
             <form className="py-4 px-4 border-t border-[#514350] justify-center items-center gap-[15px] flex" onSubmit={handleSubmit}>
-                <input className="w-full h-10 px-5 py-4 bg-[#514350] rounded-[10px] text-white" type="text" value={messageText} onChange={e => setMessageText(e.target.value)}placeholder="Enter a message" />
-                <button className=" h-10 py-2.5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex" type="submit">Send</button>
+                <input className="w-full h-10 px-5 py-4 bg-[#514350] rounded-[10px] text-white focus:outline-none" type="text" value={messageText} onChange={e => setMessageText(e.target.value)}placeholder="Enter a message" />
+                <button className=" h-10 py-2.5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex focus:outline-none hover:bg-[#d07db0]" type="submit">Send</button>
             </form>
         </div>
     )

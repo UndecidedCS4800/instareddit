@@ -69,7 +69,7 @@ export const CommunityFeed = () => {
 
                 <Link
                     to="/community/create"
-                    className="ml-auto text-white h-10 py-2.5 px-5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex hover:text-white"
+                    className="ml-auto text-white h-10 py-2.5 px-5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex hover:text-white hover:bg-[#d07db0]"
                 >
                     Create Community
                 </Link>
