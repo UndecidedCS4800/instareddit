@@ -1,6 +1,5 @@
-import {Friend } from "../schema";
+import { Friend } from "../schema";
 import FriendsListItem from "./FriendsListItem";
-
 
 // TODO: when we want user profile pages this should be updated
 interface FriendsListProps {
@@ -20,8 +19,7 @@ const FriendsList = ({friends, onClick, removeHandler}: FriendsListProps) => {
         <div>
             {friends.map(friend => <FriendsListItem key={friend.id} friend={friend} removeHandler={() => remove(friend)} cardHandler={() => handler(friend)} />)}
         </div>
-    )
-
-}
+    );
+};
 
 export default FriendsList;

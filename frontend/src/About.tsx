@@ -1,5 +1,4 @@
 import React from 'react';
-import './About.css'; // Import CSS
 
 
 const About: React.FC = () => {
@@ -198,10 +197,123 @@ const About: React.FC = () => {
            </td>
          </tr>
          <tr>
-              <td>10/9</td>
-           <td> 
-           </td>
-         </tr>
+            <td>10/9</td>
+            <td>This meeting was held during class time. We went over the changes we had made, and everyone was able
+               to present their changes. We all agreed on the directions for the messaging. No problems have
+               arisen, so continue as planned.</td>
+          </tr>
+          <tr>
+            <td>10/10</td>
+            <td>This meeting was held in the library. We went over the changes we had made, and everyone was able
+               to present their changes. The backend was able to finish and all that was left was the frontend.</td>
+          </tr>
+          <tr>
+            <td>10/11</td>
+            <td>This meeting was held during class hours. Messaging was completed on both the frontend and backend.
+              All progress was shown in sprint and we got the assigned task for the next sprint as well as details
+              for the final.</td>
+          </tr>
+          <tr>
+            <td>10/14</td>
+            <td>This meeting was held during class hours. The Architecture Design Document was worked on.
+              The plans for the notifications details for the frontend and backend were discussed.
+            </td>
+          </tr>
+          <tr>
+            <td>10/15</td>
+            <td>This meeting was held in the library. Everyone discussed all the progess we have made.
+              The Architecture Design Document was completed and is now ready to show to professor.
+              Progress on the frontend and backend were completed.
+            </td>
+          </tr>
+          <tr>
+            <td>10/16</td>
+            <td>This meeting was held in the library. The Architecture Design Document was shown to 
+              professor and was fully completed. The backend for the notifications system was also 
+              completed. Frontend is continuing to make progress.
+            </td>
+          </tr>
+          <tr>
+            <td>10/17</td>
+            <td>This meeting was held in the library. The main focus for this day was midterm.
+              A group study session was held.
+            </td>
+          </tr>
+          <tr>
+            <td>10/18</td>
+            <td>This was day of midterm. Everyone was focused on that and frontend team 
+              completed their work, so the system was ready to show for the next sprint.
+            </td>
+          </tr>
+          <tr>
+            <td>10/21</td>
+            <td> The meeting was held in person today. Notifications was shown in sprint
+              and met all the required conditions. The next sprint for the profile page
+              was announced.
+            </td>
+          </tr>
+          <tr>
+            <td>10/22</td>
+            <td> The meeting was held in person today. We all discussed what needed to be done 
+              on both the frontend and backend sides for the project. 
+            </td>
+          </tr>
+          <tr>
+            <td>10/23</td>
+            <td> The meeting was held in person today. The backend and frontend progress was
+              continued with no issues arising.
+            </td>
+          </tr>
+          <tr>
+            <td>10/24</td>
+            <td> The meeting was held in person today. The backend and frontend progress was
+              continued with no issues arising. The backend was completed.
+            </td>
+          </tr>
+          <tr>
+            <td>10/25</td>
+            <td> The meeting was held in person today. The backend and frontend progress was
+              continued with no issues arising. The frontend was completed.
+            </td>
+          </tr>
+          <tr>
+            <td>10/28</td>
+            <td> The meeting was held in person today. The profile page was completed and shown 
+              to professor in sprint. The next topic was testing was announced and we assigned
+              tasks accordingly.
+            </td>
+          </tr>
+          <tr>
+            <td>10/29</td>
+            <td> The meeting was held in person today. We all met up to learn how to do the testing
+              on both ends and what to include in the document.
+            </td>
+          </tr>
+          <tr>
+            <td>10/30</td>
+            <td> The meeting was held in person today. Progress on the testing was continued, nothing
+              of note.
+            </td>
+          </tr>
+          <tr>
+            <td>10/31</td>
+            <td> Halloween is a company Holiday. No meeting today.
+            </td>
+          </tr>
+          <tr>
+            <td>11/1</td>
+            <td> The meeting was held in person today. Progress on the testing was continued
+              and we should be ready for sprint next Monday.
+            </td>
+          </tr>
+          <tr>
+            <td>11/4</td>
+            <td> The meeting was held online for today since class was cancelled. We discussed
+              what we got completed and proceeded to do other tasks like completing styling 
+              for the profile page.
+            </td>
+          </tr>
+          
        </tbody>
      </table>
    </div>

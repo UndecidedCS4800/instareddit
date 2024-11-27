@@ -34,11 +34,11 @@ const Editor = ({def, uiHandler}: EditorProps) => {
         uiHandler(composed)
     }
     return (
-        <form onSubmit={onSubmit}>
+        <form className="flex p-5"onSubmit={onSubmit}>
             <span>First Name<input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}></input></span>
             <span>Last Name<input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)}></input></span>
             <span>Date of Birth<input type="date" value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)}></input></span>
-            <button type="submit">Save Changes</button>
+            <button className="bg-[#e78fcb]"type="submit">Save</button>
         </form>
     )
 }
@@ -48,7 +48,7 @@ const Display = ({ userinfo }: DisplayProps) => {
         return <p>Loading...</p>
     }
     return (
-        <div>
+        <div className="flex space-x-4">
             <p>{userinfo.first_name}</p>
             <p>{userinfo.last_name}</p>
             <p>{userinfo.date_of_birth}</p>
