@@ -63,7 +63,7 @@ class RegisterUserView(views.APIView):
         key = os.environ.get('TOKEN_KEY')
         token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
 
-        response = {'username': username, 'token': token}
+        response = {'username': username,'id': user_id, 'token': token}
         return Response(response, status=status.HTTP_201_CREATED)
 
 class LoginView(views.APIView):
@@ -97,7 +97,7 @@ class LoginView(views.APIView):
         if bcrypt.checkpw(pw_bytes, hashpass_bytes):
             key = os.environ.get('TOKEN_KEY')
             token = jwt.encode({'username': username, 'id': user_id}, key, algorithm='HS256')
-            response = {'username': username, 'token': token}
+            response = {'username': username, 'id': user_id, 'token': token}
             return Response(response, status=status.HTTP_200_OK)
         else:
             return Response({'error' : "Incorrect password"}, status=status.HTTP_401_UNAUTHORIZED)
