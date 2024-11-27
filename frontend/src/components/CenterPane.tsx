@@ -56,7 +56,7 @@ export const CenterPane = () => {
     const v = getView(view, auth, posts? posts.results : [])
 
     return (
-        <div id="centerpane" className='h-full basis-8/12'>
+        <div id="centerpane" className='w-full'>
             <FeedNav viewSetter={setViewHandler} activeView={view} />
             <div>
                 {v}
