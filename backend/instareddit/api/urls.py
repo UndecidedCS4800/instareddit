@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .controllers import community_views, auth_views, post_views, profile_views, friendship_views
+from .controllers import community_views, auth_views, post_views, profile_views, friendship_views, notifications_views
 
 urlpatterns = [
     #authentication routes
@@ -28,6 +28,9 @@ urlpatterns = [
     #profiles
     path('profile/<str:username>' , profile_views.ProfileView.as_view()),
     path('profile/', profile_views.SelfProfileView.as_view()),
+    path('profile/notifications/likes',notifications_views.NotificationsGetLikesViews.as_view()),
+    path('profile/notifications/comments',notifications_views.NotificationsGetCommentsViews.as_view()),
+
 
     #friends
     path('friends/', friendship_views.FriendsIdsGetView.as_view()),
