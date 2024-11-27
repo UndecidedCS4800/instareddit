@@ -7,7 +7,7 @@ interface FeedNavProps {
 
 export const FeedNav = ({ viewSetter, activeView }: FeedNavProps) => {
     return (
-        <div className="flex w-full bg-[#342c33] justify-center">
+        <div className="flex w-full bg-[#342c33] justify-center border-b border-[#514350]">
             {/* Left Section: Navigation */}
             <nav className="flex basis-9/12 justify-center py-4 px-8">
                 <ol className="flex space-x-14">

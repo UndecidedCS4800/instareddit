@@ -53,27 +53,31 @@ export const CommunityFeed = () => {
     return (
         <div className="flex-col h-screen bg-[#342c33] overflow-hidden">
             {/* Search Bar */}
-            <form
-                onSubmit={handleFilterSubmit}
-                className="flex p-4 border-b border-[#514350] bg-[#2c272e]"
-            >
-                <input
-                    type="text"
-                    value={filter}
-                    placeholder="Search"
-                    onChange={(e) => setFilter(e.currentTarget.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-[#514350] text-white focus:outline-none"
-                />
-            </form>
+            <div className="flex items-center p-4 gap-2.5">
+                <form
+                    onSubmit={handleFilterSubmit}
+                    className="flex-grow"
+                >
+                    <input
+                        type="text"
+                        value={filter}
+                        placeholder="Search"
+                        onChange={(e) => setFilter(e.currentTarget.value)}
+                        className="w-full px-4 py-2 rounded-lg bg-[#514350] text-white focus:outline-none"
+                    />
+                </form>
 
-            {/* Content Section (Make this scrollable) */}
-            <div className="flex-1 p-4 overflow-y-auto">
                 <Link
                     to="/community/create"
-                    className="block mb-4 text-pink-400 hover:underline"
+                    className="ml-auto text-white h-10 py-2.5 px-5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex hover:text-white"
                 >
                     Create Community
                 </Link>
+            </div>
+
+
+            {/* Content Section (Make this scrollable) */}
+            <div className="flex-1 p-4 overflow-y-auto">
 
                 {users.length > 0 && (
                     <>
