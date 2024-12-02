@@ -50,6 +50,7 @@ class GetCommunityDetail(SetUpTest):
         c_dict = CommunitySerializer(c).data
         self.assertDictEqual(c_dict, response.json())
 
+#add error tests for those \/ \/ \/
 class ChangeCommunityDetailName(SetUpTest):
     def test(self):
         response = CLIENT.patch(
@@ -59,6 +60,7 @@ class ChangeCommunityDetailName(SetUpTest):
         c = Community.objects.get(id=COMMUNITY_ID)
         c_dict = CommunitySerializer(c).data
         self.assertDictEqual(c_dict, response.json())
+        self.assertEqual(response.status_code, 200)
 
 class ChangeCommunityDetailDescription(SetUpTest):
     def test(self):
@@ -69,6 +71,7 @@ class ChangeCommunityDetailDescription(SetUpTest):
         c = Community.objects.get(id=COMMUNITY_ID)
         c_dict = CommunitySerializer(c).data
         self.assertDictEqual(c_dict, response.json())
+        self.assertEqual(response.status_code, 200)
 
 class ChangeCommunityDetailBoth(SetUpTest):
     def test(self):
@@ -79,6 +82,7 @@ class ChangeCommunityDetailBoth(SetUpTest):
         c = Community.objects.get(id=COMMUNITY_ID)
         c_dict = CommunitySerializer(c).data
         self.assertDictEqual(c_dict, response.json())
+        self.assertEqual(response.status_code, 200)
 
 class GetCommunityPost(SetUpTest):
     def test(self):
@@ -89,3 +93,8 @@ class GetCommunityPost(SetUpTest):
         r_dict = response.json()
         r_dict.pop('comments')
         self.assertDictEqual(p_dict, r_dict)
+
+#TODO adding/removing admins and possible errors
+class AdminAdd(SetUpTest):
+    def test(self):
+        return
