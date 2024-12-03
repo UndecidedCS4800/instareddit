@@ -178,7 +178,7 @@ class CommunityAdminCreateDestroyView(views.APIView):
 
         community = models.Community.objects.filter(id=pk).first()
         if not community:
-            return Response({'error': 'Invalid community ID'})
+            return Response({'error': 'Invalid community ID'}, status=status.HTTP_400_BAD_REQUEST)
         #chekc if user authorzied
         admin = models.User.objects.get(username=decoded_token['username'])
         if not community.admins.contains(admin):
@@ -186,13 +186,13 @@ class CommunityAdminCreateDestroyView(views.APIView):
         
         username = request.data.get('username', None)
         if not username:
-            return Response({'error': 'Username not provided'})
+            return Response({'error': 'Username not provided'}, status=status.HTTP_400_BAD_REQUEST)
         user = models.User.objects.filter(username=username).first()
         if not user:
-            return Response({'error': 'Username invalid'})
+            return Response({'error': 'Username invalid'}, status=status.HTTP_400_BAD_REQUEST)
         a = community.admins.filter(username=username).first()
         if not a:
-            return Response({'error': 'User not an admin'})
+            return Response({'error': 'User not an admin'}, status=status.HTTP_400_BAD_REQUEST)
         
         community.admins.remove(user)
         return Response(status=status.HTTP_200_OK)

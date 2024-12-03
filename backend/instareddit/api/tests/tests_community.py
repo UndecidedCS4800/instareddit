@@ -140,3 +140,112 @@ class AdminAddNoUsername(SetUpTest):
         )
         self.assertEqual(response.status_code, 400)
         self.assertTrue('error' in response.json())
+
+class AdminAddInvalidUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.post(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': 'INVALID_USER'},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class AdminAddCorrectInput(SetUpTest):
+    def test(self):
+        response = CLIENT.post(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 200)
+        c = Community.objects.get(id=COMMUNITY_ID)
+        print('ADMINS', c.admins.all())
+        new_admin = c.admins.filter(username=OTHER_USERNAME).first()
+        self.assertIsNotNone(new_admin)
+
+class AdminAddUserAlreadyAdmin(SetUpTest):
+    def test(self):
+        c = Community.objects.get(id=COMMUNITY_ID)
+        u2 = User.objects.get(username=OTHER_USERNAME)
+        c.admins.add(u2)
+        response = CLIENT.post(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json()) 
+
+#deleting an admin
+"""
+possible errors:
+- invalid community id
+- unauthorized (not an admin)
+- username not provided
+- username invalid
+- user not an admin
+"""
+
+class AdminDeleteInvalidCommunityID(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(
+            '/api/community/404/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class AdminDeleteUnauthorized(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {OTHER_TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class AdminDeleteNoUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class AdminDeleteInvalidUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': 'INVALID_USER'},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class AdminDeleteUserNotAnAdmin(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json()) 
+
+class AdminDeleteCorrectInput(SetUpTest):
+    def test(self):
+        c = Community.objects.get(id=COMMUNITY_ID)
+        u2 = User.objects.get(username=OTHER_USERNAME)
+        c.admins.add(u2)
+        response = CLIENT.delete(
+            f'/api/community/{COMMUNITY_ID}/admin',
+            data={'username': OTHER_USERNAME},
+            headers={'Authorization': f'bearer {TOKEN}'}
+        )
+        self.assertEqual(response.status_code, 200)
+        admin = c.admins.filter(username=OTHER_USERNAME).first()
+        self.assertIsNone(admin)
