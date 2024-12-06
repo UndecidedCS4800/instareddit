@@ -39,6 +39,7 @@ class CommunityListCreateView(generics.ListCreateAPIView):
             owner = owner
         )
         community.admins.add(owner)
+        community.members.add(owner)
         community.save()
 
         serializer = serializers.CommunitySerializer(community)
