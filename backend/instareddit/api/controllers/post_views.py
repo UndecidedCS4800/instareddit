@@ -69,12 +69,12 @@ class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin)
     
     @requires_token
     def patch(self, request, username, post_pk, **kwargs):
-        decoded_token = kwargs['token']
-        if decoded_token['username'] != username:
-            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         post = self.get_post(username, post_pk)
         if not post:
             return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        decoded_token = kwargs['token']
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = serializers.PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -82,12 +82,12 @@ class PostGetUpdateDestroyView(generics.GenericAPIView, mixins.UpdateModelMixin)
         
     @requires_token
     def delete(self, request, username, post_pk, **kwargs):
-        decoded_token = kwargs['token']
-        if decoded_token['username'] != username:
-            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         post = self.get_post(username, post_pk)
         if not post:
             return Response({'error': 'Invalid username or post ID'}, status=status.HTTP_400_BAD_REQUEST)
+        decoded_token = kwargs['token']
+        if decoded_token['username'] != username:
+            return Response({'error': 'Unauthorized user'}, status=status.HTTP_401_UNAUTHORIZED)
         post.delete()
         return Response({}, status=status.HTTP_200_OK)
 
@@ -140,13 +140,13 @@ class PostLikesView(views.APIView):
         try:
             user = models.User.objects.get(id = user_id)
         except models.User.DoesNotExist:
-            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
 	 #check if post exists
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
-            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
         #check if the post is already liked by user
         if models.Like.objects.filter(user=user, post=post).exists():
@@ -206,13 +206,13 @@ class PostDislikesView(views.APIView):
         try:
             user = models.User.objects.get(id = user_id)
         except models.User.DoesNotExist:
-            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
 	 #check if post exists
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
-            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
         #check if the post is already disliked by user
         if models.Dislike.objects.filter(user=user, post=post).exists():
@@ -271,7 +271,7 @@ class PostCommentView(views.APIView):
         try:
             user = models.User.objects.get(id = user_id)
         except models.User.DoesNotExist:
-            return Response({'error': "User not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
         #get the comment from body
         body = request.data 
@@ -284,7 +284,7 @@ class PostCommentView(views.APIView):
         try:
             post = models.Post.objects.get(id =post_id)
         except models.Post.DoesNotExist:
-            return Response({'error': "Post not found"}, staus=status.HTTP_404_NOT_FOUND)
+            return Response({'error': "Post not found"}, status=status.HTTP_404_NOT_FOUND)
  
 	 #create comment and save
         new_comment = models.Comment(user = user, post = post,text = comment, datetime = datetime.now())
