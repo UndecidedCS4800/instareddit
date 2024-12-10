@@ -26,7 +26,7 @@ export interface Post {
   text: string,
   image: string | null,
   datetime: string,
-  community: number, // Foreign key to the community
+  community?: number, // Foreign key to the community
   community_name: string,
   comments?: Comment[]
 }
@@ -155,7 +155,7 @@ export type Notification = ({ type: "like" } & LikeNotifications) | ({type: "com
 
 export type ChatHistory = Record<number, ChatMessage[]>
 export type UserMeta = Omit<UserInfo, "user">
-export type PostRequest = Pick<Post, "text" | "community">
+export type PostRequest = Pick<Post, "text"> & Partial<Pick<Post, "community">>;
 export const isError = <T>(obj: T | ServerError): obj is ServerError => {
   return obj && (obj as ServerError).error !== undefined
 }
