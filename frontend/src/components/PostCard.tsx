@@ -35,11 +35,11 @@ export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
         <Elem link={link} to={`posts/${post.id}`}>
             {auth && privileged && <button onClick={handleRemove}>rm</button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
-                <div className="text-white text-xl font-bold font-sans">{username}</div>
+                <div className="text-[#e78fcb] text-xl font-bold font-sans">{username}</div>
                 {image && <img className="h-[350px] w-full object-cover"src={image} />}
-                <div className="ml-auto">{datetime}</div>
+                <div className="ml-auto text-white">{datetime.split("T")[0]}</div>
             </div>
-            <div className="px-4 py-2 text-pink-800 flex">{text}</div>
+            <div className="px-4 py-2 text-white flex">{text}</div>
         </Elem>
     )
 }

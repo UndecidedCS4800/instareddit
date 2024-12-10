@@ -42,9 +42,9 @@ export const CreatePost = () => {
             {/* Modal */}
             
                 <div className="fixed inset-0 bg-gray bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-8 w-full max-w-lg relative">
+                    <div className="bg-[#342c33] rounded-lg p-8 w-full max-w-lg border-2 border-[#514350] relative">
                         <Link
-                            className="absolute top-2 right-4 text-gray-400 hover:text-gray-600"
+                            className="absolute top-2 right-4 text-white hover:text-[#e78fcb]"
                             to=".."
                         
                         >
@@ -57,11 +57,11 @@ export const CreatePost = () => {
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 placeholder="Write your post..."
-                                className="w-full border border-gray-300 rounded-md p-2 mb-4"
+                                className="w-full bg-[#514350] focus:outline-none border border-[#514350] rounded-md p-2 mb-4"
                             />
                             <button
                                 type="submit"
-                                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                                className="h-10 py-2.5 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex focus:outline-none hover:bg-[#d07db0]"
                             >
                                 Submit
                             </button>

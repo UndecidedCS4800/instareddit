@@ -61,11 +61,18 @@ export const Community = () => {
     // TODO: add pagination support
     return (
         <React.Fragment>
-            <div className="bg-[#342c33] h-full w-full overflow-auto">
+            <div className="bg-[#342c33] h-screen w-full overflow-y-auto">
                 {canEnterPage ? <button onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
-                <Link to="posts/create">Create Post</Link>
                 <CommunityCard community={community} />
-                <div className="h-screen bg-[#342c33]"><Posts privileged={canEnterPage} posts={posts.results} /></div>
+                <div className="flex justify-end px-3">
+                    <Link
+                    to="posts/create"
+                    className="h-10 w-40 p-4 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex focus:outline-none hover:bg-[#d07db0] hover:text-white text-white"
+                    >
+                    Create Post
+                    </Link>
+                </div>                
+            <div className="h-screen bg-[#342c33]"><Posts privileged={canEnterPage} posts={posts.results} /></div>
                 <Outlet />
             </div>
         </React.Fragment>

@@ -27,8 +27,8 @@ export const Post = () => {
 
     const { comments, ...post } = data
     return (
-        <div className="h-screen flex-1 border border-[#514350] bg-[#342c33] overflow-hidden shadow-lg transition-transform transform">
-            <PostCard privileged={false} post={post} />
+        <div className="h-screen overflow-y-auto flex-1 border border-[#514350] bg-[#342c33] overflow-hidden shadow-lg transition-transform transform">
+            <PostCard privileged={false} post={post} />          
             {comments && <Comments comments={comments} />}
         </div>
     )

@@ -9,10 +9,11 @@ type CommentsProps = {
 export const Comments = ({comments}: CommentsProps) => {
     return (
         <>
+            <CommentForm />
             <ul className="space-y-4">
                 {comments.map(comment => <Comment key={comment.id} comment={comment} />)}
             </ul>
-            <CommentForm />
+            
         </>
     )
 }
