@@ -13,7 +13,7 @@ const ProfilePage = () => {
     const [userinfo, setUserInfo] = useState<UserMeta | null>(null);
     const [friends, setFriends] = useState<Friend[] | null>(null);
     const [editable, toggleEditable] = useState<boolean>(false);
-    const [posts, setPosts] = useState<PaginationResponse<Post> | null>(null);
+    const [posts, setPosts] = useState<Post[] | null>(null);
     const params = useParams();
     const auth = useAuth();
     const [buttonText, setButtonText] = useState("Send friend request");
@@ -143,7 +143,7 @@ const ProfilePage = () => {
 
                         {/* Render Posts */}
                         {posts ? (
-                            <div className="h-screen bg-[#342c33]"><Posts posts={posts.results} privileged={false} /></div>
+                            <div className="h-screen bg-[#342c33]"><Posts posts={posts} privileged={false} /></div>
                         ) : (
                             <div>Loading posts...</div>
                         )}
