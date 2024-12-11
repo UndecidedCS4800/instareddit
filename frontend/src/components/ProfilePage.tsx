@@ -86,7 +86,7 @@ const ProfilePage = () => {
                 {auth && auth.username !== params?.username && (
                     <button
                         onClick={handleClick}
-                        className=""
+                        className="flex bg-[#e78fcb] ml-auto mr-4 focus:outline-none hover:bg-[#d07db0]"
                     >
                         {buttonText}
                     </button>
@@ -107,7 +107,7 @@ const ProfilePage = () => {
 
                 {/* Posts Section */}
                 <div className="mt-4">
-                    <h2 className="text-xl px-4 font-semibold pb-2 mb-4">Posts</h2>
+                    <h2 className="text-xl px-4 font-semibold pb-2 mb-4"></h2>
                     
                 </div>
 
