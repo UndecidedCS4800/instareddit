@@ -136,8 +136,12 @@ export const getCommunity = async (id: number): Promise<ResponseOrError<Communit
     return await get(`/api/community/${id}/about`)
 }
 
-export const getPostComments = async (communityid: number, postid: number) : Promise<ResponseOrError<Post>> => {
+export const getPostComments = async (communityid: number | null, postid: number) : Promise<ResponseOrError<Post>> => {
     return await get(`/api/community/${communityid}/post/${postid}`)
+}
+
+export const getPostComments2 = async (username: string, postid: number) : Promise<ResponseOrError<Post>> => {
+    return await get(`/api/user/${username}/posts/${postid}`)
 }
 
 export const getUserProfile = async (username: string): Promise<ResponseOrError<UserMeta>> => {
@@ -145,7 +149,7 @@ export const getUserProfile = async (username: string): Promise<ResponseOrError<
 }
 
 export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
-    return await get(`/api/user/${username}/posts`)
+    return await get(`/api/${username}/posts`)
 }
 
 export const getRecentPosts = async (token: JWTTokenResponse['token']): Promise<ResponseOrError<PaginationResponse<Post>>> => {

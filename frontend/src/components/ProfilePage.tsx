@@ -1,12 +1,13 @@
 // consider: do we use react-routers loaders or simple fetch hooks?
 
-import { useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 import { useAuth } from "./auth";
 import { getFriends, getUserProfile, modifyProfile, sendFriendRequest, getUserPosts } from "../remote";
 import { MouseEvent, useEffect, useState } from "react";
 import { Friend, isError, JWTTokenResponse, Post, UserMeta } from "../schema";
 import UserInfoDisplay from "./UserInfoDisplay";
 import FriendsList from "./FriendsList";
+import React from "react";
 
 
 const ProfilePage = () => {
@@ -94,54 +95,67 @@ const ProfilePage = () => {
         fetchPosts();
     }, [auth?.username]);
 
-    console.log(posts)
+    console.log(posts);
+
+    // If postid is provided, render the Outlet for post details
+    if (params?.postid) {
+        return <Outlet />;
+    }
 
     const editButton = auth && auth.username === params?.username ? <button className="bg-[#e78fcb]" onClick={() => toggleEditable(!editable)}>Edit</button> : <></>
     return (
-        <div className="flex h-screen w-full">
-            {/* Left Side: User Information */}
-            <div className="basis-9/12 bg-[#342c33] text-white">
-                <h1 className="p-6 text-3xl font-semibold">{params?.username}</h1>
-                
-                {auth && auth.username !== params?.username && (
-                    <button
-                        onClick={handleClick}
-                        className="flex bg-[#e78fcb] ml-auto mr-4 focus:outline-none hover:bg-[#d07db0]"
-                    >
-                        {buttonText}
-                    </button>
-                )}
-    
-                <div className="flex px-4 items-center justify-between">
-                    <h2 className="text-xl font-semibold">User Information</h2>
-                    {editButton}
-                </div>
-                
-                <div className="px-4 pb-2 border-b border-[#514350]">
-                <UserInfoDisplay
-                    userinfo={userinfo}
-                    editable={editable}
-                    uiHandler={handleModify}
-                />
-                </div>
+        <React.Fragment>
+            <div className="flex h-screen w-full">
+                {/* Left Side: User Information */}
+                <div className="basis-9/12 bg-[#342c33] text-white">
+                    <h1 className="p-6 text-3xl font-semibold">{params?.username}</h1>
 
-                {/* Posts Section */}
-                <div className="mt-4">
-                    <h2 className="text-xl px-4 font-semibold pb-2 mb-4"></h2>
+                    {auth && auth.username !== params?.username && (
+                        <button onClick={handleClick} className="">
+                            {buttonText}
+                        </button>
+                    )}
+
+                    <div className="flex px-4 items-center justify-between">
+                        <h2 className="text-xl font-semibold">User Information</h2>
+                        {editButton}
+                    </div>
+
+                    <div className="px-4 pb-2 border-b border-[#514350]">
+                        <UserInfoDisplay
+                            userinfo={userinfo}
+                            editable={editable}
+                            uiHandler={handleModify}
+                        />
+                    </div>
+
+                    {/* Posts Section */}
+                    <div className="mt-4">
+                        <h2 className="text-xl px-4 font-semibold pb-2 mb-4">Posts</h2>
+                        <div className="flex justify-end px-3">
+                            <Link
+                                to="posts/create"
+                                className="h-10 w-40 p-4 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex focus:outline-none hover:bg-[#d07db0] hover:text-white text-white"
+                            >
+                                Create Post
+                            </Link>
+                        </div>
+
                     
+                    </div>
                 </div>
 
+                {/* Right Side: Friends List */}
+                <div className="w-full basis-3/12 p-6 px-8 bg-[#342c33] overflow-y-auto border-l border-[#514350]">
+                    <h2 className="text-2xl font-semibold text-[#e78fcb] p-2 font-bold font-sans rounded-lg">Friends</h2>
+                    <FriendsList friends={friends} />
+                </div>
             </div>
-    
-            {/* Right Side: Friends List */}
-            <div className="w-full basis-3/12 p-6 px-8 bg-[#342c33] overflow-y-auto border-l border-[#514350]">
-                <h2 className="text-2xl font-semibold text-[#e78fcb] p-2 font-bold font-sans rounded-lg">Friends</h2>
-                
-                <FriendsList friends={friends} />
-            </div>
-        </div>
+
+            {/* This will render the child route, such as CreatePost */}
+            <Outlet />
+        </React.Fragment>
     );
-    
-}
+};
 
 export default ProfilePage;

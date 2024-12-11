@@ -11,24 +11,24 @@ type PostCardProps = {
     privileged: boolean
 }
 
-const Elem = ({link, to, children}: { link?: boolean, to: string, children: React.ReactNode }) => {
+const Elem = ({ link, to, children }: { link?: boolean, to: string, children: React.ReactNode }) => {
     return link ? <Card to={to}>{children}</Card> : <div>{children}</div>
 }
-export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
-    // TODO?: truncate post preview text
-    const { datetime, image,  username, text } = post
+
+export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
+    const { datetime, image, username, text, community, id } = post
     const auth = useAuth()
     const validator = useRevalidator()
+
     const handleRemove = async (e: React.MouseEvent) => {
         e.preventDefault()
         if (auth) {
-            const resp = await removePost(auth.token, post.community, post.id)
+            const resp = await removePost(auth.token, community, id)
             if (!isError(resp)) {
                 validator.revalidate()
             } else {
                 console.error("server error", resp)
             }
-
         }
     }
 
