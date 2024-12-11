@@ -25,12 +25,12 @@ const FriendRequestItem = ({from}: FriendRequestItemProps) => {
     }
 
     return (
-        <div className="flex rounded-[30px] bg-[#514350] p-2 text-xl font-sans">
-            <span className="px-4 py-3">{from.username}</span>
+        <div className=" p-2 text-white">
+            <span className="px-4 py-3">{from.username} sent you a friend request !</span>
             <button 
                 disabled={buttonDisabled} 
                 onClick={handleAccept} 
-                className="ml-auto px-2 py-2 text-xl font-sans"
+                className="ml-auto px-2 py-2 text-l bg-[#e78fcb] hover:bg-[#d07db0]"
             >
                 {buttonText}
             </button>
