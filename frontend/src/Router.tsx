@@ -59,7 +59,18 @@ const router = createBrowserRouter([
         },
         {
           path: "/user/:username",
-          element: <ProfilePage />
+          element: <ProfilePage />,
+          children: [
+            {
+              path: "posts/:postid",
+              element: <Post />,
+              loader: postLoader
+            },
+            {
+              path: "posts/create",
+              element: <CreatePost />
+            },
+          ]
         }
       ],
     },
