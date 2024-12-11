@@ -148,7 +148,7 @@ export interface FriendshipStatusResponse {
 }
 
 export interface SearchResultResponse {
-  users: User["username"][],
+  users: { username: User["username"] }[],
   communities: { id: Community["id"], name: Community["name"] }[]
 }
 export type Notification = ({ type: "like" } & LikeNotifications) | ({type: "comment"} & PostNotifications) | ({type:"friend"} & FriendRequest)

@@ -12,7 +12,6 @@ export const CommunityCard = ({ community }: CommunityCardProps) => {
         <Card 
             to={`/community/${community.id}`}>
             <div className="h-[65px] px-[12px] py-4 justify-start items-center gap-5 flex">
-                <img className="w-[54px] h-14 rounded-full" src={Rectangle} alt="/public/Rectangle1.png" />
                 <div className="text-white text-xl font-bold font-sans">{name}</div>
             </div>
             {picture && <img className="h-[350px] w-full object-cover" src={picture} alt={name} />}

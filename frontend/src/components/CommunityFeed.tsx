@@ -41,10 +41,10 @@ export const CommunityFeed = () => {
     };
 
     const { results } = data;
-    const users = filterResults
-        ? filterResults.users.map((user) => <div key={user}>{user}</div>)
+    const users = filterResults?.users
+        ? filterResults.users.map((user) => <div key={user.username}>{user.username}</div>)
         : [];
-    const communities = filterResults
+    const communities = filterResults?.communities
         ? filterResults.communities.map((comm) => (
               <div key={comm.id}>{comm.name}</div>
           ))
@@ -88,7 +88,7 @@ export const CommunityFeed = () => {
                     </>
                 )}
 
-                {filterResults && (
+                {communities.length > 0 && (
                     <h2 className="text-xl text-[#e78fcb] font-bold mb-2">
                         Communities
                     </h2>
