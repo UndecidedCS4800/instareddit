@@ -46,7 +46,7 @@ const Notifications: React.FC = () => {
 
   return (
     <div className='h-screen bg-[#342c33] flex-1 p-5 overflow-y-auto'>
-      <h2 className="w-[242px] h-12 text-white text-[32px] font-bold font-sans">Notifications</h2>
+      <h2 className="w-[242px] h-12 text-white text-[32px] font-bold font-sans mb-5">Notifications</h2>
       <FriendRequestList friend_requests={friendRequests} />
       <NotificationCardList comments={commentNotifications} likes={likeNotifications} />
     </div>
