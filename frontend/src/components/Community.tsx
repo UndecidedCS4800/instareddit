@@ -1,12 +1,12 @@
 import { Outlet, useLoaderData } from "react-router"
 import { getCommunity, getCommunityPosts } from "../remote"
 import { isError } from "../schema"
-import { CommunityCard } from "./CommunityCard"
 import React, { useState } from "react"
 import { Link, LoaderFunction, useParams } from "react-router-dom"
 import { Posts } from "./Posts"
 import { useAuth } from "./auth"
 import AdminPage from "./AdminPage"
+import { CommunityHeader } from "./CommunityHeader"
 
 type LoaderParams = {
     communityid: string,
@@ -63,7 +63,7 @@ export const Community = () => {
         <React.Fragment>
             <div className="bg-[#342c33] h-screen w-full overflow-y-auto">
                 {canEnterPage ? <button className="bg-[#e78fcb] focus:outline-none hover:bg-[#d07db0]"onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
-                <CommunityCard community={community} />
+                <CommunityHeader community={community} />
                 <div className="flex justify-end px-3 pt-3">
                     <Link
                     to="posts/create"
