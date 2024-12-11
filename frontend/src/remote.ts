@@ -145,7 +145,7 @@ export const getUserProfile = async (username: string): Promise<ResponseOrError<
 }
 
 export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
-    return await get(`/api/${username}/posts`)
+    return await get(`/api/user/${username}/posts`)
 }
 
 export const getRecentPosts = async (token: JWTTokenResponse['token']): Promise<ResponseOrError<PaginationResponse<Post>>> => {

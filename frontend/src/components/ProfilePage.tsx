@@ -2,9 +2,9 @@
 
 import { useParams } from "react-router-dom";
 import { useAuth } from "./auth";
-import { getFriends, getUserProfile, modifyProfile, sendFriendRequest } from "../remote";
+import { getFriends, getUserProfile, modifyProfile, sendFriendRequest, getUserPosts } from "../remote";
 import { MouseEvent, useEffect, useState } from "react";
-import { Friend, isError, JWTTokenResponse, UserMeta } from "../schema";
+import { Friend, isError, JWTTokenResponse, Post, UserMeta } from "../schema";
 import UserInfoDisplay from "./UserInfoDisplay";
 import FriendsList from "./FriendsList";
 
@@ -14,6 +14,7 @@ const ProfilePage = () => {
     const [userinfo, setUserInfo] = useState<UserMeta | null>(null)
     const [friends, setFriends] = useState<Friend[] | null>(null)
     const [editable, toggleEditable] = useState<boolean>(false)
+    const [posts, setPosts] = useState<Post[]>()
     const params = useParams();
     const auth = useAuth();
     const [buttonText, setButtonText] = useState("Send friend request")
@@ -74,7 +75,26 @@ const ProfilePage = () => {
             }
         }
     }
+    // Fetch user posts
+    useEffect(() => {
+        const fetchPosts = async () => {
+            console.log('TEST')
+            if (auth?.username) {
+                console.log("Fetching posts for:", auth.username); // Debugging log
+                const userPosts = await getUserPosts(auth.username);
+                console.log("Fetched posts:", userPosts); // Debugging log
+                if (!isError(userPosts)) {
+                    setPosts(userPosts); // Set the posts data
+                } else {
+                    console.error('Error loading user posts: ', userPosts);
+                }
+            }
+        };
 
+        fetchPosts();
+    }, [auth?.username]);
+
+    console.log(posts)
 
     const editButton = auth && auth.username === params?.username ? <button className="bg-[#e78fcb]" onClick={() => toggleEditable(!editable)}>Edit</button> : <></>
     return (
