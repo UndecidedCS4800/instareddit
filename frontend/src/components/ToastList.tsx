@@ -14,6 +14,7 @@ const ToastList = () => {
 
     const auth = useAuth()
     const ts = Math.floor(since / 1000)
+    console.log("toastlist")
     useInterval(async () => {
         if (auth) {
             const postreq = getPostCommentNotifications(auth.token, ts);

@@ -25,8 +25,8 @@ const App: React.FC = () => {
     <>
         <Pane className='h-screen basis-3/12'>
           <NavBar />
-        </Pane>
         <ToastList />
+        </Pane>
         <CenterViewContainer>
           <Outlet />
         </CenterViewContainer>
