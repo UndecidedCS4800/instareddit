@@ -64,7 +64,7 @@ export const Community = () => {
             <div className="bg-[#342c33] h-screen w-full overflow-y-auto">
                 {canEnterPage ? <button className="bg-[#e78fcb] focus:outline-none hover:bg-[#d07db0]"onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
                 <CommunityCard community={community} />
-                <div className="flex justify-end px-3">
+                <div className="flex justify-end px-3 pt-3">
                     <Link
                     to="posts/create"
                     className="h-10 w-40 p-4 bg-[#e78fcb] rounded-[30px] justify-center items-center gap-2.5 inline-flex focus:outline-none hover:bg-[#d07db0] hover:text-white text-white"
