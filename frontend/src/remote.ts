@@ -148,7 +148,7 @@ export const getUserProfile = async (username: string): Promise<ResponseOrError<
     return await get(`/api/profile/${username}`);
 }
 
-export const getUserPosts = async (username: string): Promise<ResponseOrError<Post[]>> => {
+export const getUserPosts = async (username: string): Promise<ResponseOrError<PaginationResponse<Post>>> => {
     return await get(`/api/${username}/posts`)
 }
 

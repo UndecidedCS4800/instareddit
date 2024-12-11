@@ -2,7 +2,7 @@ import { Link, useParams, Outlet } from "react-router-dom";
 import { useAuth } from "./auth";
 import { getFriends, getUserProfile, modifyProfile, sendFriendRequest, getUserPosts } from "../remote";
 import { MouseEvent, useEffect, useState } from "react";
-import { Friend, isError, JWTTokenResponse, UserMeta, Post } from "../schema";
+import { Friend, isError, JWTTokenResponse, UserMeta, Post, PaginationResponse } from "../schema";
 import UserInfoDisplay from "./UserInfoDisplay";
 import FriendsList from "./FriendsList";
 import { Posts } from "./Posts";
@@ -13,7 +13,7 @@ const ProfilePage = () => {
     const [userinfo, setUserInfo] = useState<UserMeta | null>(null);
     const [friends, setFriends] = useState<Friend[] | null>(null);
     const [editable, toggleEditable] = useState<boolean>(false);
-    const [posts, setPosts] = useState<Post[] | null>(null); // State to hold the posts
+    const [posts, setPosts] = useState<PaginationResponse<Post> | null>(null);
     const params = useParams();
     const auth = useAuth();
     const [buttonText, setButtonText] = useState("Send friend request");
@@ -63,7 +63,7 @@ const ProfilePage = () => {
                 }
             }
         };
-
+    
         fetchPosts();
     }, [params?.username]);
 
@@ -143,9 +143,7 @@ const ProfilePage = () => {
 
                         {/* Render Posts */}
                         {posts ? (
-                            <div className="h-screen bg-[#342c33]">
-                                <Posts posts={posts} privileged={false} />
-                            </div>
+                            <div className="h-screen bg-[#342c33]"><Posts posts={posts.results} privileged={false} /></div>
                         ) : (
                             <div>Loading posts...</div>
                         )}
