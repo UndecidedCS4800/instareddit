@@ -32,7 +32,7 @@ export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
     }
 
     return (
-        <Elem link={link} to={`posts/${post.id}`}>
+        <Elem link={link} to={`/community/${post.community}/posts/${post.id}`}>
             {auth && privileged && <button onClick={handleRemove}>rm</button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
                 <div className="text-[#e78fcb] text-xl font-bold font-sans">{username}</div>
