@@ -62,7 +62,7 @@ export const Community = () => {
     return (
         <React.Fragment>
             <div className="bg-[#342c33] h-screen w-full overflow-y-auto">
-                {canEnterPage ? <button onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
+                {canEnterPage ? <button className="bg-[#e78fcb] focus:outline-none hover:bg-[#d07db0]"onClick={() => setShowAdmin(true)}>Admin</button> : <></>}
                 <CommunityCard community={community} />
                 <div className="flex justify-end px-3">
                     <Link

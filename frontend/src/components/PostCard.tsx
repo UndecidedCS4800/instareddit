@@ -39,7 +39,6 @@ export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
 
     return (
         <Elem link={link} to={linkTo}>
-            {auth && privileged && <button onClick={handleRemove}>rm</button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
                 <ProfileLink user={username} className="font-bold text-[#e78fcb] hover:text-white text-xl">
                     {username}
@@ -48,6 +47,7 @@ export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
                 <div className="ml-auto text-white">{datetime.split("T")[0]}</div>
             </div>
             <div className="px-4 py-2 text-white flex">{text}</div>
+            {auth && privileged && <button className="bg-red-500 text-white"onClick={handleRemove}>Remove Post</button>}
         </Elem>
     )
 }
