@@ -34,7 +34,7 @@ const Editor = ({def, uiHandler}: EditorProps) => {
         uiHandler(composed)
     }
     return (
-        <form className="flex p-5"onSubmit={onSubmit}>
+        <form className="flex p-3 gap-4"onSubmit={onSubmit}>
             <span>First Name<input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}></input></span>
             <span>Last Name<input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)}></input></span>
             <span>Date of Birth<input type="date" value={dateOfBirth} onChange={e => setDateOfBirth(e.target.value)}></input></span>
