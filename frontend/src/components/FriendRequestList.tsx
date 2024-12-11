@@ -8,7 +8,7 @@ interface FriendRequestListProps {
 
 const FriendRequestList = ({friend_requests}: FriendRequestListProps) => {
     return (
-        <div>
+        <div className="flex flex-col gap-5">
             {friend_requests.map(friend =>
                 <FriendRequestItem key={friend.id} from={{id: friend.id, username: friend.from_username}} />
             )}
