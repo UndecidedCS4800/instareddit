@@ -27,7 +27,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* Conditionally render the NavBar */}
+      
       {!shouldHideNavBar && (
         <Pane className="h-screen basis-3/12">
           <NavBar />
@@ -39,7 +39,6 @@ const App: React.FC = () => {
       </CenterViewContainer>
 
       <Pane>
-        {/* Other components */}
       </Pane>
     </>
   );
