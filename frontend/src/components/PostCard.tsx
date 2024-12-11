@@ -37,8 +37,13 @@ export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
         wordBreak: 'normal'
     }
 
+    // Determine the link to use: Community or User link
+    const linkTo = community
+    ? `/community/${community}/posts/${id}`
+    : `/user/${username}/posts/${id}`
+
     return (
-        <Link to={`/community/${post.community}/posts/${post.id}`} className="w-full max-w-4xl">
+        <Link to={linkTo} className="w-full max-w-4xl">
             <div className="rounded bg-[#50444e] mx-10">
                 {auth && privileged && <button onClick={handleRemove}>rm</button>}
                 <div className="px-4 py-4 justify-start items-center gap-5 flex">
