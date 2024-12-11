@@ -131,7 +131,6 @@ const ProfilePage = () => {
 
                     {/* Posts Section */}
                     <div className="mt-4">
-                        <h2 className="text-xl px-4 font-semibold pb-2 mb-4">Posts</h2>
                         <div className="flex justify-end px-3">
                             <Link
                                 to="posts/create"
