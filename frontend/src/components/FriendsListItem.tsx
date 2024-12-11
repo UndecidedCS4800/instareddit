@@ -10,7 +10,7 @@ const FriendsListItem = ({ friend, cardHandler, removeHandler }: FriendsListItem
     return (
         <div
             onClick={() => cardHandler()}
-            className="flex items-center justify-between p-2 text-white text-xl font-bold font-sans rounded-lg cursor-pointer"
+            className="flex items-center hover:shadow-xl hover:text-[#e78fcb] justify-between p-2 text-white text-xl font-bold font-sans rounded-lg cursor-pointer"
         >
             <span>{friend.username}</span>
             <button

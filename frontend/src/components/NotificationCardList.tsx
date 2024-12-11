@@ -36,7 +36,7 @@ const NotificationCardList = ({ likes, comments }: NotificationCardListProps) =>
     const notifications = [like_nodes, comment_nodes].flat();
 
     return (
-        <div className="p-4  ">
+        <div className="p-4 ">
             <div className="flex flex-col gap-3">
                 {notifications.map((notif) => (
                     <div
