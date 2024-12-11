@@ -42,11 +42,12 @@ export const CommunityFeed = () => {
 
     const { results } = data;
     const users = filterResults?.users
-        ? filterResults.users.map((user) => <div key={user.username}>{user.username}</div>)
+        ? filterResults.users.map((user) => <Link to={`/user/${user.username}`} className="text-white hover:text-pink-300">{user.username}</Link>)
         : [];
     const communities = filterResults?.communities
         ? filterResults.communities.map((comm) => (
-              <div key={comm.id}>{comm.name}</div>
+            //   <div key={comm.id}>{comm.name}</div>
+              <Link to={`/community/${comm.id}`} className="text-white hover:text-pink-300">{comm.name}</Link>
           ))
         : results.map((com) => <CommunityCard key={com.id} community={com} />);
 
@@ -84,16 +85,18 @@ export const CommunityFeed = () => {
                         <h2 className="text-xl text-[#e78fcb] font-bold mb-2">
                             Users
                         </h2>
-                        <div className="mb-4">{users}</div>
+                        <div className="mb-4 flex flex-col gap-y-4">{users}</div>
                     </>
                 )}
 
-                {communities.length > 0 && (
+                {filterResults?.communities && (
                     <h2 className="text-xl text-[#e78fcb] font-bold mb-2">
                         Communities
                     </h2>
                 )}
-                <div>{communities}</div>
+                {
+                (filterResults?.communities && <div className="mb-4 flex flex-col gap-y-4">{communities}</div>) || 
+                <div className="mb-4 flex flex-col gap-y-4">{communities}</div>}
             </div>
         </div>
     );
