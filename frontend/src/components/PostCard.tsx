@@ -3,6 +3,7 @@ import { removePost } from "../remote"
 import { isError, Post } from "../schema"
 import { useAuth } from "./auth"
 import { Card } from "./Card"
+import ProfileLink from "./ProfileLink"
 
 type PostCardProps = {
     post: Post
@@ -35,7 +36,7 @@ export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
         <Elem link={link} to={`/community/${post.community}/posts/${post.id}`}>
             {auth && privileged && <button onClick={handleRemove}>rm</button>}
             <div className="px-4 py-4 justify-start items-center gap-5 flex">
-                <div className="text-[#e78fcb] text-xl font-bold font-sans">{username}</div>
+                <ProfileLink user={username} className="font-bold text-[#e78fcb] hover:text-white text-xl">{username}</ProfileLink>
                 {image && <img className="h-[350px] w-full object-cover"src={image} />}
                 <div className="ml-auto text-white">{datetime.split("T")[0]}</div>
             </div>
