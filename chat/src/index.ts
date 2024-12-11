@@ -22,17 +22,17 @@ exp.get('/', (_req, res) => {
 
 // redis connection
 const redisClient = createRedisClient({
-    // socket: {
-    //     // note: need to have version for render redis/amazon elasticsotrage
-    //     host: "chatlog"
-    // },
+    socket: {
+        // note: need to have version for render redis/amazon elasticsotrage
+        host: "chatlog"
+    },
 
 
     // // need to have version for render
     // username: "instareddit",
     // password: "secret",
     // database: 0,
-    url: REDIS_URL,
+    // url: REDIS_URL,
 })
 
 redisClient.on("connection", conn => console.log("Connected", conn))

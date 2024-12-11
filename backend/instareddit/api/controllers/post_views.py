@@ -27,6 +27,7 @@ class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
 
         # get posts from friends & communties 
         posts = []
+        posts.extend(user.post_set.all())
         for f in friends:
             posts.extend(f.post_set.all())
         for c in communities:
