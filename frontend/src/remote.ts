@@ -119,8 +119,8 @@ async function send<T>(method: RequestInit['method'] = "GET", relative_path: str
     }
 }
 
-export const getCommunities = async (query?: string): Promise<ResponseOrError<PaginationResponse<Community>>> => {
-    const query_string = query ? `?query={${query}}` : ""
+export const getCommunities = async (page?: number): Promise<ResponseOrError<PaginationResponse<Community>>> => {
+    const query_string = page ? `?page=${page}` : ""
     return await get(`/api/communities${query_string}`)
 }
 

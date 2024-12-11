@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Community, isError, PaginationResponse, SearchResultResponse} from "../schema"
+import { Community, isError, PaginationResponse, SearchResultResponse } from "../schema"
 import { getCommunities, searchUsersAndCommunities } from "../remote"
 import { CommunityCard } from "./CommunityCard"
 import { Link } from "react-router-dom"
@@ -8,6 +8,8 @@ export const CommunityFeed = () => {
     const [data, setData] = useState<PaginationResponse<Community> | null>(null);
     const [filter, setFilter] = useState<string>("");
     const [filterResults, setFilterResults] = useState<SearchResultResponse>();
+    const [page, setPage] = useState<number>(1);
+    const [pageCount, setPageCount] = useState<number>(1);
 
     useEffect(() => {
         let ignore = false;
@@ -17,6 +19,7 @@ export const CommunityFeed = () => {
                 const json = await getCommunities();
                 if (!isError(json)) {
                     setData(json);
+                    setPageCount(Math.ceil(json.count / 10));
                 }
             }
         };
@@ -28,6 +31,14 @@ export const CommunityFeed = () => {
 
     if (!data) {
         return <p>Loading...</p>;
+    }
+
+    const get = async (page: number = 1) => {
+        const json = await getCommunities(page);
+        if (!isError(json)) {
+            setData(json);
+            setPage(page);
+        }
     }
 
     const handleFilterSubmit = async (e: React.FormEvent) => {
@@ -47,8 +58,8 @@ export const CommunityFeed = () => {
     const communities = filterResults?.communities
         ? filterResults.communities.map((comm) => (
             //   <div key={comm.id}>{comm.name}</div>
-              <Link to={`/community/${comm.id}`} className="text-white hover:text-pink-300">{comm.name}</Link>
-          ))
+            <Link to={`/community/${comm.id}`} className="text-white hover:text-pink-300">{comm.name}</Link>
+        ))
         : results.map((com) => <CommunityCard key={com.id} community={com} />);
 
     return (
@@ -95,8 +106,25 @@ export const CommunityFeed = () => {
                     </h2>
                 )}
                 {
-                (filterResults?.communities && <div className="mb-4 flex flex-col gap-y-4">{communities}</div>) || 
-                <div className="mb-4 flex flex-col gap-y-4">{communities}</div>}
+                    (filterResults?.communities && <div className="mb-4 flex flex-col gap-y-4">{communities}</div>) ||
+                    <div>
+                        <div className="mb-4 flex flex-col gap-y-4">
+                            {communities}
+                        </div>
+                        <div className="flex justify-center gap-x-4">
+                            <div onClick={() => {
+                                if (page > 1) {
+                                    get(page - 1)
+                                }
+                            }}
+                                className="text-2xl">prev</div>
+                            <div onClick={() => {
+                                if (page < pageCount) {
+                                    get(page + 1)
+                                }
+                            }} className="text-2xl">next</div>
+                        </div>
+                    </div>}
             </div>
         </div>
     );
