@@ -1,7 +1,7 @@
 import { LoaderFunction, useLoaderData } from "react-router-dom"
 import { getPostComments, ResponseOrError } from "../remote"
 import { isError, Post as PostType } from "../schema"
-import { PostCard } from "./PostCard"
+import { PostHeader } from "./PostHeader"
 import { Comments } from "./Comments"
 export const loader: LoaderFunction<{ communityid: string, postid: string }> = async (args) => {
     const { communityid, postid } = args.params
@@ -28,7 +28,7 @@ export const Post = () => {
     const { comments, ...post } = data
     return (
         <div className="h-screen overflow-y-auto flex-1 border border-[#514350] bg-[#342c33] overflow-hidden shadow-lg transition-transform transform">
-            <PostCard privileged={false} post={post} />          
+            <PostHeader privileged={false} post={post} />          
             {comments && <Comments comments={comments} />}
         </div>
     )

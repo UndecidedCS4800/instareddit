@@ -1,4 +1,4 @@
-import { Link, useRevalidator } from "react-router-dom"
+import { useRevalidator } from "react-router-dom"
 import { removePost } from "../remote"
 import { isError, Post } from "../schema"
 import { useAuth } from "./auth"
@@ -14,7 +14,7 @@ type PostCardProps = {
 const Elem = ({link, to, children}: { link?: boolean, to: string, children: React.ReactNode }) => {
     return link ? <Card to={to}>{children}</Card> : <div>{children}</div>
 }
-export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
+export const PostHeader = ({post, privileged = false, link}: PostCardProps) => {
     // TODO?: truncate post preview text
     const { datetime, image,  username, text } = post
     const auth = useAuth()
@@ -38,16 +38,14 @@ export const PostCard = ({post, privileged = false, link}: PostCardProps) => {
     }
 
     return (
-        <Link to={`/community/${post.community}/posts/${post.id}`} className="w-full max-w-4xl">
-            <div className="rounded bg-[#50444e] mx-10">
-                {auth && privileged && <button onClick={handleRemove}>rm</button>}
-                <div className="px-4 py-4 justify-start items-center gap-5 flex">
-                    <ProfileLink user={username} className="font-bold text-[#e78fcb] hover:text-white text-xl">{username}</ProfileLink>
-                    {image && <img className="h-[350px] w-full object-cover"src={image} />}
-                    <div className="ml-auto text-white">{datetime.split("T")[0]}</div>
-                </div>
-                <p className="px-4 py-2 text-white" style={postTextStyle}>{text}</p>
+        <Elem link={link} to={`/community/${post.community}/posts/${post.id}`}>
+            {auth && privileged && <button onClick={handleRemove}>rm</button>}
+            <div className="px-4 py-4 justify-start items-center gap-5 flex">
+                <ProfileLink user={username} className="font-bold text-[#e78fcb] hover:text-white text-xl">{username}</ProfileLink>
+                {image && <img className="h-[350px] w-full object-cover"src={image} />}
+                <div className="ml-auto text-white">{datetime.split("T")[0]}</div>
             </div>
-        </Link>
+            <div className="px-4 py-2 text-white flex" style={postTextStyle}>{text}</div>
+        </Elem>
     )
 }
