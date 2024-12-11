@@ -52,7 +52,7 @@ export const CommunityFeed = () => {
         : results.map((com) => <CommunityCard key={com.id} community={com} />);
 
     return (
-        <div className="flex-col h-screen bg-[#342c33] overflow-hidden">
+        <div className="flex-col h-screen bg-[#342c33]">
             {/* Search Bar */}
             <div className="flex items-center p-4 gap-2.5">
                 <form
