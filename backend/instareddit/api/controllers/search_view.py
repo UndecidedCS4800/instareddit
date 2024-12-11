@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from .. import models
 from django.db.models import Q
 from .. import serializers
+import re
 
 class SearchView(views.APIView):
     def get(self, request):
@@ -15,9 +16,8 @@ class SearchView(views.APIView):
         #get results
         query_results = {}
 
-        # FIX NOT FINDING OBJECTS? DB NOT FILLED?
-        users = models.User.objects.filter(Q(username__istartswith=query))
-        communities = models.Community.objects.filter(Q(name__istartswith=query))
+        users = models.User.objects.filter(Q(username__iregex=f'^{re.escape(query)}'))
+        communities = models.Community.objects.filter(Q(name__iregex=f'^{re.escape(query)}'))
 
         users_s = serializers.UserSearchSerailizer(users, many=True)
         communities_s = serializers.CommunitySearchSerializer(communities, many=True)
