@@ -37,7 +37,7 @@ urlpatterns = [
     #friends
     path('friends/', friendship_views.FriendsIdsGetView.as_view()),
     path('friends/status/', friendship_views.FriendshipStatusView.as_view()),
-    path('friendrequest/', friendship_views.FriendRequestCreateView.as_view()),
+    path('friendrequests/', friendship_views.FriendRequestCreateView.as_view()),
     path('friendrequests/accept/', friendship_views.AcceptView.as_view()),
     path('friendrequests/decline/', friendship_views.DeclineView.as_view()),
     path('friendrequests/cancel/', friendship_views.CancelView.as_view()),
