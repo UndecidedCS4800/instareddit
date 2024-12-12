@@ -5,7 +5,6 @@ import Pane from './components/Pane';
 import { useEffect } from 'react';
 import socket from './socket';
 import { useAuth } from './components/auth';
-import ToastList from './components/ToastList';
 import React from 'react';
 
 const App: React.FC = () => {

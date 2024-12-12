@@ -1,6 +1,5 @@
 import { Community } from "../schema";
 import { Card } from "./Card";
-import Rectangle from "../../public/Rectangle1.png"
 import { Link } from "react-router-dom";
 interface CommunityCardProps {
     community: Community;
