@@ -1,6 +1,5 @@
 import { Post } from "../schema";
 import { PostCard } from "./PostCard";
-import { PostHeader } from "./PostHeader";
 
 interface PostProps {
     posts: Post[]

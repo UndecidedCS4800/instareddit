@@ -1,5 +1,4 @@
 import { Community } from "../schema";
-import { Card } from "./Card";
 import { Link } from "react-router-dom";
 interface CommunityCardProps {
     community: Community;

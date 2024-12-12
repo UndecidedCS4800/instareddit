@@ -22,7 +22,7 @@ export const PostHeader = ({post, privileged = false, link}: PostCardProps) => {
     const handleRemove = async (e: React.MouseEvent) => {
         e.preventDefault()
         if (auth) {
-            const resp = await removePost(auth.token, post.community, post.id)
+            const resp = await removePost(auth.token, post.community ?? 0, post.id)
             if (!isError(resp)) {
                 validator.revalidate()
             } else {

@@ -2,7 +2,6 @@ import { Link, useRevalidator } from "react-router-dom"
 import { removePost } from "../remote"
 import { isError, Post } from "../schema"
 import { useAuth } from "./auth"
-import { Card } from "./Card"
 import ProfileLink from "./ProfileLink"
 
 type PostCardProps = {
@@ -11,11 +10,8 @@ type PostCardProps = {
     privileged: boolean
 }
 
-const Elem = ({ link, to, children }: { link?: boolean, to: string, children: React.ReactNode }) => {
-    return link ? <Card to={to}>{children}</Card> : <div>{children}</div>
-}
 
-export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
+export const PostCard = ({ post, privileged = false }: PostCardProps) => {
     const { datetime, image, username, text, community, id } = post
     const auth = useAuth()
     const validator = useRevalidator()
@@ -23,7 +19,7 @@ export const PostCard = ({ post, privileged = false, link }: PostCardProps) => {
     const handleRemove = async (e: React.MouseEvent) => {
         e.preventDefault()
         if (auth) {
-            const resp = await removePost(auth.token, community, id)
+            const resp = await removePost(auth.token, community ?? 0, id)
             if (!isError(resp)) {
                 validator.revalidate()
             } else {
