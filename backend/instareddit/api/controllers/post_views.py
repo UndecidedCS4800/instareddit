@@ -26,15 +26,18 @@ class RecentPostsView(generics.GenericAPIView, mixins.ListModelMixin):
         communities = user.member_communities.all()
 
         # get posts from friends & communties 
-        posts = []
-        posts.extend(user.post_set.all())
+        posts = set()
+        for p in user.post_set.all():
+            posts.add(p)
         for f in friends:
-            posts.extend(f.post_set.all())
+            for p in f.post_set.all():
+                posts.add(p)
         for c in communities:
-            posts.extend(c.post_set.all())
+            for p in c.post_set.all():
+                posts.add(p)
 
         # sort by date 
-        self.queryset = sorted(posts, key=lambda p: p.datetime, reverse=True)
+        self.queryset = sorted(list(posts), key=lambda p: p.datetime, reverse=True)
         print(self.queryset)
 
         return self.list(request)

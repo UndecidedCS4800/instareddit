@@ -82,6 +82,8 @@ class RecentActivityTest1(SetUpTest):
     def test(self):
         response = CLIENT.get('/api/', headers={'Authorization': f'bearer {TOKEN}'})
 
+        print('HERE', response.json()) #debug
+
         self.assertTrue('count' in response.json())
         self.assertTrue('next' in response.json())
         self.assertTrue('previous' in response.json())
@@ -101,6 +103,7 @@ class RecentActivityTest1(SetUpTest):
 For User 2
 Should return:
 u1's post because they're friends
+own post
 """
 class RecentActivityTest2(SetUpTest):
     def test(self):
@@ -111,7 +114,7 @@ class RecentActivityTest2(SetUpTest):
         response = CLIENT.get('/api/', headers={'Authorization': f'bearer {TOKEN}'})
         
         #debug
-        print(response.json())
+        print('HERE', response.json())
 
         self.assertTrue('count' in response.json())
         self.assertTrue('next' in response.json())
@@ -119,13 +122,15 @@ class RecentActivityTest2(SetUpTest):
         self.assertTrue('results' in response.json())
 
         results = response.json()['results']
-        self.assertTrue(len(results) == 1)
-        self.assertTrue(results[0]['id'] == POST_ID)
+        self.assertTrue(len(results) == 2)
+        self.assertTrue(results[0]['id'] == POST_ID_2)
+        self.assertTrue(results[1]['id'] == POST_ID)
 
 """
 For User 3
 Should return:
 u1's because they're in the same community
+we are deleting u3's own post
 """
 class RecentActivityTest3(SetUpTest):
     def test(self):
