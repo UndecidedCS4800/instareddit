@@ -313,6 +313,182 @@ const About: React.FC = () => {
               for the profile page.
             </td>
           </tr>
+          <tr>
+            <td>11/5</td>
+            <td> 
+              This meeting was held online. Everyone progressed for making unit tests, so that
+              it can be shown for the sprint.
+            </td>
+          </tr>
+          <tr>
+            <td>11/6</td>
+            <td> 
+            This meeting was in person. Everyone progressed for making unit tests, so that
+              it can be shown for the sprint. 
+            </td>
+          </tr>
+          <tr>
+            <td>11/7</td>
+            <td> 
+            This meeting was online. Everyone progressed for making unit tests, so that
+            it can be shown for the sprint. Everyone is focused on unit tests.
+            </td>
+          </tr>
+          <tr>
+            <td>11/8</td>
+            <td> 
+            This meeting was online. Everyone progressed for making unit tests, so that
+            it can be shown for the sprint. Everyone is focused on unit tests.
+            </td>
+          </tr>
+          <tr>
+            <td>11/11</td>
+            <td> 
+            This meeting was online. Everyone progressed for making unit tests, so that
+            it can be shown for the sprint. Everyone is focused on unit tests.
+            </td>
+          </tr>
+          <tr>
+            <td>11/12</td>
+            <td> 
+            This meeting was online. Everyone progressed for making unit tests, so that
+            it can be shown for the sprint. Everyone is focused on unit tests.
+            </td>
+          </tr>
+          <tr>
+            <td>11/13</td>
+            <td> 
+              This meeting was held in class. Showed professor the unit tests that were
+              completed, and we successfully got the required amount on time.
+            </td>
+          </tr>
+          <tr>
+            <td>11/14</td>
+            <td> 
+              This meeting was held online. We discussed that we need to do more unit 
+              tests for the final project, and that was properly assigned and made due
+              by end of project.
+            </td>
+          </tr>
+          <tr>
+            <td>11/15</td>
+            <td> 
+              This meeting was held in person during class. The sprint assigned during class 
+              was to write the draft of the report. The report is 20 pages, so were are splitting 
+              it to 4 pages each between the 5 of us.
+            </td>
+          </tr>
+          <tr>
+            <td>11/18</td>
+            <td> 
+              This meeting was held in person during class. 4 of the 20 pages were already completed,
+              and team was told to finish it before the sprint is due. We also discussed our 
+              plans for the notifications system.
+
+            </td>
+          </tr>
+          <tr>
+            <td>11/19</td>
+            <td> 
+              This meeting was held online via Discord. 2 more members finished writing pages, so 
+              3/5 members have finished their part. The last 2 members will get there parts finished 
+              before the sprint.
+            </td>
+          </tr>
+          <tr>
+            <td>11/20</td>
+            <td> 
+              This meeting was held in person during class. Disscussed more about the sections for the paper,
+              as well as working on the notifications system for the frontend and backend.
+            </td>
+          </tr>
+          <tr>
+            <td>11/21</td>
+            <td> 
+              This meeting was held online via Discord. The last two members finished their sections of the paper,
+              and we are ready for the next sprint, and we also discussed what sections we also need to get done 
+              for the final paper due at the end.
+            </td>
+          </tr>
+          <tr>
+            <td>11/22</td>
+            <td> 
+            This meeting was held in person during class. The 20 pages was shown to professor, and
+              we successfully completed the 20 pages.
+            </td>
+          </tr>
+          <tr>
+            <td>11/25</td>
+            <td> 
+              Today we had a demo in class for professor. So, we had the meeting during class, and 
+              decided what needed to be worked on after showing professor our progress. 
+            </td>
+          </tr>
+          <tr>
+            <td>11/26</td>
+            <td> 
+              This meeting was held in person in the library. Everyone was assigned a task 
+              based on the demo we had. Essentially, fixing what did not work during the demo.
+            </td>
+          </tr>
+          <tr>
+            <td>11/27</td>
+            <td> 
+              Meeting was held online with discord. This meeting was the same as yesterday. Just making
+              progress of what was previously not working properly.
+            </td>
+          </tr>
+          <tr>
+            <td>12/2</td>
+            <td> 
+              This meeting was held in person. Backend was tasked to fix notifications so comments can be
+              properly sent. Frontend was assigned to add more styling to the project. Also, more writing
+              for the final paper was assigned.
+            </td>
+          </tr>
+          <tr>
+            <td>12/3</td>
+            <td> 
+              This meeting was held online via Discord. Backend continued to fix notifications so comments can be
+              properly sent. Frontend kept working to add more styling to the project, and writing
+              for the final paper was assigned.
+            </td>
+          </tr>
+          <tr>
+            <td>12/4</td>
+            <td> 
+            This meeting was held online via Discord. Backend finished fixing notifications so comments can be
+            properly sent. Frontend kept working to add more styling to the project, and writing
+            for the final paper was assigned.
+            </td>
+          </tr>
+          <tr>
+            <td>12/5</td>
+            <td> 
+            This meeting was held online via Discord. Frontend was finished styling, and all that is left is the final
+            paper.
+            </td>
+          </tr>
+          <tr>
+            <td>12/6</td>
+            <td> 
+            This meeting was held online via Discord. We finished the final paper, and that was all for the meeting.
+            </td>
+          </tr>
+          <tr>
+            <td>12/9</td>
+            <td> 
+              We are finished with the project. We discussed how we would present our website along with
+              demoing the project with ourselves.
+            </td>
+          </tr>
+          <tr>
+            <td>12/10</td>
+            <td> 
+              This was the day before presentation. We met up online to make 
+              the slides and make final touches to the project.
+            </td>
+          </tr>
           
        </tbody>
      </table>
