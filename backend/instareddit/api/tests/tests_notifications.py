@@ -5,8 +5,6 @@ from datetime import datetime
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
 
-#python3 manage.py test api.tests.tests_notifications
-
 CLIENT = APIClient()
 
 COMMUNITY_ID = 1

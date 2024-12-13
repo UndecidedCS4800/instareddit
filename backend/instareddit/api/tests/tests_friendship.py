@@ -1,119 +1,309 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from ..models import User, FriendRequest
+from ..models import  User, FriendRequest
+from .. import models
+
 
 CLIENT = APIClient()
 
-# Predefined users
+FRIEND_REQUEST_ID = 1
+FRIEND_REQUEST_ID_2 = 2
+
+USER_ID = 1
 USERNAME = 'USER1'
 EMAIL = 'user1@gmail.com'
+
+USER_ID_2 = 2
+USERNAME_2 = 'USER2'
+EMAIL_2 = 'user2@gmail.com'
+
+USER_ID_3 = 3
+USERNAME_3 = 'USER3'
+EMAIL_3 = 'user3@gmail.com'
+
+USER_ID_4 = 4
+USERNAME_4 = 'USER4'
+EMAIL_4 = 'user4@gmail.com'
+
+USER_ID_5 = 5
+USERNAME_5 = 'USER5'
+EMAIL_5 = 'user5@gmail.com'
+
+USER_ID_6 = 6
+USERNAME_6 = 'USER6'
+EMAIL_6 = 'user6@gmail.com'
+
 PASSWORD = '12345678'
 PASSWORD_HASH = '$2b$12$09H17WQZl5bZ6jjF4A60.ehJ0ZW2Gms/0Fbpc/AwkUbM6QjmtYNqi'
-USER_INFO = {
-    "first_name": "Sample",
-    "last_name": "Sample",
-    "date_of_birth": "1972/09/21",
-    "profile_picture": None
-}
-USER_TOKEN = ""
+TOKEN = ''
 
-OTHER_USER = 'USER2'
-OTHER_EMAIL = 'user2@gmail.com'
-OTHER_PASSWORD = '12345678'
-OTHER_PASSWORD_HASH = '$2b$12$09H17WQZl5bZ6jjF4A60.ehJ0ZW2Gms/0Fbpc/AwkUbM6QjmtYNqi'
-
-# Setup class for user registration and token generation
-class TestUserSetup(TestCase):
+class SetUpTest(TestCase):
     def setUp(self):
-        global USER_TOKEN
-        resp = CLIENT.post("/api/auth/register", {"username": USERNAME, "password": PASSWORD, "email": EMAIL})
-        json = resp.json()
-        if "error" not in json:
-            USER_TOKEN = json['token']
-            CLIENT.credentials(HTTP_AUTHORIZATION=f"Bearer {USER_TOKEN}")
-        
-        # Create other user (USER2)
-        CLIENT.credentials()  # Reset the credentials
-        resp_other = CLIENT.post("/api/auth/register", {"username": OTHER_USER, "password": OTHER_PASSWORD, "email": OTHER_EMAIL})
-        json_other = resp_other.json()
-        if "error" not in json_other:
-            self.other_user_token = json_other['token']
+        #create users
+        global u
+        u = User.objects.create(id=USER_ID, username=USERNAME, email=EMAIL, password_hash=PASSWORD_HASH)
+        u2 = User.objects.create(id=USER_ID_2, username=USERNAME_2, email=EMAIL_2, password_hash=PASSWORD_HASH)
+        u3 = User.objects.create(id=USER_ID_3, username=USERNAME_3, email=EMAIL_3, password_hash=PASSWORD_HASH)
+        u4 = User.objects.create(id=USER_ID_4, username=USERNAME_4, email=EMAIL_4, password_hash=PASSWORD_HASH)
+        u5 = User.objects.create(id=USER_ID_5, username=USERNAME_5, email=EMAIL_5, password_hash=PASSWORD_HASH)
+        u6 = User.objects.create(id=USER_ID_6, username=USERNAME_6, email=EMAIL_6, password_hash=PASSWORD_HASH)
 
-# Friendship Tests
-class TestFriendshipSetup(TestUserSetup):
+        #create frienships
+        u.friends.add(u2)
+        u.friends.add(u3)
 
-    def test_invalid_userID(self):
-        temp = APIClient()
-        resp = temp.get("/api/friends")
-        json = resp.json()
-        self.assertEqual(resp.statusCode, 404)
-        self.assertTrue("error" in json)
-    
-    def test_get_friend_ids(self):
-        # Get the friend IDs and usernames for the logged-in user (USER1)
-        resp = CLIENT.get("/api/user/USER1/friendrequests")
-        self.assertTrue("error" not in resp.json())
-        self.assertEqual(resp.statusCode, 200)
+        #create friendrequest
+        fr1= models.FriendRequest(id =FRIEND_REQUEST_ID, from_user=u, to_user=u4)
+        fr1.save()
+
+        fr2= models.FriendRequest(id =FRIEND_REQUEST_ID_2, from_user=u5, to_user=u)
+        fr2.save()
+
+
+        response = CLIENT.post('/api/auth/login',
+			    {'username': USERNAME, 'password': PASSWORD})
+        global TOKEN
+        TOKEN = response.json()['token']
+
+class FriendshipGetTestInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.get('/api/friends/',
+			  headers={'Authorization': f'bearer invalid'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipGetTest(SetUpTest):
+    def test(self):
+        response = CLIENT.get('/api/friends/',
+			  headers={'Authorization': f'bearer {TOKEN}'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
+        #two friends
+        friends = response.json()['friends']
+        self.assertEqual(len(friends), 2)
+
+class FriendshipDeleteTestInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.delete('/api/friends/',
+			  headers={'Authorization': f'bearer invalid'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipDeleteTest(SetUpTest):
+    def test(self):
+        response = CLIENT.delete('/api/friends/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'username' : f'{USERNAME_2}'})
+        self.assertEqual(response.status_code, 200)
+        
+        friends=[]
+        for f in u.friends.all():
+            friends.append({
+                'id' : f.id
+            })
+        self.assertEqual(len(friends), 1)
+
+class FriendshipPostFriendRequestInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer invalid'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequestNoUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username' : ''})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequestSameUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username': f'{USERNAME}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequestInvalidUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username': 'invalid'})
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequestAlreadyFriends(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username': f'{USERNAME_2}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequestFriendRequestExists(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username': f'{USERNAME}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.post('/api/friendrequests/',
+			  headers={'Authorization': f'bearer {TOKEN}'},
+              data = {'other_username': f'{USERNAME_5}'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
+class FriendshipGetFriendRequestInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/user/{USERNAME}/friendrequests',
+                              headers ={'Authorization' : f'bearer invalid'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipGetFriendRequestUnauthorized(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/user/{USERNAME_2}/friendrequests',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostAcceptInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.post(f'/api/friendrequests/accept/',
+                              headers ={'Authorization' : f'bearer invalid'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID_2})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostAcceptInvalidFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.post(f'/api/friendrequests/accept/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : 3})
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue('error' in response.json())
+
+
+class FriendshipPostAcceptFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.post(f'/api/friendrequests/accept/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID_2})
+        self.assertEqual(response.status_code, 200)
+
+class FriendshipPostDeclineInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/decline/',
+                              headers ={'Authorization' : f'bearer invalid'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID_2})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostDeclineInvalidFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/decline/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : 3})
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue('error' in response.json())
+
+
+class FriendshipPostDeclineFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/decline/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID_2})
+        self.assertEqual(response.status_code, 200)
+
+class FriendshipPostCancelInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/cancel/',
+                              headers ={'Authorization' : f'bearer invalid'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipPostCancelInvalidFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/cancel/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : 3})
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue('error' in response.json())
+
+
+class FriendshipPostCancelFriendRequest(SetUpTest):
+    def test(self):
+        response = CLIENT.delete(f'/api/friendrequests/cancel/',
+                              headers ={'Authorization' : f'bearer {TOKEN}'},
+                              data= {'fr_id' : FRIEND_REQUEST_ID})
+        self.assertEqual(response.status_code, 200)
+
+class FriendshipStatusInvalidToken(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username={USERNAME_2}',
+                              headers ={'Authorization' : f'bearer invalid'})
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue('error' in response.json())
+
+class FriendshipStatusNoUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username=',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipStatusInvalidUsername(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username=invalid',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('error' in response.json())
+
+class FriendshipStatusFriends(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username={USERNAME_2}',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        response_data = response.json()
+        self.assertEqual(response_data['status'], 'friends')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
+class FriendshipStatusRequestSent(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username={USERNAME_4}',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        response_data = response.json()
+        self.assertEqual(response_data['status'], 'request sent')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
+class FriendshipStatusRequestReceived(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username={USERNAME_5}',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        response_data = response.json()
+        self.assertEqual(response_data['status'], 'request received')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
+class FriendshipStatusNotFriends(SetUpTest):
+    def test(self):
+        response = CLIENT.get(f'/api/friends/status/?other_username={USERNAME_6}',
+                              headers ={'Authorization' : f'bearer {TOKEN}'})
+        response_data = response.json()
+        self.assertEqual(response_data['status'], 'not friends')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json())
+
 
         
-    def test_send_friend_request(self):
-        # Send friend request from USER1 to USER2
-        CLIENT.credentials(HTTP_AUTHORIZATION=f"Bearer {self.other_user_token}")
-        resp = CLIENT.post("/api/friendrequest/", {"other_username": USERNAME})
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('id' in resp.json())
+#python3 manage.py test api.tests.tests_friendship
         
-    def test_send_friend_request_same_user(self):
-        # Send friend request to the same user (should fail)
-        resp = CLIENT.post("/api/friendrequest/", {"other_username": USERNAME})
-        self.assertEqual(resp.status_code, 401)
-        self.assertTrue("error" in resp.json())
-        
-    def test_send_friend_request_already_sent(self):
-        # Send a friend request from USER1 to USER2 again (should fail as already exists)
-        CLIENT.credentials(HTTP_AUTHORIZATION=f"Bearer {USER_TOKEN}")
-        resp = CLIENT.post("/api/friendrequest/", {"other_username": OTHER_USER})
-        self.assertEqual(resp.status_code, 401)
-        self.assertTrue("error" in resp.json())
-        
-    def test_get_friend_requests(self):
-        # Get the friend requests for the logged-in user (USER2)
-        CLIENT.credentials(HTTP_AUTHORIZATION=f"Bearer {self.other_user_token}")
-        resp = CLIENT.get("/api/user/USER2/friendrequests")
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue(isinstance(resp.json(), list))
-        
-    def test_accept_friend_request(self):
-        # Accept a pending friend request
-        friend_request = FriendRequest.objects.get(from_user__username=USERNAME, to_user__username=OTHER_USER)
-        resp = CLIENT.post(f"/api/friendrequests/accept/", {"fr_id": friend_request.id})
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("friends" in resp.json())
-        
-    def test_decline_friend_request(self):
-        # Decline a pending friend request
-        friend_request = FriendRequest.objects.get(from_user__username=USERNAME, to_user__username=OTHER_USER)
-        resp = CLIENT.post(f"/api/friendrequests/decline/", {"fr_id": friend_request.id})
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("message" in resp.json())
 
-    def test_cancel_friend_request(self):
-        # Cancel a pending friend request
-        friend_request = FriendRequest.objects.get(from_user__username=USERNAME, to_user__username=OTHER_USER)
-        resp = CLIENT.post(f"/api/friendrequests/cancel/", {"fr_id": friend_request.id})
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("message" in resp.json())
-
-    def test_friendship_status(self):
-        # Check if two users are friends
-        resp = CLIENT.get(f"/api/friends/status/?other_username={OTHER_USER}")
-        json = resp.json()
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("status" in json)
-        
-    def test_no_friendship_status(self):
-        # Check friendship status for users who are not friends
-        resp = CLIENT.get(f"/api/friends/status/?other_username={OTHER_USER}")
-        json = resp.json()
-        self.assertEqual(resp.status_code, 401)
-        self.assertEqual(json['status'], 'not friends')
